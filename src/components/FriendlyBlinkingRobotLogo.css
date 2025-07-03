@@ -1,0 +1,15 @@
+.blinking-eye {
+  animation: blink 2.5s infinite;
+  transform-origin: center;
+}
+
+@keyframes blink {
+  0%, 90%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  92%, 96% {
+    transform: scaleY(0.1);
+    opacity: 0.5;
+  }
+} 
