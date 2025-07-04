@@ -299,28 +299,28 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
               <div className="text-lg font-bold text-blue-600">
                 {posts.filter(p => p.socialShares?.facebook).length}
               </div>
-              <div className="text-sm text-blue-600">Facebook Shares</div>
+              <div className="text-[0.7rem] text-blue-600">Facebook Shares</div>
             </div>
             <div className="text-center p-4 bg-white rounded-lg border border-blue-400">
               <Twitter className="w-6 h-6 text-blue-400 mx-auto mb-2" />
               <div className="text-lg font-bold text-blue-400">
                 {posts.filter(p => p.socialShares?.twitter).length}
               </div>
-              <div className="text-sm text-blue-400">Twitter Shares</div>
+              <div className="text-[0.7rem] text-blue-400">Twitter Shares</div>
             </div>
             <div className="text-center p-4 bg-white rounded-lg border border-pink-300">
               <Instagram className="w-6 h-6 text-pink-500 mx-auto mb-2" />
               <div className="text-lg font-bold text-pink-500">
                 {posts.filter(p => p.socialShares?.instagram).length}
               </div>
-              <div className="text-sm text-pink-500">Instagram Shares</div>
+              <div className="text-[0.7rem] text-pink-500">Instagram Shares</div>
             </div>
             <div className="text-center p-4 bg-white rounded-lg border border-blue-700">
               <Linkedin className="w-6 h-6 text-blue-700 mx-auto mb-2" />
               <div className="text-lg font-bold text-blue-700">
                 {posts.filter(p => p.socialShares?.linkedin).length}
               </div>
-              <div className="text-sm text-blue-700">LinkedIn Shares</div>
+              <div className="text-[0.7rem] text-blue-700">LinkedIn Shares</div>
             </div>
           </div>
         </CardContent>
@@ -603,7 +603,7 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
                       })}
                     />
                     <Facebook className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm">Facebook</span>
+                    <span className="text-[0.7rem]">Facebook</span>
                   </label>
                   <label className="flex items-center space-x-2">
                     <input
@@ -618,7 +618,7 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
                       })}
                     />
                     <Twitter className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm">Twitter</span>
+                    <span className="text-[0.7rem]">Twitter</span>
                   </label>
                   <label className="flex items-center space-x-2">
                     <input
@@ -633,7 +633,7 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
                       })}
                     />
                     <Instagram className="w-4 h-4 text-pink-500" />
-                    <span className="text-sm">Instagram</span>
+                    <span className="text-[0.7rem]">Instagram</span>
                   </label>
                   <label className="flex items-center space-x-2">
                     <input
@@ -648,7 +648,7 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
                       })}
                     />
                     <Linkedin className="w-4 h-4 text-blue-700" />
-                    <span className="text-sm">LinkedIn</span>
+                    <span className="text-[0.7rem]">LinkedIn</span>
                   </label>
                 </div>
               </div>

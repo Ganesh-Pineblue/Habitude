@@ -89,11 +89,15 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
             className="w-48 h-48 object-contain drop-shadow-2xl animate-float"
             style={{ filter: 'drop-shadow(0 0 40px #DAF7A6)' }}
           />
-          <h2 className="text-2xl font-bold text-[#333] mt-6 text-center drop-shadow-lg">
-            Welcome to Habitude
+          <h2 className="text-3xl font-extrabold text-[#333] mt-6 text-center drop-shadow-lg">
+            {' '}
+            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 bg-clip-text text-transparent font-black tracking-wider">
+              Habitude
+            </span>
           </h2>
-          <p className="text-[#7a9c3a] text-base text-center mt-3 max-w-md">
-            SLOGAN HERE
+          <p className="text-[#333] text-xl font-light italic text-center mt-4 max-w-md drop-shadow-lg leading-relaxed">
+            <span className="font-semibold text-purple-600">Greatness</span> Begins with{' '}
+            <span className="font-bold text-blue-600 underline decoration-2 underline-offset-4">Good Habits</span>
           </p>
         </div>
         {/* Right: Login/Register Form */}
@@ -104,7 +108,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                 <div className="mb-6">
                   <div className="flex items-center mb-3">
                     <span className="w-3 h-3 bg-[#DAF7A6] rounded-full mr-2 animate-pulse"></span>
-                    <h3 className="text-xl font-bold text-[#333]">Welcome back!</h3>
+                    <h3 className="text-xl font-bold text-[#333]">Welcome!</h3>
                   </div>
                 </div>
 
@@ -113,7 +117,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   <button
                     type="button"
                     onClick={handleGoogleLogin}
-                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-[#DAF7A6] bg-white hover:bg-[#f6ffe0] text-[#333] text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-[#DAF7A6] bg-white hover:bg-[#f6ffe0] text-[#333] text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -127,7 +131,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   <button
                     type="button"
                     onClick={handleFacebookLogin}
-                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -138,7 +142,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   <button
                     type="button"
                     onClick={handleAppleLogin}
-                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-[#333] bg-black hover:bg-gray-900 text-white text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-[#333] bg-black hover:bg-gray-900 text-white text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -149,7 +153,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   <button
                     type="button"
                     onClick={handleInstagramLogin}
-                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-pink-600 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="h-10 flex items-center justify-center gap-2 rounded-lg border border-pink-600 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -211,9 +215,9 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                 <button
                   type="button"
                   onClick={() => setShowRegister(true)}
-                  className="text-[#7a9c3a] hover:text-[#b6e07d] text-xs font-medium"
+                  className="text-[#7a9c3a] text-sm font-medium"
                 >
-                  First time here? Join PRODUCT NAME
+                  First time? please join here!
                 </button>
               </div>
             </>
@@ -237,7 +241,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     onChange={handleRegisterChange}
                     required
                     autoComplete="off"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
                   />
                   
                   <input
@@ -248,7 +252,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     onChange={handleRegisterChange}
                     required
                     autoComplete="off"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
                   />
                   
                   <div className="relative">
@@ -260,7 +264,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                       onChange={handleRegisterChange}
                       required
                       autoComplete="new-password"
-                      className="w-full h-12 px-4 pr-12 rounded-xl border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                      className="w-full h-10 px-4 pr-12 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
                     />
                     <button
                       type="button"
@@ -281,7 +285,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
 
                 <button
                   type="submit"
-                  className="w-full h-12 mt-6 rounded-xl bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02]"
+                  className="w-full h-10 mt-6 rounded-lg bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   Create Account
                 </button>
@@ -293,7 +297,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   <button
                     type="button"
                     onClick={() => setShowRegister(false)}
-                    className="text-[#7a9c3a] hover:text-[#b6e07d] text-sm font-medium transition-colors"
+                    className="text-[#7a9c3a] text-sm font-semibold"
                   >
                     Already have an account? Sign in
                   </button>

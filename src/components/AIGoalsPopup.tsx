@@ -62,9 +62,9 @@ export const AIGoalsPopup: React.FC<AIGoalsPopupProps> = ({
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span>AI Generated Goals</span>
+              <span>AI Selected Best Goals</span>
               <p className="text-sm font-normal text-gray-600 mt-1">
-                Based on the habits you selected in the role model page
+                Carefully chosen from your selected habits for optimal success
               </p>
             </div>
           </DialogTitle>
@@ -78,10 +78,10 @@ export const AIGoalsPopup: React.FC<AIGoalsPopupProps> = ({
                 <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-green-800">Goals Created Successfully!</h3>
+                <h3 className="font-semibold text-green-800">Best Goals Selected for You!</h3>
                 <p className="text-sm text-green-700">
-                  We've generated {goals.length} complementary goals based on your selected habits. 
-                  These goals will help you build on your habit foundation and achieve bigger milestones.
+                  We've carefully selected {goals.length} of the best complementary goals based on your selected habits. 
+                  These goals are optimized for your success with the right balance of challenge and achievability.
                 </p>
               </div>
             </div>
@@ -198,9 +198,9 @@ export const AIGoalsPopup: React.FC<AIGoalsPopupProps> = ({
               <div>
                 <h4 className="font-semibold text-yellow-800 mb-1">💡 Tips for Success</h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>• Review and adjust goal targets to match your current capacity</li>
-                  <li>• Set realistic deadlines that give you enough time to succeed</li>
-                  <li>• Focus on 2-3 high-priority goals at a time</li>
+                  <li>• These goals were selected based on priority, achievability, and your habit patterns</li>
+                  <li>• Focus on 2-3 high-priority goals at a time for best results</li>
+                  <li>• Review and adjust goal targets if needed to match your current capacity</li>
                   <li>• Track your progress regularly in the Goals tab</li>
                 </ul>
               </div>

@@ -819,6 +819,61 @@ class AIGoalGenerationService {
         category: 'productivity' as const,
         priority: 'high' as const,
         complementaryTo: 'productivity habits'
+      },
+      {
+        title: 'Build a 30-Day Habit Streak',
+        description: 'Maintain consistency in your most important habit for 30 consecutive days',
+        target: 30,
+        current: 0,
+        unit: 'days',
+        deadline: this.getFutureDate(45),
+        category: 'productivity' as const,
+        priority: 'high' as const,
+        complementaryTo: 'multiple habit areas'
+      },
+      {
+        title: 'Complete a Digital Detox Challenge',
+        description: 'Reduce screen time and improve focus through a structured digital detox program',
+        target: 7,
+        current: 0,
+        unit: 'days',
+        deadline: this.getFutureDate(30),
+        category: 'mindfulness' as const,
+        priority: 'medium' as const,
+        complementaryTo: 'mindfulness habits'
+      },
+      {
+        title: 'Learn and Practice 3 Stress Management Techniques',
+        description: 'Master different stress management methods for better mental health',
+        target: 3,
+        current: 0,
+        unit: 'techniques',
+        deadline: this.getFutureDate(60),
+        category: 'mindfulness' as const,
+        priority: 'high' as const,
+        complementaryTo: 'mindfulness habits'
+      },
+      {
+        title: 'Create a Personal Mission Statement',
+        description: 'Define your life purpose and values through a structured reflection process',
+        target: 1,
+        current: 0,
+        unit: 'mission statement',
+        deadline: this.getFutureDate(30),
+        category: 'productivity' as const,
+        priority: 'high' as const,
+        complementaryTo: 'multiple habit areas'
+      },
+      {
+        title: 'Establish a Weekly Review System',
+        description: 'Create a consistent system for reviewing progress and planning ahead',
+        target: 12,
+        current: 0,
+        unit: 'weeks',
+        deadline: this.getFutureDate(90),
+        category: 'productivity' as const,
+        priority: 'medium' as const,
+        complementaryTo: 'productivity habits'
       }
     );
 
@@ -829,9 +884,48 @@ class AIGoalGenerationService {
     // Select 3-5 goals based on the number of habits selected
     const targetGoalCount = Math.min(Math.max(3, numberOfHabits - 1), 5);
     
-    // Shuffle and select the best goals
-    const shuffled = [...allGoals].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, targetGoalCount);
+    // Score each goal based on multiple criteria
+    const scoredGoals = allGoals.map(goal => {
+      let score = 0;
+      
+      // Priority scoring (high priority goals get higher scores)
+      if (goal.priority === 'high') score += 30;
+      else if (goal.priority === 'medium') score += 20;
+      else score += 10;
+      
+      // Category diversity scoring (prefer different categories)
+      const categoryScore = this.getCategoryScore(goal.category);
+      score += categoryScore;
+      
+      // Goal complexity scoring (prefer achievable but challenging goals)
+      const complexityScore = this.getComplexityScore(goal);
+      score += complexityScore;
+      
+      // Deadline scoring (prefer goals with reasonable deadlines)
+      const deadlineScore = this.getDeadlineScore(goal.deadline);
+      score += deadlineScore;
+      
+      // Cross-category goals get bonus points (they complement multiple habit areas)
+      if (goal.complementaryTo === 'multiple habit areas') {
+        score += 15;
+      }
+      
+      // Morning routine goals get bonus points (foundational)
+      if (goal.title.toLowerCase().includes('morning') || goal.title.toLowerCase().includes('routine')) {
+        score += 10;
+      }
+      
+      // Personal development goals get bonus points
+      if (goal.title.toLowerCase().includes('personal development') || goal.title.toLowerCase().includes('challenge')) {
+        score += 12;
+      }
+      
+      return { ...goal, score };
+    });
+    
+    // Sort by score (highest first) and select the best goals
+    const sortedGoals = scoredGoals.sort((a, b) => b.score - a.score);
+    const selected = sortedGoals.slice(0, targetGoalCount);
     
     // Add IDs and metadata to the selected goals
     return selected.map((goal, index) => ({
@@ -841,6 +935,62 @@ class AIGoalGenerationService {
       personalityInspiration: 'Based on your selected habits',
       createdAt: new Date().toISOString()
     }));
+  }
+
+  private getCategoryScore(category: string): number {
+    // Different categories get different base scores
+    const categoryScores: { [key: string]: number } = {
+      'health': 25,      // High priority for overall wellbeing
+      'fitness': 25,     // High priority for physical health
+      'productivity': 20, // Important for personal growth
+      'mindfulness': 18,  // Good for mental health
+      'social': 15       // Important but can be built later
+    };
+    
+    return categoryScores[category] || 10;
+  }
+
+  private getComplexityScore(goal: any): number {
+    // Prefer goals that are challenging but achievable
+    const target = goal.target;
+    const unit = goal.unit.toLowerCase();
+    
+    // Score based on goal complexity and achievability
+    if (unit.includes('days') || unit.includes('day')) {
+      if (target <= 30) return 20;      // Short-term, achievable
+      else if (target <= 90) return 25; // Medium-term, good balance
+      else return 15;                   // Long-term, might be overwhelming
+    } else if (unit.includes('books')) {
+      if (target <= 12) return 20;      // Reasonable reading goal
+      else return 15;                   // Ambitious reading goal
+    } else if (unit.includes('hours')) {
+      if (target <= 50) return 20;      // Manageable volunteer hours
+      else return 15;                   // Ambitious volunteer goal
+    } else if (unit.includes('courses') || unit.includes('skills')) {
+      if (target <= 3) return 20;       // Reasonable learning goal
+      else return 15;                   // Ambitious learning goal
+    } else if (unit.includes('workout') || unit.includes('races')) {
+      return 22;                        // Good fitness goals
+    } else if (unit.includes('score')) {
+      return 18;                        // Measurement-based goals
+    } else {
+      return 15;                        // Default score
+    }
+  }
+
+  private getDeadlineScore(deadline: string): number {
+    const daysUntilDeadline = Math.ceil((new Date(deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Prefer goals with reasonable deadlines (30-180 days)
+    if (daysUntilDeadline >= 30 && daysUntilDeadline <= 180) {
+      return 20; // Optimal deadline range
+    } else if (daysUntilDeadline >= 15 && daysUntilDeadline <= 365) {
+      return 15; // Acceptable deadline range
+    } else if (daysUntilDeadline < 15) {
+      return 5;  // Too soon, might be stressful
+    } else {
+      return 10; // Too far, might lose motivation
+    }
   }
 
   private getFutureDate(days: number): string {
@@ -1436,63 +1586,68 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
   if (currentStep === 1) {
     return (
       <>
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-4 py-2">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-2 py-1">
           <Card className="w-full max-w-7xl bg-white shadow-2xl border-2 border-green-100 rounded-3xl">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl font-bold text-green-800">🌟 Choose Your Role Model & Habits</CardTitle>
-              <p className="text-green-600 text-base mt-1">Search for any personality or select from our curated list!</p>
-              <Progress value={progress} className="mt-4 bg-[#4B2992] h-3" />
-            </CardHeader>
-            <CardContent className="px-6">
-              {/* Move Do it later button to the top */}
-              <div className="flex justify-end mb-2">
-                <Button
-                  onClick={handleSkipPersonality}
-                  className="bg-green-100 text-green-700 hover:bg-green-200 border-green-300 h-10 px-6 text-base font-semibold rounded-xl"
-                >
-                  Do it later
-                </Button>
+            <CardHeader className="relative pb-1 pt-2 px-4 bg-gradient-to-r from-green-100 to-green-50 rounded-t-3xl border-b border-green-200">
+              {/* Do it later button absolutely positioned */}
+              <Button
+                onClick={handleSkipPersonality}
+                className="absolute top-2 right-4 bg-green-100 text-green-700 hover:bg-green-200 border-green-300 h-8 px-3 text-sm font-semibold rounded-xl shadow-none"
+                style={{minWidth: 'unset'}}
+              >
+                Do it later
+              </Button>
+              {/* Centered headings in a column */}
+              <div className="flex flex-col items-center justify-center w-full">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl" style={{lineHeight: 1}}>🌟</span>
+                  <CardTitle className="text-lg md:text-xl font-bold text-green-800 text-center m-0 p-0">Choose Your Role Model & Habits</CardTitle>
+                </div>
+                <p className="text-green-600 text-sm mt-1 mb-0 text-center">Search for any personality or select from our curated list!</p>
               </div>
+              <Progress value={progress} className="mt-2 bg-[#4B2992] h-2" />
+            </CardHeader>
+            <CardContent className="px-2 mt-2">
               {!personalitySelection.selectedPersonality ? (
                 <>
                   {/* AI-Powered Search Section */}
-                  <div className="mb-6">
-                    <div className="bg-gradient-to-r from-green-100 to-green-50 p-4 rounded-xl border border-green-200 mb-4">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <div className="p-2 bg-green-500 rounded-full">
-                          <Brain className="w-4 h-4 text-white" />
+                  <div className="mb-4">
+                    <div className="bg-gradient-to-r from-green-100 to-green-50 p-3 rounded-xl border border-green-200 mb-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="p-1.5 bg-green-500 rounded-full">
+                          <Brain className="w-3 h-3 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-green-800">🔍 AI-Powered Personality Search</h3>
-                          <p className="text-green-600 text-sm">Search for any personality - I'll find them and their habits for you!</p>
+                          <h3 className="text-base font-semibold text-green-800">🔍 AI-Powered Personality Search</h3>
+                          <p className="text-green-600 text-xs">Search for any personality - I'll find them and their habits for you!</p>
                         </div>
                       </div>
                       
-                      <div className="flex space-x-3">
+                      <div className="flex space-x-2">
                         <div className="flex-1 relative">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-4 h-4" />
+                          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-400 w-4 h-4" />
                           <Input
                             type="text"
                             placeholder="Search for any personality (e.g., Narendra Modi, Elon Musk, Cristiano Ronaldo...)"
                             value={searchQuery}
                             onChange={handleSearchInputChange}
                             onKeyPress={handleSearchKeyPress}
-                            className="pl-10 border-green-200 focus:border-green-500 focus:ring-green-500 h-10 text-base"
+                            className="pl-8 border-green-200 focus:border-green-500 focus:ring-green-500 h-9 text-sm"
                           />
                         </div>
                         <Button
                           onClick={handleSearch}
                           disabled={!searchQuery.trim() || isSearching}
-                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-10 px-4 font-semibold rounded-lg"
+                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-9 px-3 font-semibold rounded-lg text-sm"
                         >
                           {isSearching ? (
                             <>
-                              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                               Searching...
                             </>
                           ) : (
                             <>
-                              <Zap className="w-5 h-5 mr-2" />
+                              <Zap className="w-4 h-4 mr-1" />
                               Search
                             </>
                           )}
@@ -1502,28 +1657,28 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
 
                     {/* Search Results */}
                     {showSearchResults && (
-                      <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-green-800 mb-3">
+                      <div className="mb-4">
+                        <h3 className="text-base font-semibold text-green-800 mb-2">
                           {isSearching ? '🔍 Searching...' : searchResults.length > 0 ? '🎯 Search Results' : '❌ No Results Found'}
                         </h3>
                         
                         {isSearching ? (
-                          <div className="flex items-center justify-center py-8">
+                          <div className="flex items-center justify-center py-4">
                             <div className="text-center">
-                              <Loader2 className="w-8 h-8 text-green-500 animate-spin mx-auto mb-4" />
-                              <p className="text-green-600">Searching for personalities...</p>
+                              <Loader2 className="w-6 h-6 text-green-500 animate-spin mx-auto mb-2" />
+                              <p className="text-green-600 text-sm">Searching for personalities...</p>
                             </div>
                           </div>
                         ) : searchResults.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {searchResults.map((personality) => (
                               <div
                                 key={personality.name}
                                 onClick={() => handlePersonalitySelect(personality.name)}
-                                className="p-4 rounded-2xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-xl hover:scale-105 bg-white relative"
+                                className="p-3 rounded-xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-xl hover:scale-105 bg-white relative"
                               >
-                                <div className="absolute top-2 right-2">
-                                  <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                <div className="absolute top-1 right-1">
+                                  <div className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                                     AI Generated
                                   </div>
                                 </div>
@@ -1532,34 +1687,34 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                                     <img
                                       src={personality.image}
                                       alt={personality.name}
-                                      className="w-14 h-14 rounded-full object-cover mx-auto mb-3 border-2 border-green-200"
+                                      className="w-12 h-12 rounded-full object-cover mx-auto mb-2 border-2 border-green-200"
                                     />
                                   ) : (
-                                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                      <User className="w-7 h-7 text-white" />
+                                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                      <User className="w-6 h-6 text-white" />
                                     </div>
                                   )}
-                                  <h3 className="text-xl font-bold text-green-800 mb-2">{personality.name}</h3>
-                                  <p className="text-green-600 mb-2">{personality.category}</p>
+                                  <h3 className="text-lg font-bold text-green-800 mb-1">{personality.name}</h3>
+                                  <p className="text-green-600 text-sm mb-1">{personality.category}</p>
                                   {personality.description && (
-                                    <p className="text-sm text-green-500 italic">{personality.description}</p>
+                                    <p className="text-xs text-green-500 italic">{personality.description}</p>
                                   )}
                                 </div>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="text-center py-8">
-                            <div className="text-6xl mb-4">🤔</div>
-                            <h4 className="text-lg font-semibold text-green-800 mb-2">No personalities found</h4>
-                            <p className="text-green-600 mb-4">Try searching for a different personality or browse our curated list below.</p>
+                          <div className="text-center py-4">
+                            <div className="text-4xl mb-2">🤔</div>
+                            <h4 className="text-base font-semibold text-green-800 mb-1">No personalities found</h4>
+                            <p className="text-green-600 text-sm mb-3">Try searching for a different personality or browse our curated list below.</p>
                             <Button
                               onClick={() => {
                                 setSearchQuery('');
                                 setShowSearchResults(false);
                               }}
                               variant="outline"
-                              className="border-green-500 text-green-600 hover:bg-green-50"
+                              className="border-green-500 text-green-600 hover:bg-green-50 text-sm h-8"
                             >
                               Clear Search
                             </Button>
@@ -1569,37 +1724,37 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                     )}
 
                     {/* Divider */}
-                    <div className="flex items-center my-6">
+                    <div className="flex items-center my-3">
                       <div className="flex-1 border-t border-green-200"></div>
-                      <span className="px-4 text-green-600 font-medium">OR</span>
+                      <span className="px-3 text-green-600 font-medium text-sm">OR</span>
                       <div className="flex-1 border-t border-green-200"></div>
                     </div>
                   </div>
 
                   {/* Predefined Personalities */}
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-green-800 mb-3">⭐ Curated Role Models</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="mb-3">
+                    <h3 className="text-base font-semibold text-green-800 mb-2">⭐ Curated Role Models</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                       {famousPersonalities.map((personality) => (
                         <div
                           key={personality.name}
                           onClick={() => handlePersonalitySelect(personality.name)}
-                          className="p-3 rounded-xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg hover:scale-105 bg-white"
+                          className="p-2 rounded-xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg hover:scale-105 bg-white"
                         >
                           <div className="text-center">
                             {personality.image ? (
                               <img
                                 src={personality.image}
                                 alt={personality.name}
-                                className="w-12 h-12 rounded-full object-cover mx-auto mb-2 border-2 border-green-200"
+                                className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-green-200"
                               />
                             ) : (
-                              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                                <User className="w-6 h-6 text-white" />
+                              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <User className="w-8 h-8 text-white" />
                               </div>
                             )}
-                            <h3 className="text-lg font-bold text-green-800 mb-2">{personality.name}</h3>
-                            <p className="text-green-600 text-sm">{personality.category}</p>
+                            <h3 className="text-base font-bold text-green-800 mb-1">{personality.name}</h3>
+                            <p className="text-green-600 text-xs">{personality.category}</p>
                           </div>
                         </div>
                       ))}
@@ -1607,38 +1762,38 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                   </div>
 
                   {/* Previous button for personality selection */}
-                  <div className="flex justify-between items-center pt-4">
+                  <div className="flex justify-between items-center pt-2">
                     <Button
                       variant="outline"
                       onClick={handleGoBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-10 px-6 text-base font-semibold rounded-xl"
+                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 text-sm font-semibold rounded-xl"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" /> Previous
+                      <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                     </Button>
                   </div>
                 </>
               ) : (
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-green-100 to-green-50 p-6 rounded-xl border border-green-200">
-                    <div className="text-center mb-4">
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-green-100 to-green-50 p-4 rounded-xl border border-green-200">
+                    <div className="text-center mb-3">
                       {selectedPersonalityData?.image && (
                         <img
                           src={selectedPersonalityData.image}
                           alt={selectedPersonalityData.name}
-                          className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-4 border-green-200 shadow-lg"
+                          className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-3 border-green-200 shadow-lg"
                         />
                       )}
-                      <h3 className="text-2xl font-bold text-green-800 mb-2">
+                      <h3 className="text-xl font-bold text-green-800 mb-1">
                         {selectedPersonalityData?.name}'s Habits
                       </h3>
-                      <p className="text-green-600 text-base">
+                      <p className="text-green-600 text-sm">
                         Here are the top 10 habits that made {selectedPersonalityData?.name} successful
                       </p>
                     </div>
-                    <p className="text-green-600 text-base text-center">Select the habits you'd like to build. I'll help you master them step by step!</p>
+                    <p className="text-green-600 text-sm text-center">Select the habits you'd like to build. I'll help you master them step by step!</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     {selectedPersonalityData?.habits.map((habit, index) => (
                       <div
                         key={habit}
@@ -1672,19 +1827,19 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                     ))}
                   </div>
 
-                  <div className="flex justify-between items-center pt-4">
+                  <div className="flex justify-between items-center pt-2">
                     <Button
                       variant="outline"
                       onClick={handleGoBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-10 px-6 text-base font-semibold rounded-xl"
+                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 text-sm font-semibold rounded-xl"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" /> Back to Selection
+                      <ArrowLeft className="w-4 h-4 mr-1" /> Back to Selection
                     </Button>
                     <Button 
                       onClick={handleComplete}
-                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-10 px-8 text-base font-semibold rounded-xl"
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 px-6 text-sm font-semibold rounded-xl"
                     >
-                      Complete Setup <Sparkles className="w-4 h-4 ml-2" />
+                      Complete Setup <Sparkles className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
                 </div>

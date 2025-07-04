@@ -168,44 +168,59 @@ export const GoalDashboard = ({
   return (
     <div className="space-y-6">
       {/* Goal Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <Target className="w-5 h-5 text-white" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Total Goals */}
+        <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-blue-100 to-blue-50 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 min-h-[120px] flex flex-col justify-between">
+          <CardContent className="p-6 flex flex-col h-full justify-between">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-2xl p-2 shadow-md bg-blue-500/20">
+                <Target className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Goals</p>
-                <p className="text-2xl font-semibold text-gray-900">{goals.length}</p>
+                <div className="text-sm font-semibold text-gray-700 mb-0.5">Total Goals</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{goals.length}</div>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-white" />
+        {/* Avg Progress */}
+        <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-orange-100 to-orange-50 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 min-h-[120px] flex flex-col justify-between">
+          <CardContent className="p-6 flex flex-col h-full justify-between">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-2xl p-2 shadow-md bg-orange-500/20">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Avg Progress</p>
-                <p className="text-2xl font-semibold text-gray-900">{totalProgress.toFixed(0)}%</p>
+                <div className="text-sm font-semibold text-gray-700 mb-0.5">Avg Progress</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{totalProgress.toFixed(0)}%</div>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <Calendar className="w-5 h-5 text-white" />
+        {/* Urgent Goals */}
+        <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-purple-100 to-purple-50 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 min-h-[120px] flex flex-col justify-between">
+          <CardContent className="p-6 flex flex-col h-full justify-between">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-2xl p-2 shadow-md bg-purple-500/20">
+                <Calendar className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Urgent</p>
-                <p className="text-2xl font-semibold text-gray-900">{urgentGoals}</p>
+                <div className="text-sm font-semibold text-gray-700 mb-0.5">Urgent</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{urgentGoals}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Completed Goals */}
+        <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-green-100 to-green-50 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 min-h-[120px] flex flex-col justify-between">
+          <CardContent className="p-6 flex flex-col h-full justify-between">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-2xl p-2 shadow-md bg-green-500/20">
+                <Trophy className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-700 mb-0.5">Completed</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{completedGoals}</div>
               </div>
             </div>
           </CardContent>

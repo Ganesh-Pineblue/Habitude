@@ -94,29 +94,48 @@ export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, 
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className="border-0 shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <div className="p-1.5 sm:p-2 bg-green-50 rounded-lg">
-                  <stat.icon className="w-4 h-4 sm:w-6 sm:h-6 text-green-500" />
+          <Card
+            key={index}
+            className={
+              `rounded-3xl shadow-lg border-0 bg-gradient-to-br ` +
+              (index === 0 ? 'from-blue-100 to-blue-50' :
+               index === 1 ? 'from-orange-100 to-orange-50' :
+               index === 2 ? 'from-purple-100 to-purple-50' :
+               'from-green-100 to-green-50') +
+              ' hover:scale-[1.02] hover:shadow-xl transition-all duration-200 min-h-[120px] flex flex-col justify-between'
+            }
+          >
+            <CardContent className="p-6 flex flex-col h-full justify-between">
+              <div className="flex items-center gap-3 mb-2">
+                <div className={
+                  `rounded-2xl p-2 shadow-md ` +
+                  (index === 0 ? 'bg-blue-500/20' :
+                   index === 1 ? 'bg-orange-500/20' :
+                   index === 2 ? 'bg-purple-500/20' :
+                   'bg-green-500/20')
+                }>
+                  <stat.icon className={
+                    `w-6 h-6 ` +
+                    (index === 0 ? 'text-blue-600' :
+                     index === 1 ? 'text-orange-600' :
+                     index === 2 ? 'text-purple-600' :
+                     'text-green-600')
+                  } />
                 </div>
-                <div className="text-right">
-                  <div className="text-lg sm:text-2xl font-bold text-gray-900">{stat.value}</div>
-                  <div className="text-xs sm:text-sm text-gray-600 hidden sm:block">{stat.label}</div>
+                <div>
+                  <div className="text-sm font-semibold text-gray-700 mb-0.5">{stat.label}</div>
+                  <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                    <AnimatedNumber value={stat.value} />
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center sm:hidden">
-                  <span className="text-xs text-gray-500">{stat.label}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Progress</span>
-                  <span className="text-xs font-medium text-gray-700">{Math.round(stat.percentage)}%</span>
-                </div>
-                <Progress value={stat.percentage} className="h-1.5 sm:h-2" />
+              <div className="flex items-center justify-between mt-auto">
+                <span className="text-xs text-gray-500">Progress</span>
+                <span className="text-xs font-bold text-gray-700">{Math.round(stat.percentage)}%</span>
               </div>
+              <Progress value={stat.percentage} className="h-2 mt-2 rounded-full bg-white/60" />
             </CardContent>
           </Card>
         ))}
@@ -208,4 +227,38 @@ export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, 
       )}
     </div>
   );
+};
+
+// AnimatedNumber component for count-up effect
+const AnimatedNumber: React.FC<{ value: string }> = ({ value }) => {
+  const [display, setDisplay] = React.useState(value);
+  React.useEffect(() => {
+    if (!/^[0-9]+(\/[0-9]+)?$/.test(value)) {
+      setDisplay(value);
+      return;
+    }
+    const isFraction = value.includes('/');
+    if (isFraction) {
+      setDisplay(value); // skip animation for fractions
+      return;
+    }
+    const target = parseInt(value, 10);
+    let current = 0;
+    const duration = 700;
+    const steps = 30;
+    const increment = target / steps;
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      current = Math.round(step * increment);
+      if (current > target) current = target;
+      setDisplay(current.toString());
+      if (step >= steps) {
+        setDisplay(target.toString());
+        clearInterval(interval);
+      }
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [value]);
+  return <span>{display}</span>;
 };

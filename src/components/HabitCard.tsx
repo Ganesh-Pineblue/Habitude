@@ -646,7 +646,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
 
       {/* Suggestion Details Dialog */}
       <Dialog open={showSuggestion} onOpenChange={setShowSuggestion}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <Lightbulb className="w-5 h-5 text-yellow-600" />
@@ -654,7 +654,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
             {/* Current Habit Context */}
             <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <div className="flex items-center space-x-2 mb-2">
@@ -680,50 +680,50 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                 const suggestions = generateHabitSuggestions(habit);
                 return suggestions.map((suggestion, index) => (
                   <div key={index} className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Lightbulb className="w-5 h-5 text-yellow-600" />
-                          <span className="font-semibold text-yellow-800">{suggestion.title}</span>
+                          <Lightbulb className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                          <span className="font-semibold text-yellow-800 truncate">{suggestion.title}</span>
                         </div>
-                        <p className="text-yellow-700 text-sm mb-3">{suggestion.description}</p>
-                        <div className="flex items-center space-x-2 text-xs text-yellow-600">
+                        <p className="text-yellow-700 text-sm mb-3 break-words">{suggestion.description}</p>
+                        <div className="flex items-center space-x-2 text-xs text-yellow-600 flex-wrap">
                           <span className="px-2 py-1 bg-yellow-100 rounded-full">{suggestion.category}</span>
                           <span>•</span>
-                          <span>{suggestion.reason}</span>
+                          <span className="break-words">{suggestion.reason}</span>
                         </div>
                       </div>
-                                             <Button
-                         onClick={() => {
-                           // Add the suggested habit
-                           const newHabit = {
-                             id: Date.now().toString(),
-                             title: suggestion.title,
-                             description: suggestion.description,
-                             streak: 0,
-                             completedToday: false,
-                             category: suggestion.category as 'health' | 'productivity' | 'mindfulness' | 'social',
-                             habitType: 'good' as const,
-                             weeklyTarget: 7,
-                             currentWeekCompleted: 0,
-                             bestStreak: 0,
-                             completionRate: 0,
-                             aiGenerated: true,
-                             aiSuggestion: `Suggested based on your "${habit.title}" habit. ${suggestion.reason}`
-                           };
-                           
-                           // Call the parent's onAddHabit function if available
-                           if (onAddHabit) {
-                             onAddHabit(newHabit);
-                             alert(`✅ Habit "${suggestion.title}" has been added to your dashboard!`);
-                           } else {
-                             console.log('Adding suggested habit:', newHabit);
-                             alert(`✅ Habit "${suggestion.title}" has been added to your dashboard!`);
-                           }
-                           
-                           setShowSuggestion(false);
-                         }}
-                        className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                      <Button
+                        onClick={() => {
+                          // Add the suggested habit
+                          const newHabit = {
+                            id: Date.now().toString(),
+                            title: suggestion.title,
+                            description: suggestion.description,
+                            streak: 0,
+                            completedToday: false,
+                            category: suggestion.category as 'health' | 'productivity' | 'mindfulness' | 'social',
+                            habitType: 'good' as const,
+                            weeklyTarget: 7,
+                            currentWeekCompleted: 0,
+                            bestStreak: 0,
+                            completionRate: 0,
+                            aiGenerated: true,
+                            aiSuggestion: `Suggested based on your "${habit.title}" habit. ${suggestion.reason}`
+                          };
+                          
+                          // Call the parent's onAddHabit function if available
+                          if (onAddHabit) {
+                            onAddHabit(newHabit);
+                            alert(`✅ Habit "${suggestion.title}" has been added to your dashboard!`);
+                          } else {
+                            console.log('Adding suggested habit:', newHabit);
+                            alert(`✅ Habit "${suggestion.title}" has been added to your dashboard!`);
+                          }
+                          
+                          setShowSuggestion(false);
+                        }}
+                        className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex-shrink-0"
                       >
                         <Plus className="w-4 h-4 mr-1" />
                         Add Habit
@@ -741,12 +741,12 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                   <Brain className="w-5 h-5 text-purple-600" />
                   <span className="font-semibold text-purple-800">Current AI Insight</span>
                 </div>
-                <p className="text-purple-700">{habit.aiSuggestion}</p>
+                <p className="text-purple-700 break-words">{habit.aiSuggestion}</p>
               </div>
             )}
           </div>
           
-          <div className="flex justify-end mt-6">
+          <div className="flex justify-end mt-6 pt-4 border-t border-gray-200">
             <Button onClick={() => setShowSuggestion(false)} variant="outline">Close</Button>
           </div>
         </DialogContent>
