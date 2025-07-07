@@ -2047,7 +2047,7 @@ export const HabitDashboard = ({
                   <Target className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">✅ My Good Habits</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">My Good Habits</h3>
                   <p className="text-gray-600">Habits you've created to improve yourself</p>
                 </div>
               </div>

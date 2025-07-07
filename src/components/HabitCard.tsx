@@ -273,6 +273,30 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                 </div>
               </div>
               
+              {/* Toggle button in top right corner */}
+              <div className="absolute top-4 right-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleToggle}
+                  className={`w-8 h-8 flex items-center justify-center p-0 rounded-xl transition-all duration-300 ${
+                    isBadHabit
+                      ? 'text-red-600 hover:text-red-700 hover:bg-red-100 border border-red-200'
+                      : habit.completedToday 
+                        ? `text-${config.color}-600 hover:text-${config.color}-700 hover:bg-${config.color}-100 border border-${config.color}-200` 
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {isBadHabit ? (
+                    <XCircle className="w-5 h-5" />
+                  ) : habit.completedToday ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : (
+                    <Circle className="w-5 h-5" />
+                  )}
+                </Button>
+              </div>
+              
               {/* Action buttons */}
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center space-x-2">
@@ -293,7 +317,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                       variant="ghost"
                       size="sm"
                       onClick={onSchedule}
-                      className="h-auto px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs font-medium"
+                      className="h-10 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs font-medium"
                       title="Schedule Habit"
                     >
                       <Clock className="w-3 h-3 mr-1" />
@@ -309,7 +333,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                       console.log('aiSuggestion:', habit.aiSuggestion);
                       setShowSuggestion(true); 
                     }}
-                    className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-300"
+                    className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                     title={`Show AI Suggestion${habit.aiSuggestion ? ': ' + habit.aiSuggestion.substring(0, 30) + '...' : ' (No suggestion available)'}`}
                   >
                     <Lightbulb className="w-6 h-6" />
@@ -329,7 +353,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowCalendar(true)}
-                    className="w-10 h-10 flex items-center justify-center p-0 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                    className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                     title="AI Coordinated Calendar"
                   >
                     <Calendar className="w-6 h-6" />
@@ -339,11 +363,11 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                       variant="ghost"
                       size="icon"
                       onClick={onDelete}
-                      className="w-10 h-10 flex items-center justify-center p-0 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                      className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                       title="Delete Habit"
                     >
                       <Trash2 className="w-6 h-6" />
-                    </Button>
+                  </Button>
                   )}
                 </div>
               </div>
@@ -353,29 +377,6 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
         
         <CardContent className="pt-0">
           <div className="space-y-4">
-            {/* Main toggle button */}
-            <div className="flex items-center justify-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleToggle}
-                className={`w-16 h-16 flex items-center justify-center p-0 rounded-2xl transition-all duration-300 ${
-                  isBadHabit
-                    ? 'text-red-600 hover:text-red-700 hover:bg-red-100 border-2 border-red-200'
-                    : habit.completedToday 
-                      ? `text-${config.color}-600 hover:text-${config.color}-700 hover:bg-${config.color}-100 border-2 border-${config.color}-200` 
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 border-2 border-gray-200'
-                }`}
-              >
-                {isBadHabit ? (
-                  <XCircle className="w-12 h-12" />
-                ) : habit.completedToday ? (
-                  <CheckCircle2 className="w-12 h-12" />
-                ) : (
-                  <Circle className="w-12 h-12" />
-                )}
-              </Button>
-            </div>
 
             {/* Bad Habit Specific Info */}
             {isBadHabit && habit.badHabitDetails && (
@@ -794,7 +795,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             <div className="absolute top-4 left-4 animate-bounce">
               <Star className="w-6 h-6 text-yellow-500" />
             </div>
-            <div className="absolute top-4 right-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
+            <div className="absolute top-4 left-12 animate-bounce" style={{ animationDelay: '0.2s' }}>
               <Trophy className="w-6 h-6 text-orange-500" />
             </div>
             <div className="absolute bottom-4 left-4 animate-bounce" style={{ animationDelay: '0.4s' }}>
