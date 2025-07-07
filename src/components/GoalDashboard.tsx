@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Plus, Target, Trophy, Calendar, TrendingUp, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface Goal {
   id: string;
@@ -178,7 +182,9 @@ export const GoalDashboard = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-700 mb-0.5">Total Goals</div>
-                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{goals.length}</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                  <AnimatedNumber value={goals.length} duration={1200} />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -192,7 +198,9 @@ export const GoalDashboard = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-700 mb-0.5">Avg Progress</div>
-                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{totalProgress.toFixed(0)}%</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                  <AnimatedNumber value={Number(totalProgress.toFixed(0))} suffix="%" duration={1200} />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -206,7 +214,9 @@ export const GoalDashboard = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-700 mb-0.5">Urgent</div>
-                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{urgentGoals}</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                  <AnimatedNumber value={urgentGoals} duration={1200} />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -220,7 +230,9 @@ export const GoalDashboard = ({
               </div>
               <div>
                 <div className="text-sm font-semibold text-gray-700 mb-0.5">Completed</div>
-                <div className="text-2xl font-extrabold text-gray-900 flex items-end">{completedGoals}</div>
+                <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                  <AnimatedNumber value={completedGoals} duration={1200} />
+                </div>
               </div>
             </div>
           </CardContent>

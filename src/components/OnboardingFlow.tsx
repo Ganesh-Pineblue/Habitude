@@ -1443,17 +1443,17 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
   // Step 0: Personal Information (Progressive Questions)
   if (currentStep === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-4 py-2">
-        <Card className="w-full max-w-xl bg-white shadow-2xl border-2 border-green-100 rounded-3xl">
-          <CardHeader className="text-center pb-4">
-            <div className="flex justify-center mb-3">
-              <FriendlyChatbotLogo size={60} />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-2 py-1">
+        <Card className="w-full max-w-lg bg-white shadow-2xl border-2 border-green-100 rounded-3xl">
+          <CardHeader className="text-center pb-2 pt-3">
+            <div className="flex justify-center mb-2">
+              <FriendlyChatbotLogo size={50} />
             </div>
-            <CardTitle className="text-2xl font-bold text-green-800">Let's Get To Know Each Other! 🤝</CardTitle>
-            <p className="text-green-600 text-base mt-1">I need to understand you better to create the perfect habit journey</p>
+            <CardTitle className="text-xl font-bold text-green-800">Let's Get To Know Each Other! 🤝</CardTitle>
+            <p className="text-green-600 text-sm mt-1">I need to understand you better to create the perfect habit journey</p>
           </CardHeader>
-          <CardContent className="px-6">
-            <div className="space-y-6">
+          <CardContent className="px-4 pb-4">
+            <div className="space-y-4">
               {/* Show both questions on the same page */}
               {questions.map((question, index) => (
                 <div 
@@ -1461,8 +1461,8 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                   className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0"
                 >
                   {/* Question Header with Edit Button */}
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="font-semibold text-lg text-blue-900">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="font-semibold text-base text-blue-900">
                       {question.title}
                     </div>
                     {personalInfo[question.field] && (
@@ -1477,7 +1477,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                             setPersonalInfo(prev => ({ ...prev, customGender: '' }));
                           }
                         }}
-                        className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-3 text-sm font-semibold rounded-lg"
+                        className="border-green-500 text-green-600 hover:bg-green-50 h-7 px-2 text-xs font-semibold rounded-lg"
                       >
                         Edit
                       </Button>
@@ -1487,40 +1487,40 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                   {/* Question Options */}
                   {personalInfo[question.field] ? (
                     // Show selected option only
-                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                      <div className="flex items-center gap-3">
+                    <div className="bg-green-50 p-2 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2">
                         {('emoji' in question.options.find(opt => opt.value === personalInfo[question.field])!) && (
-                          <span className="text-xl">{(question.options.find(opt => opt.value === personalInfo[question.field]) as any).emoji}</span>
+                          <span className="text-lg">{(question.options.find(opt => opt.value === personalInfo[question.field]) as any).emoji}</span>
                         )}
-                        <span className="font-semibold text-green-800">
+                        <span className="font-semibold text-green-800 text-sm">
                           {question.options.find(opt => opt.value === personalInfo[question.field])?.label}
                         </span>
                         {personalInfo[question.field] === 'custom' && personalInfo.customGender && (
-                          <span className="text-green-600">({personalInfo.customGender})</span>
+                          <span className="text-green-600 text-sm">({personalInfo.customGender})</span>
                         )}
                       </div>
                     </div>
                   ) : (
                     // Show all options
-                    <div className="flex flex-col gap-2 bg-gray-50 p-3 rounded-lg border border-blue-100">
+                    <div className="flex flex-col gap-1 bg-gray-50 p-2 rounded-lg border border-blue-100">
                       {question.options.map(option => (
                         <button
                           key={option.value}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 text-blue-900 font-medium transition-all duration-200"
+                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-100 text-blue-900 font-medium transition-all duration-200 text-sm"
                           onClick={() => handleQuestionAnswer(question.field, option.value)}
                         >
-                          {('emoji' in option) && <span className="text-xl">{(option as any).emoji}</span>}
+                          {('emoji' in option) && <span className="text-lg">{(option as any).emoji}</span>}
                           <span>{option.label}</span>
                         </button>
                       ))}
                       
                       {/* Custom gender input */}
                       {question.id === 'gender' && personalInfo.gender === 'custom' && (
-                        <div className="mt-2">
+                        <div className="mt-1">
                           <Input
                             value={personalInfo.customGender}
                             onChange={(e) => setPersonalInfo(prev => ({ ...prev, customGender: e.target.value }))}
-                            className="border-green-200 focus:border-green-500 focus:ring-green-500 h-12 text-base"
+                            className="border-green-200 focus:border-green-500 focus:ring-green-500 h-9 text-sm"
                             placeholder="How would you like to be addressed?"
                             autoFocus
                           />
@@ -1532,8 +1532,8 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
               ))}
 
               {/* Progress Indicator - Simplified for single page */}
-              <div className="flex justify-center space-x-2 mt-4">
-                <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              <div className="flex justify-center space-x-2 mt-2">
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   currentQuestion >= 1 ? 'bg-green-500 scale-125' : 'bg-gray-300'
                 }`} />
               </div>
@@ -1541,13 +1541,13 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
               {/* Privacy Notice - Show after both questions are answered */}
               {personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
                 <div className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0">
-                  <div className="bg-gradient-to-r from-green-100 to-green-50 p-3 rounded-xl border border-green-200">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-3 h-3 text-white" />
+                  <div className="bg-gradient-to-r from-green-100 to-green-50 p-2 rounded-xl border border-green-200">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-2 h-2 text-white" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-green-800 text-sm">🔒 Your privacy is our priority</h4>
+                        <h4 className="font-semibold text-green-800 text-xs">🔒 Your privacy is our priority</h4>
                         <p className="text-green-600 text-xs">We use this information to personalize your experience and never share it with third parties.</p>
                       </div>
                     </div>
@@ -1558,19 +1558,19 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
               {/* Continue Button - Show after both questions are answered */}
               {personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
                 <div className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0">
-                  <div className="flex gap-3 justify-end pt-2">
+                  <div className="flex gap-2 justify-end pt-1">
                     <Button
                       variant="outline"
                       onClick={onBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-10 font-semibold rounded-xl"
+                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 font-semibold rounded-xl text-sm"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" /> Back to Login
+                      <ArrowLeft className="w-3 h-3 mr-1" /> Back to Login
                     </Button>
                     <Button
                       onClick={() => setCurrentStep(1)}
-                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-10 font-semibold rounded-xl transition-all duration-300 scale-105 shadow-lg"
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 font-semibold rounded-xl transition-all duration-300 scale-105 shadow-lg text-sm"
                     >
-                      Continue <ArrowRight className="w-4 h-4 ml-2" />
+                      Continue <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   </div>
                 </div>
@@ -1592,10 +1592,10 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
               {/* Do it later button absolutely positioned */}
               <Button
                 onClick={handleSkipPersonality}
-                className="absolute top-2 right-4 bg-green-100 text-green-700 hover:bg-green-200 border-green-300 h-8 px-3 text-sm font-semibold rounded-xl shadow-none"
+                className="absolute top-2 right-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 h-8 px-4 text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 style={{minWidth: 'unset'}}
               >
-                Do it later
+                ⏭️ Do it later
               </Button>
               {/* Centered headings in a column */}
               <div className="flex flex-col items-center justify-center w-full">
@@ -1816,7 +1816,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                             personalitySelection.selectedHabits.includes(habit)
                               ? 'text-green-800'
                               : 'text-green-700'
-                          }`}>
+                          }`} style={{ fontSize: '0.9rem' }}>
                             {habit}
                           </span>
                           {personalitySelection.selectedHabits.includes(habit) && (

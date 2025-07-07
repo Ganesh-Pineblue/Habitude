@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HabitCard } from './HabitCard';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 // QuickStats, WeeklyProgress, and HabitStrengthMeter integrated directly
 import { AICoordinatedCalendar } from './AICoordinatedCalendar';
 
@@ -86,7 +87,9 @@ export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, 
               </p>
             </div>
             <div className="text-center sm:text-right">
-              <div className="text-3xl sm:text-4xl font-bold text-gray-900">{totalStreak}</div>
+              <div className="text-3xl sm:text-4xl font-bold text-gray-900">
+                <AnimatedNumber value={totalStreak} duration={1500} delay={200} />
+              </div>
               <div className="text-gray-600 text-sm">Day Streak</div>
             </div>
           </div>
@@ -127,13 +130,26 @@ export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, 
                 <div>
                   <div className="text-sm font-semibold text-gray-700 mb-0.5">{stat.label}</div>
                   <div className="text-2xl font-extrabold text-gray-900 flex items-end">
-                    <AnimatedNumber value={stat.value} />
+                    <AnimatedNumber 
+                      value={stat.value} 
+                      duration={1200} 
+                      delay={index * 100} 
+                      className="text-gray-900"
+                    />
                   </div>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-auto">
                 <span className="text-xs text-gray-500">Progress</span>
-                <span className="text-xs font-bold text-gray-700">{Math.round(stat.percentage)}%</span>
+                <span className="text-xs font-bold text-gray-700">
+                  <AnimatedNumber 
+                    value={Math.round(stat.percentage)} 
+                    suffix="%" 
+                    duration={800} 
+                    delay={index * 100 + 300}
+                    className="text-gray-700"
+                  />
+                </span>
               </div>
               <Progress value={stat.percentage} className="h-2 mt-2 rounded-full bg-white/60" />
             </CardContent>
@@ -229,36 +245,4 @@ export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, 
   );
 };
 
-// AnimatedNumber component for count-up effect
-const AnimatedNumber: React.FC<{ value: string }> = ({ value }) => {
-  const [display, setDisplay] = React.useState(value);
-  React.useEffect(() => {
-    if (!/^[0-9]+(\/[0-9]+)?$/.test(value)) {
-      setDisplay(value);
-      return;
-    }
-    const isFraction = value.includes('/');
-    if (isFraction) {
-      setDisplay(value); // skip animation for fractions
-      return;
-    }
-    const target = parseInt(value, 10);
-    let current = 0;
-    const duration = 700;
-    const steps = 30;
-    const increment = target / steps;
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      current = Math.round(step * increment);
-      if (current > target) current = target;
-      setDisplay(current.toString());
-      if (step >= steps) {
-        setDisplay(target.toString());
-        clearInterval(interval);
-      }
-    }, duration / steps);
-    return () => clearInterval(interval);
-  }, [value]);
-  return <span>{display}</span>;
-};
+

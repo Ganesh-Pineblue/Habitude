@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Circle, Clock, Lightbulb, Flame, Calendar, BarChart3, Bell, AlertTriangle, XCircle, CalendarDays, X, Trash2, Zap, Target, TrendingUp, Activity, Sparkles, Brain, Plus } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Lightbulb, Flame, Calendar, BarChart3, Bell, AlertTriangle, XCircle, CalendarDays, X, Trash2, Zap, Target, TrendingUp, Activity, Sparkles, Brain, Plus, Trophy, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -223,11 +223,24 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
   const [showDetails, setShowDetails] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   
   const weeklyProgress = habit.weeklyTarget ? (habit.currentWeekCompleted || 0) / habit.weeklyTarget * 100 : 0;
   const isStreakRecord = habit.streak === (habit.bestStreak || 0) && habit.streak > 0;
   const isBadHabit = habit.habitType === 'bad';
   const config = categoryConfig[habit.category];
+
+  const handleToggle = () => {
+    const wasCompleted = habit.completedToday;
+    onToggle();
+    
+    // Show celebration if habit was just completed (not uncompleted)
+    if (!wasCompleted) {
+      setShowCelebration(true);
+      // Auto-hide after 4 seconds
+      setTimeout(() => setShowCelebration(false), 4000);
+    }
+  };
 
   return (
     <>
@@ -247,8 +260,8 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             <div className="flex-1 min-w-0">
               {/* Header with icon and title */}
               <div className="flex items-center space-x-3 mb-3">
-                <div className={`p-2 rounded-xl bg-gradient-to-r ${config.gradient} shadow-lg`}>
-                  <span className="text-white text-lg">{config.icon}</span>
+                <div className={`w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r ${config.gradient} shadow-lg`}>
+                  <span className="text-2xl">{config.icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <CardTitle className={`text-lg font-bold truncate ${isBadHabit ? 'text-red-900' : 'text-gray-900'}`}>
@@ -275,21 +288,6 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  {/* Always show suggestions button for testing */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={e => { 
-                      e.stopPropagation(); 
-                      console.log('Suggestion button clicked for:', habit.title);
-                      console.log('aiSuggestion:', habit.aiSuggestion);
-                      setShowSuggestion(true); 
-                    }}
-                    className="h-10 w-10 p-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-300"
-                    title={`Show AI Suggestion${habit.aiSuggestion ? ': ' + habit.aiSuggestion.substring(0, 30) + '...' : ' (No suggestion available)'}`}
-                  >
-                    <Lightbulb className="w-5 h-5" />
-                  </Button>
                   {onSchedule && (
                     <Button
                       variant="ghost"
@@ -298,39 +296,53 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                       className="h-auto px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-xs font-medium"
                       title="Schedule Habit"
                     >
-                      <CalendarDays className="w-3 h-3 mr-1" />
+                      <Clock className="w-3 h-3 mr-1" />
                       SCHEDULE
-                    </Button>
-                  )}
-                  {onGenerateGoal && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={onGenerateGoal}
-                      className="h-9 w-9 p-0 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl rounded-xl transition-all duration-200"
-                      title="Generate Goal"
-                    >
-                      <Target className="w-4 h-4" />
                     </Button>
                   )}
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
+                    onClick={e => { 
+                      e.stopPropagation(); 
+                      console.log('Suggestion button clicked for:', habit.title);
+                      console.log('aiSuggestion:', habit.aiSuggestion);
+                      setShowSuggestion(true); 
+                    }}
+                    className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-300"
+                    title={`Show AI Suggestion${habit.aiSuggestion ? ': ' + habit.aiSuggestion.substring(0, 30) + '...' : ' (No suggestion available)'}`}
+                  >
+                    <Lightbulb className="w-6 h-6" />
+                  </Button>
+                  {onGenerateGoal && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onGenerateGoal}
+                      className="w-10 h-10 flex items-center justify-center p-0 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl rounded-xl transition-all duration-200"
+                      title="Generate Goal"
+                    >
+                      <Target className="w-6 h-6" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowCalendar(true)}
-                    className="h-9 w-9 p-0 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                    className="w-10 h-10 flex items-center justify-center p-0 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                     title="AI Coordinated Calendar"
                   >
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="w-6 h-6" />
                   </Button>
                   {onDelete && (
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={onDelete}
-                      className="h-9 w-9 p-0 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                      className="w-10 h-10 flex items-center justify-center p-0 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                       title="Delete Habit"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-6 h-6" />
                     </Button>
                   )}
                 </div>
@@ -345,9 +357,9 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             <div className="flex items-center justify-center">
               <Button
                 variant="ghost"
-                size="lg"
-                onClick={onToggle}
-                className={`p-6 rounded-2xl transition-all duration-300 ${
+                size="icon"
+                onClick={handleToggle}
+                className={`w-16 h-16 flex items-center justify-center p-0 rounded-2xl transition-all duration-300 ${
                   isBadHabit
                     ? 'text-red-600 hover:text-red-700 hover:bg-red-100 border-2 border-red-200'
                     : habit.completedToday 
@@ -429,7 +441,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
               <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5 text-green-600" />
+                    <BarChart3 className="w-6 h-6 text-green-600" />
                     <span className="text-sm font-semibold text-green-800">Weekly Progress</span>
                   </div>
                   <span className="text-sm font-bold text-green-700">
@@ -448,7 +460,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
               isBadHabit ? 'bg-gradient-to-r from-red-100 to-rose-100' : `bg-gradient-to-r from-${config.color}-100 to-${config.color}-50`
             }`}>
               <div className="flex items-center space-x-2">
-                <Flame className={`w-5 h-5 ${isBadHabit ? 'text-red-600' : `text-${config.color}-600`}`} />
+                <Flame className={`w-6 h-6 ${isBadHabit ? 'text-red-600' : `text-${config.color}-600`}`} />
                 <div>
                   <div className={`text-lg font-bold ${isBadHabit ? 'text-red-700' : `text-${config.color}-700`}`}>
                     {habit.streak}
@@ -770,6 +782,90 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
               onEditGoal={() => {}}
               onScheduleHabit={() => {}}
             />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Celebration Popup */}
+      <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
+        <DialogContent className="max-w-md border-0 shadow-2xl bg-gradient-to-br from-green-50 to-emerald-100">
+          <div className="text-center p-6">
+            {/* Confetti-like decoration */}
+            <div className="absolute top-4 left-4 animate-bounce">
+              <Star className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div className="absolute top-4 right-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
+              <Trophy className="w-6 h-6 text-orange-500" />
+            </div>
+            <div className="absolute bottom-4 left-4 animate-bounce" style={{ animationDelay: '0.4s' }}>
+              <Sparkles className="w-6 h-6 text-purple-500" />
+            </div>
+            <div className="absolute bottom-4 right-4 animate-bounce" style={{ animationDelay: '0.6s' }}>
+              <Star className="w-6 h-6 text-pink-500" />
+            </div>
+
+            {/* Main celebration content */}
+            <div className="mb-6">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                <CheckCircle2 className="w-10 h-10 text-white" />
+              </div>
+              
+              <h2 className="text-2xl font-bold text-green-800 mb-2">
+                🎉 Habit Completed! 🎉
+              </h2>
+              
+              <p className="text-green-700 mb-4">
+                Great job completing <strong>"{habit.title}"</strong>!
+              </p>
+
+              {/* Streak information */}
+              <div className="bg-white/60 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                  <span className="text-lg font-bold text-orange-700">
+                    {habit.streak} Day{habit.streak !== 1 ? 's' : ''} Streak!
+                  </span>
+                </div>
+                
+                {habit.streak >= 7 && (
+                  <div className="text-sm text-green-600 font-medium">
+                    🔥 You're on fire! Keep the momentum going!
+                  </div>
+                )}
+                
+                {habit.streak >= 30 && (
+                  <div className="text-sm text-purple-600 font-medium">
+                    💎 Diamond level consistency! You're unstoppable!
+                  </div>
+                )}
+                
+                {isStreakRecord && (
+                  <div className="text-sm text-blue-600 font-medium">
+                    🏆 New personal record! Amazing work!
+                  </div>
+                )}
+              </div>
+
+              {/* Encouraging message based on streak */}
+              <div className="text-sm text-green-600">
+                {habit.streak === 1 && "Every journey begins with a single step. You've taken yours!"}
+                {habit.streak === 2 && "Two days in a row! You're building momentum!"}
+                {habit.streak === 3 && "Three days! They say it takes 3 days to start a habit. You're doing it!"}
+                {habit.streak === 7 && "A full week! You're officially building a habit!"}
+                {habit.streak === 14 && "Two weeks strong! You're becoming consistent!"}
+                {habit.streak === 21 && "Three weeks! You're approaching habit mastery!"}
+                {habit.streak === 30 && "A full month! You're a habit champion!"}
+                {habit.streak > 30 && "Incredible consistency! You're an inspiration!"}
+                {habit.streak > 1 && habit.streak < 7 && "Keep going! Every day counts!"}
+              </div>
+            </div>
+
+            <Button 
+              onClick={() => setShowCelebration(false)}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg"
+            >
+              Keep Going! 💪
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

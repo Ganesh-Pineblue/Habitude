@@ -26,6 +26,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from '@/components/ui/chart';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface MoodData {
   date: string;
@@ -260,9 +261,13 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
               <div>
                 <p className="text-sm text-green-700">Today's Habits</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {overallStats.completedToday}/{overallStats.totalHabits}
+                  <AnimatedNumber value={overallStats.completedToday} duration={1200} />
+                  /
+                  <AnimatedNumber value={overallStats.totalHabits} duration={1200} delay={200} />
                 </p>
-                <p className="text-xs text-green-600">{overallStats.completionRate}% completion</p>
+                <p className="text-xs text-green-600">
+                  <AnimatedNumber value={overallStats.completionRate} suffix="%" duration={1000} /> completion
+                </p>
               </div>
             </div>
           </CardContent>
@@ -276,7 +281,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
               </div>
               <div>
                 <p className="text-sm text-blue-700">Average Mood</p>
-                <p className="text-2xl font-bold text-blue-800">{moodStats.averageMood}/4</p>
+                <p className="text-2xl font-bold text-blue-800">
+                  <AnimatedNumber value={parseFloat(moodStats.averageMood)} duration={1200} decimals={1} />/4
+                </p>
                 <p className="text-xs text-blue-600">last 10 days</p>
               </div>
             </div>
@@ -291,7 +298,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
               </div>
               <div>
                 <p className="text-sm text-purple-700">Best Streak</p>
-                <p className="text-2xl font-bold text-purple-800">{overallStats.bestStreak}</p>
+                <p className="text-2xl font-bold text-purple-800">
+                  <AnimatedNumber value={overallStats.bestStreak} duration={1200} />
+                </p>
                 <p className="text-xs text-purple-600">days achieved</p>
               </div>
             </div>
@@ -307,7 +316,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
               <div>
                 <p className="text-sm text-orange-700">Consistency</p>
                 <p className="text-2xl font-bold text-orange-800">
-                  {Math.round(habits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / Math.max(habits.length, 1))}%
+                  <AnimatedNumber value={Math.round(habits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / Math.max(habits.length, 1))} suffix="%" duration={1200} />
                 </p>
                 <p className="text-xs text-orange-600">overall rate</p>
               </div>

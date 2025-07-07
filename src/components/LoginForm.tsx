@@ -180,7 +180,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     value={form.email}
                     onChange={handleChange}
                     required
-                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-base outline-none transition"
                   />
                 </div>
                 
@@ -192,7 +192,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     value={form.password}
                     onChange={handleChange}
                     required
-                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-base outline-none transition"
                   />
                   <button
                     type="button"
@@ -241,7 +241,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     onChange={handleRegisterChange}
                     required
                     autoComplete="off"
-                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-base outline-none transition-all duration-200"
                   />
                   
                   <input
@@ -252,7 +252,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                     onChange={handleRegisterChange}
                     required
                     autoComplete="off"
-                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                    className="w-full h-10 px-4 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-base outline-none transition-all duration-200"
                   />
                   
                   <div className="relative">
@@ -264,7 +264,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                       onChange={handleRegisterChange}
                       required
                       autoComplete="new-password"
-                      className="w-full h-10 px-4 pr-12 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-sm outline-none transition-all duration-200"
+                      className="w-full h-10 px-4 pr-12 rounded-lg border border-[#DAF7A6] focus:border-[#b6e07d] focus:ring-2 focus:ring-[#DAF7A6] bg-[#f6ffe0] text-[#333] text-base outline-none transition-all duration-200"
                     />
                     <button
                       type="button"

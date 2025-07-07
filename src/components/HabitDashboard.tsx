@@ -18,6 +18,7 @@ import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Calendar, BarChart3, Target, Zap, Plus, Edit3, Trash2, Bell, Clock, CalendarDays, Sparkles, AlertTriangle, CheckCircle2, Activity, Trophy, Users, Share2, UserPlus, Brain, Lightbulb, Facebook, Twitter, Instagram, Linkedin, TrendingUp, Heart, Flame } from 'lucide-react';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface Habit {
   id: string;
@@ -1203,7 +1204,15 @@ export const HabitDashboard = ({
                     </div>
                     <div className="flex-1">
                       <p className={`text-sm font-medium ${stat.subtextColor}`}>{stat.label}</p>
-                      <p className={`text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                      <p className={`text-2xl font-bold ${stat.textColor}`}>
+                        <AnimatedNumber 
+                          value={stat.value.replace(/[^\d.]/g, '')} 
+                          duration={1200} 
+                          delay={index * 100} 
+                          className={stat.textColor}
+                          suffix={stat.value.includes('%') ? '%' : stat.value.includes('days') ? ' days' : ''}
+                        />
+                      </p>
                       <p className={`text-xs ${stat.subtextColor}`}>{stat.subtext}</p>
                     </div>
                   </div>
