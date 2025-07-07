@@ -219,7 +219,7 @@ const LogoutMoodCapture: React.FC<LogoutMoodCaptureProps> = ({
             style={{ boxShadow: '0 20px 60px 0 rgba(16,185,129,0.2)' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-center mb-6">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-r from-green-500 to-green-600 rounded-lg">
                   <LogOut className="w-5 h-5 text-white" />
@@ -229,14 +229,6 @@ const LogoutMoodCapture: React.FC<LogoutMoodCaptureProps> = ({
                   <p className="text-sm text-green-700">How are you feeling after using the app?</p>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSkip}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-4 h-4" />
-              </Button>
             </div>
 
             <Stepper />

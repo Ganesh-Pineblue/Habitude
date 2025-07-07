@@ -313,6 +313,12 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
     setAiGeneratedGoals(prevGoals => prevGoals.filter(goal => goal.id !== goalId));
   };
 
+  const handleUserUpdate = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
+    // Here you would typically make an API call to update the user
+    console.log('User updated:', updatedUser);
+  };
+
   const handleGoalAddFormTriggered = () => {
     setTriggerGoalAddForm(false);
   };
@@ -346,6 +352,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
         onLogout={handleLogout}
         currentMood={currentMood}
         onMoodSelect={handleMoodSelect}
+        onUserUpdate={handleUserUpdate}
       />
       <main className="container mx-auto px-2 py-2 max-w-sm sm:max-w-md lg:max-w-6xl">
         <div className="w-full">

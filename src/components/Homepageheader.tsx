@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 import { MoodHeader } from './MoodHeader';
 import NotificationsBar from './NotificationsBar';
+import { UserProfileDropdown } from './UserProfileDropdown';
+import { Profile } from './Profile';
+import { ChangePassword } from './ChangePassword';
 
 interface User {
   name: string;
@@ -15,13 +18,47 @@ interface HeaderProps {
   onLogout: () => void;
   currentMood?: number;
   onMoodSelect?: (mood: string) => void;
+  onUserUpdate?: (updatedUser: User) => void;
 }
 
-export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: HeaderProps) => {
+export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect, onUserUpdate }: HeaderProps) => {
+  const [showProfile, setShowProfile] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+
   const handleMoodSelect = (mood: string) => {
     if (onMoodSelect) {
       onMoodSelect(mood);
     }
+  };
+
+  const handleProfileClick = () => {
+    setShowProfile(true);
+  };
+
+  const handleChangePasswordClick = () => {
+    setShowChangePassword(true);
+  };
+
+  const handleProfileClose = () => {
+    setShowProfile(false);
+  };
+
+  const handleChangePasswordClose = () => {
+    setShowChangePassword(false);
+  };
+
+  const handleProfileSave = (updatedUser: User) => {
+    if (onUserUpdate) {
+      onUserUpdate(updatedUser);
+    }
+    setShowProfile(false);
+  };
+
+  const handlePasswordChange = (currentPassword: string, newPassword: string) => {
+    // Here you would typically make an API call to change the password
+    console.log('Changing password:', { currentPassword, newPassword });
+    // For now, we'll just close the modal
+    setShowChangePassword(false);
   };
 
   return (
@@ -44,30 +81,18 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: Header
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
-                <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                <p className="text-xs text-gray-600">{user.email}</p>
-              </div>
-            </div>
+            {/* User Profile Dropdown */}
+            <UserProfileDropdown
+              user={user}
+              onLogout={onLogout}
+              onProfileClick={handleProfileClick}
+              onChangePasswordClick={handleChangePasswordClick}
+            />
             
             {/* Notifications Bar */}
             <div className="relative">
               <NotificationsBar />
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onLogout}
-              className="border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-2 sm:px-4"
-            >
-              <LogOut className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
           </div>
         </div>
 
@@ -76,6 +101,23 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: Header
           <MoodHeader currentMood={currentMood} onMoodSelect={handleMoodSelect} />
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <Profile
+          user={user}
+          onClose={handleProfileClose}
+          onSave={handleProfileSave}
+        />
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <ChangePassword
+          onClose={handleChangePasswordClose}
+          onSave={handlePasswordChange}
+        />
+      )}
     </header>
   );
 };
