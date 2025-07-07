@@ -1558,19 +1558,12 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
               {/* Continue Button - Show after both questions are answered */}
               {personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
                 <div className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0">
-                  <div className="flex gap-2 justify-end pt-1">
-                    <Button
-                      variant="outline"
-                      onClick={onBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 font-semibold rounded-xl text-sm"
-                    >
-                      <ArrowLeft className="w-3 h-3 mr-1" /> Back to Login
-                    </Button>
+                  <div className="flex justify-end pt-1">
                     <Button
                       onClick={() => setCurrentStep(1)}
                       className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 font-semibold rounded-xl transition-all duration-300 scale-105 shadow-lg text-sm"
                     >
-                      Continue <ArrowRight className="w-3 h-3 ml-1" />
+                      Next <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   </div>
                 </div>
@@ -1595,7 +1588,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                 className="absolute top-2 right-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 h-8 px-4 text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 style={{minWidth: 'unset'}}
               >
-                ⏭️ Do it later
+                Do it later <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
               {/* Centered headings in a column */}
               <div className="flex flex-col items-center justify-center w-full">
@@ -1638,7 +1631,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                         <Button
                           onClick={handleSearch}
                           disabled={!searchQuery.trim() || isSearching}
-                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-9 px-3 font-semibold rounded-lg text-sm"
+                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 px-4 font-semibold rounded-xl transition-all duration-300 shadow-lg text-sm"
                         >
                           {isSearching ? (
                             <>
@@ -1714,7 +1707,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                                 setShowSearchResults(false);
                               }}
                               variant="outline"
-                              className="border-green-500 text-green-600 hover:bg-green-50 text-sm h-8"
+                              className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 font-semibold rounded-xl transition-all duration-300 text-sm"
                             >
                               Clear Search
                             </Button>
@@ -1766,7 +1759,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                     <Button
                       variant="outline"
                       onClick={handleGoBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 text-sm font-semibold rounded-xl"
+                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 font-semibold rounded-xl transition-all duration-300 text-sm"
                     >
                       <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                     </Button>
@@ -1831,13 +1824,13 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
                     <Button
                       variant="outline"
                       onClick={handleGoBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 text-sm font-semibold rounded-xl"
+                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 font-semibold rounded-xl transition-all duration-300 text-sm"
                     >
                       <ArrowLeft className="w-4 h-4 mr-1" /> Back to Selection
                     </Button>
                     <Button 
                       onClick={handleComplete}
-                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 px-6 text-sm font-semibold rounded-xl"
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white h-8 px-6 font-semibold rounded-xl transition-all duration-300 shadow-lg text-sm"
                     >
                       Complete Setup <Sparkles className="w-4 h-4 ml-1" />
                     </Button>
