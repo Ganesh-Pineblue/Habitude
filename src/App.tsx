@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import { TestAdaptiveEngine } from "./components/TestAdaptiveEngine";
 import { ProfilePage } from "./pages/ProfilePage";
 import { UserProvider } from "./contexts/UserContext";
+import { AdminPanel } from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => {
               <Route path="/" element={<Index userMood={null} />} />
               <Route path="/test-adaptive" element={<TestAdaptiveEngine />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/admin" element={<AdminPanel />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
