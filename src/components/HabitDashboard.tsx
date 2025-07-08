@@ -1273,156 +1273,6 @@ export const HabitDashboard = ({
             </Button>
           </div>
 
-          {/* AI Generated Habits Section */}
-          {aiGeneratedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl shadow-lg">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">🤖 AI-Generated Habits</h3>
-                  <p className="text-gray-600">Habits created based on your role model selection</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {aiGeneratedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).map((habit) => (
-                  <div key={habit.id} className="relative group">
-                    <HabitCard 
-                      habit={habit} 
-                      onToggle={() => toggleHabit(habit.id)}
-                      onSchedule={() => handleScheduleHabit(habit)}
-                      onGenerateGoal={() => generateGoalForHabit(habit)}
-                      onDelete={() => deleteHabit(habit.id)}
-                      onAddHabit={addHabitFromSuggestion}
-                    />
-                    <CompactStrengthMeter habit={habit} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Paired Habits Section - Bad Habit + Positive Alternative */}
-          {pairedHabits.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">🔄 Habit Replacement Pairs</h3>
-                  <p className="text-gray-600">Bad habits with their positive alternatives - only positive habits are reminded</p>
-                </div>
-              </div>
-              
-              <div className="space-y-6">
-                {pairedHabits.map(({ badHabit, positiveHabit }) => (
-                  <Card key={badHabit.id} className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-3 bg-red-500 rounded-xl shadow-lg">
-                            <AlertTriangle className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-red-900 text-lg">Replace This</h4>
-                            <p className="text-sm text-red-700">{badHabit.title}</p>
-                            <p className="text-xs text-red-600">(No reminders)</p>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-3xl">🔄</div>
-                          <p className="text-xs text-gray-600 font-medium">Switch to</p>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <div>
-                            <h4 className="font-bold text-green-900 text-right text-lg">With This</h4>
-                            <p className="text-sm text-green-700 text-right">{positiveHabit.title}</p>
-                            <p className="text-xs text-green-600 text-right">(Reminded)</p>
-                          </div>
-                          <div className="p-3 bg-green-500 rounded-xl shadow-lg">
-                            <CheckCircle2 className="w-5 h-5 text-white" />
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Bad Habit Card */}
-                        <div className="border border-red-200 rounded-lg p-3 bg-red-50">
-                          <HabitCard 
-                            habit={badHabit} 
-                            onToggle={() => toggleHabit(badHabit.id)}
-                            onSchedule={() => handleScheduleHabit(badHabit)}
-                            onAddHabit={addHabitFromSuggestion}
-                          />
-                          <CompactStrengthMeter habit={badHabit} />
-                        </div>
-                        {/* Positive Habit Card */}
-                        <div className="border border-green-200 rounded-lg p-3 bg-green-50">
-                          <HabitCard 
-                            habit={positiveHabit} 
-                            onToggle={() => toggleHabit(positiveHabit.id)}
-                            onSchedule={() => handleScheduleHabit(positiveHabit)}
-                            onAddHabit={addHabitFromSuggestion}
-                          />
-                          <CompactStrengthMeter habit={positiveHabit} />
-                        </div>
-                      </div>
-                      
-                      {/* Reminder Info */}
-                      {positiveHabit.reminder && positiveHabit.reminder.enabled && (
-                        <div className="mt-4 p-3 bg-white rounded-lg border border-green-200">
-                          <div className="flex items-center space-x-2">
-                            <Bell className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800">Positive Habit Reminder</span>
-                          </div>
-                          <p className="text-sm text-green-700 mt-1">
-                            You'll be reminded to do "{positiveHabit.title}" at {positiveHabit.reminder.time} ({positiveHabit.reminder.frequency}) - 
-                            this helps you replace the bad habit with the positive one!
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Bad Habits Section */}
-          {badHabits.filter(h => !pairedHabits.some(p => p.badHabit.id === h.id)).length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
-                  <AlertTriangle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-red-900">⚠️ Bad Habits to Break</h3>
-                  <p className="text-red-700">Track and work on reducing these habits</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {badHabits.filter(h => !pairedHabits.some(p => p.badHabit.id === h.id)).map((habit) => (
-                  <div key={habit.id} className="relative group">
-                    <HabitCard 
-                      habit={habit} 
-                      onToggle={() => toggleHabit(habit.id)}
-                      onSchedule={() => handleScheduleHabit(habit)}
-                      onGenerateGoal={() => generateGoalForHabit(habit)}
-                      onDelete={() => deleteHabit(habit.id)}
-                      onAddHabit={addHabitFromSuggestion}
-                    />
-                    <CompactStrengthMeter habit={habit} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Add/Edit Form */}
           {(showAddForm || editingHabit) && (
             <Card className="border-gray-200 shadow-sm">
@@ -1876,6 +1726,156 @@ export const HabitDashboard = ({
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* AI Generated Habits Section */}
+          {aiGeneratedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl shadow-lg">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">🤖 AI-Generated Habits</h3>
+                  <p className="text-gray-600">Habits created based on your role model selection</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {aiGeneratedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).map((habit) => (
+                  <div key={habit.id} className="relative group">
+                    <HabitCard 
+                      habit={habit} 
+                      onToggle={() => toggleHabit(habit.id)}
+                      onSchedule={() => handleScheduleHabit(habit)}
+                      onGenerateGoal={() => generateGoalForHabit(habit)}
+                      onDelete={() => deleteHabit(habit.id)}
+                      onAddHabit={addHabitFromSuggestion}
+                    />
+                    <CompactStrengthMeter habit={habit} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Paired Habits Section - Bad Habit + Positive Alternative */}
+          {pairedHabits.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">🔄 Habit Replacement Pairs</h3>
+                  <p className="text-gray-600">Bad habits with their positive alternatives - only positive habits are reminded</p>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                {pairedHabits.map(({ badHabit, positiveHabit }) => (
+                  <Card key={badHabit.id} className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-3 bg-red-500 rounded-xl shadow-lg">
+                            <AlertTriangle className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-red-900 text-lg">Replace This</h4>
+                            <p className="text-sm text-red-700">{badHabit.title}</p>
+                            <p className="text-xs text-red-600">(No reminders)</p>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl">🔄</div>
+                          <p className="text-xs text-gray-600 font-medium">Switch to</p>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <h4 className="font-bold text-green-900 text-right text-lg">With This</h4>
+                            <p className="text-sm text-green-700 text-right">{positiveHabit.title}</p>
+                            <p className="text-xs text-green-600 text-right">(Reminded)</p>
+                          </div>
+                          <div className="p-3 bg-green-500 rounded-xl shadow-lg">
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Bad Habit Card */}
+                        <div className="border border-red-200 rounded-lg p-3 bg-red-50">
+                          <HabitCard 
+                            habit={badHabit} 
+                            onToggle={() => toggleHabit(badHabit.id)}
+                            onSchedule={() => handleScheduleHabit(badHabit)}
+                            onAddHabit={addHabitFromSuggestion}
+                          />
+                          <CompactStrengthMeter habit={badHabit} />
+                        </div>
+                        {/* Positive Habit Card */}
+                        <div className="border border-green-200 rounded-lg p-3 bg-green-50">
+                          <HabitCard 
+                            habit={positiveHabit} 
+                            onToggle={() => toggleHabit(positiveHabit.id)}
+                            onSchedule={() => handleScheduleHabit(positiveHabit)}
+                            onAddHabit={addHabitFromSuggestion}
+                          />
+                          <CompactStrengthMeter habit={positiveHabit} />
+                        </div>
+                      </div>
+                      
+                      {/* Reminder Info */}
+                      {positiveHabit.reminder && positiveHabit.reminder.enabled && (
+                        <div className="mt-4 p-3 bg-white rounded-lg border border-green-200">
+                          <div className="flex items-center space-x-2">
+                            <Bell className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-green-800">Positive Habit Reminder</span>
+                          </div>
+                          <p className="text-sm text-green-700 mt-1">
+                            You'll be reminded to do "{positiveHabit.title}" at {positiveHabit.reminder.time} ({positiveHabit.reminder.frequency}) - 
+                            this helps you replace the bad habit with the positive one!
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bad Habits Section */}
+          {badHabits.filter(h => !pairedHabits.some(p => p.badHabit.id === h.id)).length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
+                  <AlertTriangle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-red-900">⚠️ Bad Habits to Break</h3>
+                  <p className="text-red-700">Track and work on reducing these habits</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {badHabits.filter(h => !pairedHabits.some(p => p.badHabit.id === h.id)).map((habit) => (
+                  <div key={habit.id} className="relative group">
+                    <HabitCard 
+                      habit={habit} 
+                      onToggle={() => toggleHabit(habit.id)}
+                      onSchedule={() => handleScheduleHabit(habit)}
+                      onGenerateGoal={() => generateGoalForHabit(habit)}
+                      onDelete={() => deleteHabit(habit.id)}
+                      onAddHabit={addHabitFromSuggestion}
+                    />
+                    <CompactStrengthMeter habit={habit} />
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Schedule Habit Dialog */}
