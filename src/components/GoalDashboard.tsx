@@ -3,7 +3,7 @@ import { GoalCard } from './GoalCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Target, Trophy, Calendar, TrendingUp, Sparkles } from 'lucide-react';
+import { Plus, Target, Trophy, Calendar, TrendingUp, Sparkles, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -239,41 +239,8 @@ export const GoalDashboard = ({
         </Card>
       </div>
 
-      {/* AI Generated Goals Section */}
-      {aiGeneratedGoals.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">🤖 AI-Generated Goals</h2>
-              <p className="text-sm text-gray-600">Goals created based on your selected habits</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {aiGeneratedGoals.map((goal) => (
-              <div key={goal.id} className="relative">
-                <GoalCard 
-                  goal={goal} 
-                  onEdit={handleEditGoal}
-                />
-                {goal.sourceHabit && (
-                  <div className="absolute top-2 right-2">
-                    <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full border border-blue-200">
-                      From: {goal.sourceHabit}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Add Custom Goal Button */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-gray-900">Your Goals</h2>
         <Button 
           onClick={() => setShowAddForm(true)}
@@ -286,7 +253,7 @@ export const GoalDashboard = ({
 
       {/* Add/Edit Form */}
       {(showAddForm || editingGoal) && (
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="border-gray-200 shadow-sm mb-6">
           <CardHeader>
             <CardTitle className="text-gray-900">
               {editingGoal ? 'Edit Goal' : 'Add New Goal'}
@@ -384,6 +351,39 @@ export const GoalDashboard = ({
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* AI Generated Goals Section */}
+      {aiGeneratedGoals.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">AI-Generated Goals</h2>
+              <p className="text-sm text-gray-600">Goals created based on your selected habits</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {aiGeneratedGoals.map((goal) => (
+              <div key={goal.id} className="relative">
+                <GoalCard 
+                  goal={goal} 
+                  onEdit={handleEditGoal}
+                />
+                {goal.sourceHabit && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full border border-blue-200">
+                      From: {goal.sourceHabit}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* User Created Goals */}
