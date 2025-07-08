@@ -44,9 +44,9 @@ interface Habit {
     enabled: boolean;
     time: string;
     frequency: 'daily' | 'weekly' | 'custom';
-    daysOfWeek: number[];
-    customInterval: number;
-    customUnit: 'days' | 'weeks' | 'months';
+    daysOfWeek?: number[];
+    customInterval?: number;
+    customUnit?: 'days' | 'weeks' | 'months';
   };
   aiGenerated?: boolean;
 }

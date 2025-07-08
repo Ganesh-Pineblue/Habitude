@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,6 @@ import {
   Trophy, 
   Users, 
   Target, 
- 
-  Share2, 
   MessageCircle, 
   Heart, 
   Crown, 
@@ -23,7 +21,8 @@ import {
   Send,
   Sparkles,
   Brain,
-  Activity
+  Activity,
+  Share2
 } from 'lucide-react';
 
 interface Challenge {
@@ -276,6 +275,7 @@ export const HabitChallenges: React.FC<HabitChallengesProps> = ({ currentUser })
   const [buddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
   const [activeTab, setActiveTab] = useState('challenges');
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
+  const [showFindBuddies, setShowFindBuddies] = useState(false);
 
   const [newChallenge, setNewChallenge] = useState({
     title: '',

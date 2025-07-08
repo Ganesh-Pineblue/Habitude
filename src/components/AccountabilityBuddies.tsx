@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { 
-  Users, MessageCircle, Heart, Star, UserPlus, Search,
+  MessageCircle, Star, UserPlus, Search,
   Clock, Calendar, Target, Zap, Crown, Award, CheckCircle2,
   AlertCircle, TrendingUp, Activity, Brain, Heart as HeartIcon
 } from 'lucide-react';

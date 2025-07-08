@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Settings, 
-  Mail, 
   Bell,
   Save,
   Palette,
   Eye,
-  EyeOff,
   RotateCcw
 } from 'lucide-react';
 import { useAdminSettings } from '@/hooks/useAdminSettings';

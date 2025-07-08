@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,15 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
   Search, 
-  Calendar, 
   Edit, 
   Trash2, 
   FileText,
   Quote,
   BookOpen,
-  Image,
-  Eye,
-  EyeOff
+  Eye
 } from 'lucide-react';
 import {
   Dialog,
@@ -246,7 +243,7 @@ export const ContentManagement = () => {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, title: e.target.value }))}
                 placeholder="Enter suggestion title"
                 required
               />
@@ -256,7 +253,7 @@ export const ContentManagement = () => {
               <Textarea
                 id="content"
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, content: e.target.value }))}
                 placeholder="Write your daily suggestion..."
                 rows={4}
                 required
@@ -272,7 +269,7 @@ export const ContentManagement = () => {
               <Textarea
                 id="text"
                 value={formData.text}
-                onChange={(e) => setFormData(prev => ({ ...prev, text: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, text: e.target.value }))}
                 placeholder="Enter inspirational quote..."
                 rows={3}
                 required
@@ -283,7 +280,7 @@ export const ContentManagement = () => {
               <Input
                 id="author"
                 value={formData.author}
-                onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, author: e.target.value }))}
                 placeholder="Quote author"
                 required
               />
@@ -298,7 +295,7 @@ export const ContentManagement = () => {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, title: e.target.value }))}
                 placeholder="Enter article title"
                 required
               />
@@ -308,7 +305,7 @@ export const ContentManagement = () => {
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
-                onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, excerpt: e.target.value }))}
                 placeholder="Brief article summary..."
                 rows={2}
                 required
@@ -319,7 +316,7 @@ export const ContentManagement = () => {
               <Textarea
                 id="content"
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, content: e.target.value }))}
                 placeholder="Write the full article content..."
                 rows={8}
                 required
@@ -331,7 +328,7 @@ export const ContentManagement = () => {
                 <Input
                   id="author"
                   value={formData.author}
-                  onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
+                  onChange={(e) => setFormData((prev: any) => ({ ...prev, author: e.target.value }))}
                   placeholder="Author name"
                   required
                 />
@@ -341,7 +338,7 @@ export const ContentManagement = () => {
                 <Input
                   id="readTime"
                   value={formData.readTime}
-                  onChange={(e) => setFormData(prev => ({ ...prev, readTime: e.target.value }))}
+                  onChange={(e) => setFormData((prev: any) => ({ ...prev, readTime: e.target.value }))}
                   placeholder="e.g., 5 min"
                   required
                 />
@@ -353,7 +350,7 @@ export const ContentManagement = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="category">Category</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+            <Select value={formData.category} onValueChange={(value) => setFormData((prev: any) => ({ ...prev, category: value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -374,7 +371,7 @@ export const ContentManagement = () => {
               id="scheduledDate"
               type="date"
               value={formData.scheduledDate}
-              onChange={(e) => setFormData(prev => ({ ...prev, scheduledDate: e.target.value }))}
+              onChange={(e) => setFormData((prev: any) => ({ ...prev, scheduledDate: e.target.value }))}
               required
             />
           </div>
@@ -382,7 +379,7 @@ export const ContentManagement = () => {
 
         <div>
           <Label htmlFor="status">Status</Label>
-          <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as any }))}>
+          <Select value={formData.status} onValueChange={(value) => setFormData((prev: any) => ({ ...prev, status: value as any }))}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

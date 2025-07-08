@@ -1,29 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Calendar, 
   Target, 
   Flame, 
   Award, 
-  Brain,
   Heart,
   Star,
-  BarChart3,
-  CheckCircle,
-  TrendingUp,
-  Plus,
-  BarChart,
-  Zap,
-  ChevronLeft,
-  ChevronRight
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { HabitCard } from './HabitCard';
 import { AnimatedNumber } from '@/components/ui/animated-number';
-// QuickStats, WeeklyProgress, and HabitStrengthMeter integrated directly
-import { AICoordinatedCalendar } from './AICoordinatedCalendar';
 
 interface ModernDashboardProps {
   habits: any[];

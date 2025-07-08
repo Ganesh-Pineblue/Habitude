@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CheckCircle2, Circle, Clock, Lightbulb, Flame, Calendar, BarChart3, Bell, AlertTriangle, XCircle, CalendarDays, X, Trash2, Zap, Target, TrendingUp, Activity, Sparkles, Brain, Plus, Trophy, Star } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle2, Circle, Clock, Lightbulb, Flame, Calendar, BarChart3, Bell, AlertTriangle, XCircle, Trash2, Zap, Target, TrendingUp, Sparkles, Brain, Plus, Trophy, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ interface Habit {
     frequency: 'daily' | 'weekly' | 'custom';
     daysOfWeek?: number[];
     customInterval?: number;
-    customUnit: 'days' | 'weeks' | 'months';
+    customUnit?: 'days' | 'weeks' | 'months';
   };
 }
 

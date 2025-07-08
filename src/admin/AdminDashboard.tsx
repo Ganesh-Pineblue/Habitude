@@ -1,18 +1,15 @@
-import React from 'react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Users, 
-  Target, 
-  TrendingUp, 
-  AlertCircle,
-  Activity,
-  Calendar,
   CheckCircle,
   Clock,
   BarChart3,
-  Award
+  Award,
+  AlertCircle,
+  TrendingUp
 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+
 import { Badge } from '@/components/ui/badge';
 
 export const AdminDashboard = () => {

@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
@@ -7,7 +6,6 @@ import {
   BarChart3, 
   Settings, 
   Shield,
-  Home,
   LogOut,
   Target,
   FileText,
@@ -26,7 +24,6 @@ interface AdminNavigationProps {
 }
 
 export const AdminNavigation = ({ activeSection, onSectionChange, onCollapseChange }: AdminNavigationProps) => {
-  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleCollapse = () => {

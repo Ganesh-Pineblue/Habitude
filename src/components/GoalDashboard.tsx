@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { GoalCard } from './GoalCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Target, Trophy, Calendar, TrendingUp, Sparkles, Bot } from 'lucide-react';
+import { Plus, Target, Trophy, Calendar, TrendingUp, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface Goal {

@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 export const FriendlyChatbotLogo = ({ size = 100 }) => (
   <svg width={size} height={size} viewBox="0 0 100 100" fill="none">

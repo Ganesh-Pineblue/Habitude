@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
 
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (type: 'password' | 'otp') => {
+  const handleSubmit = async () => {
     setLoading(true);
     // Simulate login
     setTimeout(() => {
