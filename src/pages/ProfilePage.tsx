@@ -360,18 +360,37 @@ export const ProfilePage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="roleModelHabits" className="text-sm font-semibold text-gray-700 flex items-center">
+                    <Label className="text-sm font-semibold text-gray-700 flex items-center">
                       <Target className="w-4 h-4 mr-2 text-purple-600" />
                       Role Model Habits
                     </Label>
-                    <Textarea
-                      id="roleModelHabits"
-                      value={editedUser.roleModelHabits}
-                      onChange={(e) => setEditedUser({ ...editedUser, roleModelHabits: e.target.value })}
-                      placeholder="The habits and qualities of your selected role model will appear here..."
-                      className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] transition-all duration-200"
-                      readOnly={!!editedUser.roleModel}
-                    />
+                    <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                      {editedUser.roleModelHabits ? (
+                        editedUser.roleModelHabits.split(', ').map((habit, index) => (
+                          <div key={index} className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <span>{habit.trim()}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const habitsArray = editedUser.roleModelHabits.split(', ');
+                                const updatedHabits = habitsArray.filter((_, i) => i !== index);
+                                setEditedUser({
+                                  ...editedUser,
+                                  roleModelHabits: updatedHabits.join(', ')
+                                });
+                              }}
+                              className="ml-2 text-purple-600 hover:text-purple-800 focus:outline-none"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <span className="text-gray-500 italic text-sm">
+                          Select a role model to see their habits here...
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
