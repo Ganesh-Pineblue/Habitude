@@ -16,7 +16,7 @@ import MoodSelectorPopup from '@/components/MoodSelectorPopup';
 import LogoutMoodCapture from '@/components/LogoutMoodCapture';
 import GuidedTour from '@/components/GuidedTour';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Star, Award } from 'lucide-react';
+import { Star, Award, Bot } from 'lucide-react';
 import { moodStorage } from '@/lib/moodStorage';
 
 interface User {
@@ -383,7 +383,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
                 data-tour="ai-coach"
                 className="text-xs sm:text-sm font-medium text-gray-600 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:shadow-lg px-2 py-1.5 w-full h-full rounded-xl hover:bg-gray-200/50 transition-all duration-200 flex items-center justify-center"
               >
-                🤖
+                <Bot className="w-4 h-4" />
                 <span className="hidden sm:inline ml-1">AI Coach</span>
               </TabsTrigger>
               <TabsTrigger 

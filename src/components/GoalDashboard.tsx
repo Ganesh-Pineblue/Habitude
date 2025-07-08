@@ -272,7 +272,7 @@ export const GoalDashboard = ({
         </div>
       )}
 
-      {/* Add New Goal Button */}
+      {/* Add Custom Goal Button */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold text-gray-900">Your Goals</h2>
         <Button 
@@ -280,7 +280,7 @@ export const GoalDashboard = ({
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add New Goal
+          Add Custom Goal
         </Button>
       </div>
 
@@ -410,7 +410,7 @@ export const GoalDashboard = ({
             className="bg-green-600 hover:bg-green-700 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Your First Goal
+            Add Your First Custom Goal
           </Button>
         </div>
       )}

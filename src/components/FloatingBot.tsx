@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, MessageCircle, Brain } from 'lucide-react';
+import { X, MessageCircle, Brain, Bot } from 'lucide-react';
 import { AICoach } from './AICoach';
 import { AIInsights } from './AIInsights';
 
@@ -32,12 +32,7 @@ export const FloatingBot = ({
           className="w-20 h-20 rounded-full bg-green-400 hover:bg-green-500 shadow-2xl border-4 border-green-300 p-0 overflow-hidden"
           style={{ animation: 'pulse 3s ease-in-out infinite' }}
         >
-          <img
-            src="/images/chatbot.png"
-            alt="AI Bot"
-            className="w-full h-full object-contain bg-transparent"
-            style={{ animation: 'pulse 3s ease-in-out infinite' }}
-          />
+          <Bot className="w-10 h-10 text-white" />
         </Button>
       </div>
 
@@ -48,12 +43,7 @@ export const FloatingBot = ({
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-3">
-                  <img
-                    src="/images/chatbot.png"
-                    alt="AI Bot"
-                    className="w-8 h-8 object-contain bg-transparent"
-                    style={{ animation: 'pulse 3s ease-in-out infinite' }}
-                  />
+                  <Bot className="w-8 h-8 text-green-600" />
                   <span>AI Assistant</span>
                 </CardTitle>
                 <Button

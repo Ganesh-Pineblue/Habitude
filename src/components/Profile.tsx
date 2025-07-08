@@ -85,44 +85,7 @@ export const Profile = ({ user, onClose, onSave }: ProfileProps) => {
             </div>
           </div>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{user.streak || 0}</p>
-                    <p className="text-sm text-gray-600">Current Streak</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-5 h-5 text-blue-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{user.totalHabits || 0}</p>
-                    <p className="text-sm text-gray-600">Total Habits</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <User className="w-5 h-5 text-purple-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{user.completedHabits || 0}</p>
-                    <p className="text-sm text-gray-600">Completed</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+
 
           {/* Edit Form */}
           {isEditing && (
