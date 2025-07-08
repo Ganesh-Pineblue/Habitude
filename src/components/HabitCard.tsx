@@ -778,9 +778,6 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             <AICoordinatedCalendar
               habits={[habit]}
               goals={[]}
-              onToggleHabit={onToggle}
-              onEditHabit={() => {}}
-              onEditGoal={() => {}}
               onScheduleHabit={() => {}}
             />
           </div>

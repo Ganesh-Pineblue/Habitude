@@ -7,7 +7,9 @@ import {
   Award, 
   Heart,
   Star,
-  BarChart3
+  BarChart3,
+  Brain,
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedNumber } from '@/components/ui/animated-number';

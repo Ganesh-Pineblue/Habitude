@@ -1,46 +1,18 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { 
+import {
   Calendar,
   Clock,
   Target,
-  CheckCircle2,
-  Circle,
-  Plus,
-  MoreHorizontal,
-  Filter,
-  TrendingUp,
-  Sparkles,
-  Brain,
-  Users,
-  Coffee,
-  Sun,
-  Moon,
-  Star,
-  ArrowRight,
-  Play,
-  Pause,
-  Eye,
   BrainCircuit,
-  Lightbulb,
-  BarChart3,
   Activity,
-  Zap,
   Mail,
-  Phone,
-  Smartphone,
-  Settings,
-  Home,
-  User,
-  Search,
-  Layout,
   RefreshCw,
   AlertTriangle,
   CheckCircle,
@@ -48,65 +20,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
-  Clock4,
-  Timer,
   CalendarCheck,
-  CalendarX,
-  CalendarPlus,
   Smartphone as Mobile,
   Monitor,
-  Wifi,
   WifiOff,
-  Shield,
-  Lock,
-  Unlock,
-  Bell,
-  BellOff,
   Settings2,
-  Zap as Lightning,
-  Target as Bullseye,
-  TrendingUp as ChartUp,
-  PieChart,
-  Clock3,
-  Calendar as CalendarIcon,
-  MapPin,
-  Navigation,
-  Route,
-  Car,
-  Bus,
-  Train,
-  Plane,
-  Ship,
-  Bike,
-  Dumbbell,
-  Heart,
-  Brain as Mind,
-  BookOpen,
-  GraduationCap,
-  Briefcase,
-  Home as House,
-  Utensils,
-  Bed,
-  Pill,
-  Stethoscope,
-  Microscope,
-  TestTube,
-  Syringe,
-  Thermometer,
-  Activity as Pulse,
-  Scale,
-  Ruler,
-  Calculator,
-  Clock1,
-  Clock2,
-  Clock5,
-  Clock6,
-  Clock7,
-  Clock8,
-  Clock9,
-  Clock10,
-  Clock11,
-  Clock12
+  MapPin
 } from 'lucide-react';
 
 interface Habit {
@@ -190,9 +109,6 @@ interface SchedulingConflict {
 interface AICoordinatedCalendarProps {
   habits: Habit[];
   goals: Goal[];
-  onToggleHabit?: (habitId: string) => void;
-  onEditHabit?: (habit: Habit) => void;
-  onEditGoal?: (goal: Goal) => void;
   onScheduleHabit?: (habitId: string, time: Date) => void;
 }
 
@@ -201,16 +117,11 @@ type ViewMode = 'day' | 'week' | 'month' | 'ai-suggestions' | 'time-blocks' | 'c
 export const AICoordinatedCalendar = ({ 
   habits, 
   goals, 
-  onToggleHabit, 
-  onEditHabit,
-  onEditGoal,
   onScheduleHabit
 }: AICoordinatedCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('day');
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
@@ -249,20 +160,6 @@ export const AICoordinatedCalendar = ({
     apple: false
   });
   
-  const [showConflictModal, setShowConflictModal] = useState(false);
-  const [selectedConflict, setSelectedConflict] = useState<SchedulingConflict | null>(null);
-  const [showAddEventModal, setShowAddEventModal] = useState(false);
-  const [newEvent, setNewEvent] = useState({
-    title: '',
-    start: '',
-    end: '',
-    description: '',
-    location: '',
-    isAllDay: false
-  });
-  const [weekViewDates, setWeekViewDates] = useState<Date[]>([]);
-  const [monthViewDates, setMonthViewDates] = useState<Date[][]>([]);
-
   // Simulate calendar connection
   useEffect(() => {
     const simulateConnection = async () => {
@@ -302,41 +199,6 @@ export const AICoordinatedCalendar = ({
     };
     
     simulateConnection();
-  }, [currentDate]);
-
-  // Generate week and month view dates
-  useEffect(() => {
-    // Generate week view dates
-    const weekStart = new Date(currentDate);
-    weekStart.setDate(currentDate.getDate() - currentDate.getDay());
-    const weekDates: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(weekStart);
-      date.setDate(weekStart.getDate() + i);
-      weekDates.push(date);
-    }
-    setWeekViewDates(weekDates);
-
-    // Generate month view dates
-    const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-    const startDate = new Date(monthStart);
-    startDate.setDate(monthStart.getDate() - monthStart.getDay());
-    
-    const monthDates: Date[][] = [];
-    let currentWeek: Date[] = [];
-    
-    for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
-      currentWeek.push(date);
-      
-      if (currentWeek.length === 7) {
-        monthDates.push([...currentWeek]);
-        currentWeek = [];
-      }
-    }
-    setMonthViewDates(monthDates);
   }, [currentDate]);
 
   // Generate AI suggestions
@@ -415,7 +277,7 @@ export const AICoordinatedCalendar = ({
     return Math.random() > 0.7 ? 'rainy' : 'sunny';
   };
 
-  const isLocationAvailable = (location: string): boolean => {
+  const isLocationAvailable = (): boolean => {
     // Simulate location availability
     return Math.random() > 0.3;
   };
@@ -423,7 +285,6 @@ export const AICoordinatedCalendar = ({
   // Helper functions for conflict detection
   const generateAlternativeTimes = (habit: Habit, event: CalendarEvent) => {
     const alternatives = [];
-    const eventDuration = (event.end.getTime() - event.start.getTime()) / (1000 * 60);
     
     // Suggest before the event
     const beforeEvent = new Date(event.start);
@@ -484,7 +345,7 @@ export const AICoordinatedCalendar = ({
     return alternatives;
   };
 
-  const generateWeatherAlternatives = (habit: Habit) => {
+  const generateWeatherAlternatives = () => {
     const alternatives = [];
     
     // Suggest indoor alternatives
@@ -509,7 +370,7 @@ export const AICoordinatedCalendar = ({
     return alternatives;
   };
 
-  const generateLocationAlternatives = (habit: Habit) => {
+  const generateLocationAlternatives = () => {
     const alternatives = [];
     
     // Suggest alternative locations
@@ -555,13 +416,6 @@ export const AICoordinatedCalendar = ({
   };
 
   const showConflictNotification = (conflict: SchedulingConflict) => {
-    const severityColors = {
-      low: 'bg-blue-50 border-blue-200 text-blue-800',
-      medium: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-      high: 'bg-orange-50 border-orange-200 text-orange-800',
-      critical: 'bg-red-50 border-red-200 text-red-800'
-    };
-
     toast({
       title: conflict.title,
       description: (
@@ -668,7 +522,7 @@ export const AICoordinatedCalendar = ({
           title: `Weather Conflict: ${habit.title}`,
           description: `Your ${habit.title} habit is weather-dependent, but current weather is not suitable.`,
           conflictingHabit: habit,
-          suggestedAlternatives: generateWeatherAlternatives(habit),
+          suggestedAlternatives: generateWeatherAlternatives(),
           resolved: false,
           createdAt: new Date()
         };
@@ -677,7 +531,7 @@ export const AICoordinatedCalendar = ({
       }
       
       // Check for location conflicts
-      if (habit.location && !isLocationAvailable(habit.location)) {
+      if (habit.location && !isLocationAvailable()) {
         const conflict: SchedulingConflict = {
           id: `location-${habit.id}`,
           type: 'location-unavailable',
@@ -685,7 +539,7 @@ export const AICoordinatedCalendar = ({
           title: `Location Unavailable: ${habit.title}`,
           description: `Your ${habit.title} habit requires ${habit.location}, but it's currently unavailable.`,
           conflictingHabit: habit,
-          suggestedAlternatives: generateLocationAlternatives(habit),
+          suggestedAlternatives: generateLocationAlternatives(),
           resolved: false,
           createdAt: new Date()
         };
@@ -785,7 +639,7 @@ export const AICoordinatedCalendar = ({
     return blocks;
   }, [currentDate, calendarEvents, habits]);
 
-  const connectCalendar = async (provider: 'google' | 'outlook' | 'apple') => {
+  const connectCalendar = async () => {
     setSyncStatus('syncing');
     try {
       // Simulate API call
@@ -842,7 +696,7 @@ export const AICoordinatedCalendar = ({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => connectCalendar('google')}
+              onClick={() => connectCalendar()}
               disabled={syncStatus === 'syncing'}
             >
               {syncStatus === 'syncing' ? (
@@ -859,7 +713,7 @@ export const AICoordinatedCalendar = ({
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => connectCalendar('google')}
+            onClick={() => connectCalendar()}
           >
             <Mail className="w-4 h-4" />
             Google Calendar
@@ -867,7 +721,7 @@ export const AICoordinatedCalendar = ({
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => connectCalendar('outlook')}
+            onClick={() => connectCalendar()}
           >
             <Monitor className="w-4 h-4" />
             Outlook Calendar
@@ -875,7 +729,7 @@ export const AICoordinatedCalendar = ({
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => connectCalendar('apple')}
+            onClick={() => connectCalendar()}
           >
             <Mobile className="w-4 h-4" />
             Phone Calendar
@@ -1434,7 +1288,25 @@ export const AICoordinatedCalendar = ({
   );
 
   const renderCalendarView = () => {
-    const today = new Date();
+    const getHabitsForDate = () => {
+      return habits.filter(() => {
+        // Mock filter logic
+        return Math.random() > 0.5;
+      });
+    };
+
+    const getGoalsForDate = () => {
+      return goals.filter(() => {
+        // Mock filter logic
+        return Math.random() > 0.5;
+      });
+    };
+
+    const isToday = (date: Date) => {
+      const today = new Date();
+      return date.toDateString() === today.toDateString();
+    };
+
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
     
@@ -1457,32 +1329,6 @@ export const AICoordinatedCalendar = ({
       const date = new Date(currentYear, currentMonth, day);
       calendarDays.push(date);
     }
-    
-    // Get habits and goals for the current month
-    const getHabitsForDate = (date: Date) => {
-      return habits.filter(habit => {
-        // For demo purposes, show habits on random days
-        // In a real app, this would check actual scheduling
-        const dayOfMonth = date.getDate();
-        return dayOfMonth % 3 === 0 || dayOfMonth % 5 === 0;
-      });
-    };
-    
-    const getGoalsForDate = (date: Date) => {
-      return goals.filter(goal => {
-        // For demo purposes, show goals on specific days
-        const dayOfMonth = date.getDate();
-        return dayOfMonth % 7 === 0;
-      });
-    };
-    
-    const isToday = (date: Date) => {
-      return date.toDateString() === today.toDateString();
-    };
-    
-    const isCurrentMonth = (date: Date) => {
-      return date.getMonth() === currentMonth;
-    };
 
     return (
       <div className="space-y-6">
@@ -1540,8 +1386,8 @@ export const AICoordinatedCalendar = ({
                 );
               }
               
-              const dayHabits = getHabitsForDate(date);
-              const dayGoals = getGoalsForDate(date);
+              const dayHabits = getHabitsForDate();
+              const dayGoals = getGoalsForDate();
               const isCurrentDay = isToday(date);
               
               return (
@@ -1657,7 +1503,7 @@ export const AICoordinatedCalendar = ({
                     checked={connectedCalendars.google}
                     onCheckedChange={(checked) => {
                       setConnectedCalendars(prev => ({ ...prev, google: checked }));
-                      if (checked) connectCalendar('google');
+                      if (checked) connectCalendar();
                     }}
                   />
                 </div>
@@ -1675,7 +1521,7 @@ export const AICoordinatedCalendar = ({
                     checked={connectedCalendars.outlook}
                     onCheckedChange={(checked) => {
                       setConnectedCalendars(prev => ({ ...prev, outlook: checked }));
-                      if (checked) connectCalendar('outlook');
+                      if (checked) connectCalendar();
                     }}
                   />
                 </div>
@@ -1693,7 +1539,7 @@ export const AICoordinatedCalendar = ({
                     checked={connectedCalendars.apple}
                     onCheckedChange={(checked) => {
                       setConnectedCalendars(prev => ({ ...prev, apple: checked }));
-                      if (checked) connectCalendar('apple');
+                      if (checked) connectCalendar();
                     }}
                   />
                 </div>
