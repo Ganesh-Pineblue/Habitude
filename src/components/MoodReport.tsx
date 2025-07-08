@@ -2,18 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { 
   BarChart3, 
   TrendingUp, 
-  Calendar, 
   Target, 
   Flame,
   CheckCircle2,
   XCircle,
   Activity,
   Zap,
-  Clock,
   Award,
   Brain,
   Heart,
@@ -23,8 +20,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from '@/components/ui/chart';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
@@ -428,7 +423,6 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
                     <XAxis dataKey="dayName" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    {/* <ChartLegend content={<ChartLegendContent />} /> */}
                     <Line
                       type="monotone"
                       dataKey="completionRate"
@@ -473,7 +467,6 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
                     <XAxis dataKey="day" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    {/* <ChartLegend content={<ChartLegendContent />} /> */}
                     <Bar dataKey="completionRate" fill="#10b981" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="averageStreak" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>

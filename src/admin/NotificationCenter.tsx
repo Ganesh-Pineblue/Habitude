@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,15 +13,10 @@ import {
   Calendar,
   Edit,
   Trash2,
-  Play
+  Play,
+  Search
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import {
   Select,
   SelectContent,
@@ -149,14 +144,14 @@ export const NotificationCenter = () => {
     });
   };
 
-  const handleEditNotification = (notification: Notification) => {
+  const handleEditNotification = () => {
     toast({
       title: "Notification Edited",
       description: "The notification has been edited.",
     });
   };
 
-  const handleRescheduleNotification = (id: number) => {
+  const handleRescheduleNotification = () => {
     toast({
       title: "Notification Rescheduled",
       description: "The notification has been rescheduled.",

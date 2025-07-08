@@ -66,12 +66,6 @@ const moodReasons = {
   ],
 };
 
-const steps = [
-  'Select Mood',
-  'Select Reason',
-  'Suggestions',
-];
-
 const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect, onClose }) => {
   const [step, setStep] = useState(1); // 1: mood, 2: reason, 3: suggestions
   const [selectedMood, setSelectedMood] = useState<string | null>(null);

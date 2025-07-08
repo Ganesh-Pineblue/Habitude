@@ -5,9 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
-  MessageCircle, Star, UserPlus, Search,
-  Clock, Calendar, Target, Zap, Crown, Award, CheckCircle2,
-  AlertCircle, TrendingUp, Activity, Brain, Heart as HeartIcon
+  MessageCircle, UserPlus, Target, Crown, Heart as HeartIcon
 } from 'lucide-react';
 
 interface AccountabilityBuddy {
@@ -96,8 +94,8 @@ const defaultRequests: BuddyRequest[] = [
   }
 ];
 
-export const AccountabilityBuddies: React.FC<AccountabilityBuddiesProps> = ({ habits, currentUser }) => {
-  const [buddies, setBuddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
+export const AccountabilityBuddies: React.FC<AccountabilityBuddiesProps> = ({ habits }) => {
+  const [buddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
   const [requests, setRequests] = useState<BuddyRequest[]>(defaultRequests);
   const [showFindBuddies, setShowFindBuddies] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

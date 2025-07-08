@@ -5,23 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Clock, 
-  Zap, 
   Target, 
   Brain, 
   TrendingUp, 
-  Calendar, 
   Activity, 
   Sparkles,
   Lightbulb,
-  Timer,
-  Coffee,
-  BookOpen,
-  Heart,
-  Users,
-  CheckCircle2,
-  Play,
-  Pause,
-  RotateCcw,
   Plus
 } from 'lucide-react';
 
@@ -103,10 +92,7 @@ export const AdaptiveHabitSuggestionEngine: React.FC<AdaptiveHabitSuggestionEngi
   onCompleteHabit,
   personalityProfile
 }) => {
-  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
   const [currentSuggestions, setCurrentSuggestions] = useState<MicroHabit[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [userPatterns, setUserPatterns] = useState<UserPattern | null>(null);
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
 
@@ -263,59 +249,6 @@ export const AdaptiveHabitSuggestionEngine: React.FC<AdaptiveHabitSuggestionEngi
       priority: 'medium'
     }
   ], []);
-
-  // Analyze user patterns and identify idle time blocks
-  const analyzeUserPatterns = useMemo(() => {
-    if (!habits.length) return null;
-
-    const currentHour = currentTime.getHours();
-    const currentMinute = currentTime.getMinutes();
-    const currentTimeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-
-    // Analyze habit completion patterns
-    const habitCompletionPatterns: { [habitId: string]: { [time: string]: number } } = {};
-    habits.forEach(habit => {
-      if (habit.reminder?.time) {
-        const time = habit.reminder.time;
-        habitCompletionPatterns[habit.id] = { [time]: habit.completionRate || 0 };
-      }
-    });
-
-    // Identify common idle time patterns
-    const commonIdleTimes = [];
-    const completedHabits = habits.filter(h => h.completedToday);
-    const incompleteHabits = habits.filter(h => !h.completedToday);
-
-    // If user has completed morning habits, suggest mid-morning activities
-    if (currentHour >= 6 && currentHour <= 10 && completedHabits.length > 0) {
-      commonIdleTimes.push('09:00', '10:30');
-    }
-
-    // Afternoon slump time
-    if (currentHour >= 14 && currentHour <= 16) {
-      commonIdleTimes.push('15:00', '15:30');
-    }
-
-    // Evening transition time
-    if (currentHour >= 17 && currentHour <= 19) {
-      commonIdleTimes.push('18:00', '18:30');
-    }
-
-    // Generate user patterns
-    const patterns: UserPattern = {
-      wakeTime: '06:00',
-      sleepTime: '22:00',
-      workHours: { start: '09:00', end: '17:00' },
-      energyPeaks: ['08:00', '14:00'],
-      energyLows: ['15:00', '21:00'],
-      commonIdleTimes,
-      habitCompletionPatterns,
-      moodPatterns: { [currentTimeString]: currentMood },
-      productivityPatterns: { [currentTimeString]: Math.min(currentMood * 20, 100) }
-    };
-
-    return patterns;
-  }, [habits, currentTime, currentMood]);
 
   // Analyze current context and suggest micro-habits
   const analyzeAndSuggest = useMemo(() => {
@@ -485,16 +418,6 @@ export const AdaptiveHabitSuggestionEngine: React.FC<AdaptiveHabitSuggestionEngi
       case 'mindfulness': return <Brain className="w-4 h-4" />;
       case 'social': return <Users className="w-4 h-4" />;
       default: return <Activity className="w-4 h-4" />;
-    }
-  };
-
-  // Get energy level color
-  const getEnergyLevelColor = (level: string) => {
-    switch (level) {
-      case 'high': return 'text-green-600 bg-green-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
     }
   };
 

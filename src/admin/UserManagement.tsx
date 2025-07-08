@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -8,17 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Search, 
-  Filter, 
-  MoreHorizontal, 
   UserPlus,
   Mail,
-  Shield,
-  Ban,
   Edit,
   Trash2,
-  Send,
-  Eye,
-  EyeOff
+  Ban,
+  Shield
 } from 'lucide-react';
 import {
   Table,

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Brain, ArrowRight, ArrowLeft, Sparkles, User, CheckCircle, Search, Loader2, Zap } from 'lucide-react';
@@ -462,7 +461,7 @@ class AIPersonalityService {
     return descriptions[Math.floor(Math.random() * descriptions.length)];
   }
 
-  private generatePersonalityImage(name: string): string {
+  private generatePersonalityImage(): string {
     // Use a placeholder image service or return a default
     const imageOptions = [
       '/images/steve.webp',
@@ -492,7 +491,7 @@ class AIGoalGenerationService {
 
   // Generate AI-powered goals based on selected habits - creating complementary goals, not duplicates
   generateGoalsFromHabits(selectedHabits: string[], personalityName: string): any[] {
-    const goals: any[] = [];
+
     
     // Analyze the selected habits to understand the user's focus areas
     const habitCategories = this.analyzeHabitCategories(selectedHabits);
@@ -538,7 +537,7 @@ class AIGoalGenerationService {
     return categories;
   }
 
-  private generateComplementaryGoals(habitCategories: { [category: string]: number }, personalityName: string): any[] {
+  private generateComplementaryGoals(habitCategories: { [category: string]: number }): any[] {
     const allGoals: any[] = [];
     
     // Health-focused complementary goals
@@ -1253,7 +1252,7 @@ class HabitConversionService {
   }
 }
 
-export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps) => {
+export const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1274,8 +1273,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
     selectedHabits: []
   });
 
-  const [showGenOptions, setShowGenOptions] = useState(false);
-  const [showGenderOptions, setShowGenderOptions] = useState(false);
+
 
   const totalSteps = 2;
   const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -1374,10 +1372,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
   const selectedPersonalityData = famousPersonalities.find(p => p.name === personalitySelection.selectedPersonality) ||
     searchResults.find(p => p.name === personalitySelection.selectedPersonality);
 
-  const filteredPersonalities = famousPersonalities.filter(personality =>
-    personality.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    personality.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
 
   // AI Personality Search Functions
   const handleSearch = async () => {
@@ -1455,7 +1450,7 @@ export const OnboardingFlow = ({ onComplete, onBack, user }: OnboardingFlowProps
           <CardContent className="px-4 pb-4">
             <div className="space-y-4">
               {/* Show both questions on the same page */}
-              {questions.map((question, index) => (
+              {questions.map((question) => (
                 <div 
                   key={question.id}
                   className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0"

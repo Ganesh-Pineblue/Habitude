@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Bot, Send, Sparkles, Target, Brain, Heart, Lightbulb, BookOpen } from 'lucide-react';
+
+import { Send, Sparkles, Target, Brain, Heart, Lightbulb, BookOpen } from 'lucide-react';
 
 interface AICoachProps {
   personalityProfile?: any;
