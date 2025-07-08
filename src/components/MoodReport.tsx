@@ -158,12 +158,15 @@ const generateCategoryData = (habits: Habit[] = []) => {
       totalHabits,
       completedHabits,
       averageStreak: Math.floor(Math.random() * 10) + 5,
-      color: {
-        health: '#10b981',
-        productivity: '#3b82f6',
-        mindfulness: '#8b5cf6',
-        social: '#f59e0b'
-      }[category as keyof typeof category]
+      color: (() => {
+        const colors = {
+          health: '#10b981',
+          productivity: '#3b82f6',
+          mindfulness: '#8b5cf6',
+          social: '#f59e0b'
+        };
+        return colors[category as keyof typeof colors] || '#6b7280';
+      })()
     };
   });
 };
@@ -206,7 +209,7 @@ const CustomDot = (props: any) => {
 
 export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab = 'mood' }) => {
   const [moodData] = useState<MoodData[]>(generateMockMoodData());
-  const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
+  // const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
 
   const historicalData = useMemo(() => generateHistoricalData(habits), [habits]);
   const weeklyData = useMemo(() => generateWeeklyData(habits), [habits]);
@@ -425,7 +428,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
                     <XAxis dataKey="dayName" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
+                    {/* <ChartLegend content={<ChartLegendContent />} /> */}
                     <Line
                       type="monotone"
                       dataKey="completionRate"
@@ -470,7 +473,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
                     <XAxis dataKey="day" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
+                    {/* <ChartLegend content={<ChartLegendContent />} /> */}
                     <Bar dataKey="completionRate" fill="#10b981" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="averageStreak" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>

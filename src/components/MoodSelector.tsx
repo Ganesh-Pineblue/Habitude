@@ -174,24 +174,24 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect, onClose }) =>
   };
 
   // Stepper UI
-  const Stepper = () => (
-    <div className="flex items-center justify-center mb-4">
-      {steps.map((label, idx) => (
-        <React.Fragment key={label}>
-          <div className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-all duration-300
-            ${step === idx + 1 ? 'bg-green-500 border-green-500 text-white scale-110 shadow-lg' : 'bg-white border-green-200 text-green-500'}
-          `}>
-            <span className="font-bold">{idx + 1}</span>
-          </div>
-          {idx < steps.length - 1 && (
-            <div className={`w-8 h-1 mx-1 rounded-full transition-all duration-300
-              ${step > idx + 1 ? 'bg-green-500' : 'bg-green-100'}`}
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+  // const Stepper = () => (
+  //   <div className="flex items-center justify-center mb-4">
+  //     {steps.map((label, idx) => (
+  //       <React.Fragment key={label}>
+  //         <div className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-all duration-300
+  //           ${step === idx + 1 ? 'bg-green-500 border-green-500 text-white scale-110 shadow-lg' : 'bg-white border-green-200 text-green-500'}
+  //         `}>
+  //           <span className="font-bold">{idx + 1}</span>
+  //         </div>
+  //         {idx < steps.length - 1 && (
+  //           <div className={`w-8 h-1 mx-1 rounded-full transition-all duration-300
+  //             ${step > idx + 1 ? 'bg-green-500' : 'bg-green-100'}`}
+  //           />
+  //         )}
+  //       </React.Fragment>
+  //     ))}
+  //   </div>
+  // );
 
   return (
     <div className="flex items-center justify-center bg-gradient-to-br from-green-100 via-white to-green-50 p-1">

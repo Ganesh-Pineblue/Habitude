@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,23 +12,16 @@ import {
   Trophy, 
   Users, 
   Target, 
-  Calendar, 
+ 
   Share2, 
   MessageCircle, 
   Heart, 
-  Star, 
-  Zap, 
   Crown, 
   Award, 
-  TrendingUp, 
   Plus, 
-  CheckCircle2, 
-  Clock, 
   UserPlus,
   Send,
-  Bell,
   Sparkles,
-  Flame,
   Brain,
   Activity
 } from 'lucide-react';
@@ -278,12 +271,12 @@ interface HabitChallengesProps {
   };
 }
 
-export const HabitChallenges: React.FC<HabitChallengesProps> = ({ habits, currentUser }) => {
+export const HabitChallenges: React.FC<HabitChallengesProps> = ({ currentUser }) => {
   const [challenges, setChallenges] = useState<Challenge[]>(defaultChallenges);
-  const [buddies, setBuddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
+  const [buddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
   const [activeTab, setActiveTab] = useState('challenges');
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
-  const [showFindBuddies, setShowFindBuddies] = useState(false);
+
   const [newChallenge, setNewChallenge] = useState({
     title: '',
     description: '',
@@ -639,7 +632,7 @@ export const HabitChallenges: React.FC<HabitChallengesProps> = ({ habits, curren
                       </Button>
                     </div>
 
-                    {myProgress?.achievements.length > 0 && (
+                    {myProgress?.achievements && myProgress.achievements.length > 0 && (
                       <div className="p-3 bg-white rounded-lg border border-green-200">
                         <div className="flex items-center space-x-2 mb-2">
                           <Award className="w-4 h-4 text-yellow-500" />

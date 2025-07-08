@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { HabitCard } from './HabitCard';
-import { MoodTracker } from './MoodTracker';
-import { AddHabitButton } from './AddHabitButton';
-// QuickStats, WeeklyProgress, and HabitStrengthMeter integrated directly
 import { HabitChallenges } from './HabitChallenges';
 import { SocialSharing } from './SocialSharing';
 import { AccountabilityBuddies } from './AccountabilityBuddies';
@@ -14,10 +11,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Calendar, BarChart3, Target, Zap, Plus, Edit3, Trash2, Bell, Clock, CalendarDays, Sparkles, AlertTriangle, CheckCircle2, Activity, Trophy, Users, Share2, UserPlus, Brain, Lightbulb, Facebook, Twitter, Instagram, Linkedin, TrendingUp, Heart, Flame } from 'lucide-react';
+import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp } from 'lucide-react';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface Habit {
@@ -47,9 +43,9 @@ interface Habit {
     enabled: boolean;
     time: string;
     frequency: 'daily' | 'weekly' | 'custom';
-    daysOfWeek: number[]; // 0 = Sunday, 1 = Monday, etc.
-    customInterval: number; // for custom frequency
-    customUnit: 'days' | 'weeks' | 'months';
+    daysOfWeek?: number[]; // 0 = Sunday, 1 = Monday, etc.
+    customInterval?: number; // for custom frequency
+    customUnit?: 'days' | 'weeks' | 'months';
   };
   aiGenerated?: boolean;
   pairedBadHabitId?: string;
@@ -89,17 +85,15 @@ const defaultHabits = [
 
 const steps = ["Welcome", "Role Model", "Habits", "Finish"];
 
-const OnboardingFlow = ({ onComplete }) => {
+const OnboardingFlow = ({ onComplete }: { onComplete: () => void }) => {
   const [step, setStep] = useState(0);
-  const [selectedRoleModel, setSelectedRoleModel] = useState<string | null>(null);
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
 
   // Progress bar width
   const progress = ((step + 1) / steps.length) * 100;
 
   // Step handlers
-  const handleRoleModelSelect = (roleModel) => {
-    setSelectedRoleModel(roleModel.name);
+  const handleRoleModelSelect = (roleModel: { name: string; habits: string[] }) => {
     setSelectedHabits(Array.from(new Set([...selectedHabits, ...roleModel.habits])));
     setStep(step + 1);
   };
@@ -196,7 +190,7 @@ const OnboardingFlow = ({ onComplete }) => {
   );
 };
 
-export default OnboardingFlow;
+
 
 export const HabitDashboard = ({ 
   tabValue = 'habits', 
@@ -345,44 +339,7 @@ export const HabitDashboard = ({
     }
   }, [habits, onHabitsUpdate]);
 
-  // Mock goals data
-  const [goals, setGoals] = useState<Goal[]>([
-    {
-      id: '1',
-      title: 'Lose 10 lbs',
-      description: 'Achieve target weight through consistent exercise and healthy eating',
-      target: 10,
-      current: 6.5,
-      unit: 'lbs',
-      deadline: '2025-08-01',
-      category: 'health',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Read 24 Books',
-      description: 'Complete 2 books per month to expand knowledge',
-      target: 24,
-      current: 12,
-      unit: 'books',
-      deadline: '2025-12-31',
-      category: 'productivity',
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      title: 'Meditate 100 Days',
-      description: 'Build a consistent meditation practice',
-      target: 100,
-      current: 75,
-      unit: 'days',
-      deadline: '2025-09-15',
-      category: 'mindfulness',
-      priority: 'high'
-    }
-  ]);
-
-  const [currentMood, setCurrentMood] = useState<number>(4);
+  const [currentMood] = useState<number>(4);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [schedulingHabit, setSchedulingHabit] = useState<Habit | null>(null);
@@ -427,7 +384,12 @@ export const HabitDashboard = ({
       // Disable reminder for the bad habit after creation
       habit.reminder = {
         ...habit.reminder,
-        enabled: false
+        enabled: false,
+        time: habit.reminder?.time || '09:00',
+        frequency: habit.reminder?.frequency || 'daily',
+        daysOfWeek: habit.reminder?.daysOfWeek || [1, 2, 3, 4, 5],
+        customInterval: habit.reminder?.customInterval || 1,
+        customUnit: habit.reminder?.customUnit || 'days'
       };
       // Create a new array including the new bad habit
       const newHabitsArray = [...habits, habit];
@@ -573,8 +535,7 @@ export const HabitDashboard = ({
   const aiGeneratedHabits = habits.filter(h => h.aiGenerated);
   const userCreatedHabits = habits.filter(h => !h.aiGenerated);
   
-  // Separate good and bad habits
-  const goodHabits = habits.filter(h => h.habitType !== 'bad');
+  // Separate bad habits
   const badHabits = habits.filter(h => h.habitType === 'bad');
 
   // Function to get positive habit alternatives for bad habits
@@ -661,7 +622,7 @@ export const HabitDashboard = ({
   };
 
   // Function to create a positive habit automatically when a bad habit is added
-  const createPositiveHabitForBadHabit = (badHabit: Habit) => {
+  const createPositiveHabitForBadHabit = (badHabit: Habit): Habit => {
     const alternativesList = getPositiveHabitAlternatives(badHabit.title, badHabit.category);
     
     // Normalize function for titles
@@ -1366,8 +1327,12 @@ export const HabitDashboard = ({
                           onChange={(e) => {
                             const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
                             const updatedDetails = { 
-                              ...badHabitDetails, 
-                              frequency: Number(e.target.value) 
+                              frequency: Number(e.target.value),
+                              frequencyUnit: badHabitDetails?.frequencyUnit || 'times_per_day',
+                              timeOfDay: badHabitDetails?.timeOfDay || [],
+                              triggers: badHabitDetails?.triggers || [],
+                              severity: badHabitDetails?.severity || 'low',
+                              impact: badHabitDetails?.impact || ''
                             };
                             if (editingHabit) {
                               setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
@@ -1385,8 +1350,12 @@ export const HabitDashboard = ({
                           onChange={(e) => {
                             const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
                             const updatedDetails = { 
-                              ...badHabitDetails, 
-                              frequencyUnit: e.target.value as 'times_per_day' | 'times_per_week' 
+                              frequency: badHabitDetails?.frequency || 0,
+                              frequencyUnit: e.target.value as 'times_per_day' | 'times_per_week',
+                              timeOfDay: badHabitDetails?.timeOfDay || [],
+                              triggers: badHabitDetails?.triggers || [],
+                              severity: badHabitDetails?.severity || 'low',
+                              impact: badHabitDetails?.impact || ''
                             };
                             if (editingHabit) {
                               setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
@@ -1408,11 +1377,15 @@ export const HabitDashboard = ({
                         placeholder="e.g., 8:00 AM, 12:00 PM, 6:00 PM"
                         value={editingHabit ? editingHabit.badHabitDetails?.timeOfDay?.join(', ') : newHabit.badHabitDetails?.timeOfDay?.join(', ')}
                         onChange={(e) => {
-                          const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
-                          const updatedDetails = { 
-                            ...badHabitDetails, 
-                            timeOfDay: e.target.value.split(',').map(t => t.trim()) 
-                          };
+                                                      const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
+                            const updatedDetails = { 
+                              frequency: badHabitDetails?.frequency || 0,
+                              frequencyUnit: badHabitDetails?.frequencyUnit || 'times_per_day',
+                              timeOfDay: e.target.value.split(',').map(t => t.trim()),
+                              triggers: badHabitDetails?.triggers || [],
+                              severity: badHabitDetails?.severity || 'low',
+                              impact: badHabitDetails?.impact || ''
+                            };
                           if (editingHabit) {
                             setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
                           } else {
@@ -1429,11 +1402,15 @@ export const HabitDashboard = ({
                         placeholder="e.g., Stress, After meals, Social situations"
                         value={editingHabit ? editingHabit.badHabitDetails?.triggers?.join(', ') : newHabit.badHabitDetails?.triggers?.join(', ')}
                         onChange={(e) => {
-                          const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
-                          const updatedDetails = { 
-                            ...badHabitDetails, 
-                            triggers: e.target.value.split(',').map(t => t.trim()) 
-                          };
+                                                      const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
+                            const updatedDetails = { 
+                              frequency: badHabitDetails?.frequency || 0,
+                              frequencyUnit: badHabitDetails?.frequencyUnit || 'times_per_day',
+                              timeOfDay: badHabitDetails?.timeOfDay || [],
+                              triggers: e.target.value.split(',').map(t => t.trim()),
+                              severity: badHabitDetails?.severity || 'low',
+                              impact: badHabitDetails?.impact || ''
+                            };
                           if (editingHabit) {
                             setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
                           } else {
@@ -1449,11 +1426,15 @@ export const HabitDashboard = ({
                       <select
                         value={editingHabit ? editingHabit.badHabitDetails?.severity : newHabit.badHabitDetails?.severity}
                         onChange={(e) => {
-                          const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
-                          const updatedDetails = { 
-                            ...badHabitDetails, 
-                            severity: e.target.value as 'low' | 'medium' | 'high' 
-                          };
+                                                      const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
+                            const updatedDetails = { 
+                              frequency: badHabitDetails?.frequency || 0,
+                              frequencyUnit: badHabitDetails?.frequencyUnit || 'times_per_day',
+                              timeOfDay: badHabitDetails?.timeOfDay || [],
+                              triggers: badHabitDetails?.triggers || [],
+                              severity: e.target.value as 'low' | 'medium' | 'high',
+                              impact: badHabitDetails?.impact || ''
+                            };
                           if (editingHabit) {
                             setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
                           } else {
@@ -1474,11 +1455,15 @@ export const HabitDashboard = ({
                         placeholder="Describe the negative impact of this habit"
                         value={editingHabit ? editingHabit.badHabitDetails?.impact : newHabit.badHabitDetails?.impact}
                         onChange={(e) => {
-                          const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
-                          const updatedDetails = { 
-                            ...badHabitDetails, 
-                            impact: e.target.value 
-                          };
+                                                      const badHabitDetails = editingHabit ? editingHabit.badHabitDetails : newHabit.badHabitDetails;
+                            const updatedDetails = { 
+                              frequency: badHabitDetails?.frequency || 0,
+                              frequencyUnit: badHabitDetails?.frequencyUnit || 'times_per_day',
+                              timeOfDay: badHabitDetails?.timeOfDay || [],
+                              triggers: badHabitDetails?.triggers || [],
+                              severity: badHabitDetails?.severity || 'low',
+                              impact: e.target.value
+                            };
                           if (editingHabit) {
                             setEditingHabit({...editingHabit, badHabitDetails: updatedDetails});
                           } else {
@@ -1500,7 +1485,14 @@ export const HabitDashboard = ({
                           checked={editingHabit ? editingHabit.reminder?.enabled : newHabit.reminder.enabled}
                           onCheckedChange={(checked) => {
                             const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                            const updatedReminder = { ...reminder, enabled: checked };
+                            const updatedReminder = { 
+                              enabled: checked,
+                              time: reminder?.time || '09:00',
+                              frequency: reminder?.frequency || 'daily',
+                              daysOfWeek: reminder?.daysOfWeek || [1, 2, 3, 4, 5],
+                              customInterval: reminder?.customInterval || 1,
+                              customUnit: reminder?.customUnit || 'days'
+                            };
                             if (editingHabit) {
                               setEditingHabit({...editingHabit, reminder: updatedReminder});
                             } else {
@@ -1531,7 +1523,14 @@ export const HabitDashboard = ({
                                 value={editingHabit ? editingHabit.reminder?.time : newHabit.reminder.time}
                                 onChange={(e) => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                                  const updatedReminder = { ...reminder, time: e.target.value };
+                                  const updatedReminder = { 
+                                    enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,
+                                    time: reminder && reminder.time ? reminder.time : '09:00',
+                                    frequency: reminder?.frequency || 'daily',
+                                    daysOfWeek: reminder && reminder.daysOfWeek !== undefined ? reminder.daysOfWeek : [1, 2, 3, 4, 5],
+                                    customInterval: reminder && reminder.customInterval !== undefined ? reminder.customInterval : 1,
+                                    customUnit: reminder && reminder.customUnit !== undefined ? reminder.customUnit : 'days'
+                                  };
                                   if (editingHabit) {
                                     setEditingHabit({...editingHabit, reminder: updatedReminder});
                                   } else {
@@ -1547,7 +1546,14 @@ export const HabitDashboard = ({
                                 value={editingHabit ? editingHabit.reminder?.frequency : newHabit.reminder.frequency}
                                 onValueChange={(value) => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                                  const updatedReminder = { ...reminder, frequency: value as 'daily' | 'weekly' | 'custom' };
+                                  const updatedReminder = { 
+                                    enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,
+                                    time: reminder && reminder.time ? reminder.time : '09:00',
+                                    frequency: value as 'daily' | 'weekly' | 'custom',
+                                    daysOfWeek: reminder && reminder.daysOfWeek !== undefined ? reminder.daysOfWeek : [1, 2, 3, 4, 5],
+                                    customInterval: reminder && reminder.customInterval !== undefined ? reminder.customInterval : 1,
+                                    customUnit: reminder && reminder.customUnit !== undefined ? reminder.customUnit : 'days'
+                                  };
                                   if (editingHabit) {
                                     setEditingHabit({...editingHabit, reminder: updatedReminder});
                                   } else {
@@ -1602,15 +1608,22 @@ export const HabitDashboard = ({
                       <div className="flex items-center space-x-2">
                         <Switch
                           checked={editingHabit ? editingHabit.reminder?.enabled : newHabit.reminder.enabled}
-                          onCheckedChange={(checked) => {
-                            const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                            const updatedReminder = { ...reminder, enabled: checked };
-                            if (editingHabit) {
-                              setEditingHabit({...editingHabit, reminder: updatedReminder});
-                            } else {
-                              setNewHabit({...newHabit, reminder: updatedReminder});
-                            }
-                          }}
+                                                      onCheckedChange={(checked) => {
+                              const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
+                              const updatedReminder = { 
+                                enabled: checked,
+                                time: reminder?.time || '09:00',
+                                frequency: reminder?.frequency || 'daily',
+                                daysOfWeek: reminder?.daysOfWeek !== undefined ? reminder.daysOfWeek : [1, 2, 3, 4, 5],
+                                customInterval: reminder?.customInterval !== undefined ? reminder.customInterval : 1,
+                                customUnit: reminder?.customUnit !== undefined ? reminder.customUnit : 'days'
+                              };
+                              if (editingHabit) {
+                                setEditingHabit({...editingHabit, reminder: updatedReminder});
+                              } else {
+                                setNewHabit({...newHabit, reminder: updatedReminder});
+                              }
+                            }}
                         />
                         <Label>Enable Reminders</Label>
                       </div>
@@ -1625,7 +1638,14 @@ export const HabitDashboard = ({
                                 value={editingHabit ? editingHabit.reminder?.time : newHabit.reminder.time}
                                 onChange={(e) => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                                  const updatedReminder = { ...reminder, time: e.target.value };
+                                  const updatedReminder = { 
+                                    enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,
+                                    time: reminder && reminder.time ? reminder.time : '09:00',
+                                    frequency: reminder?.frequency || 'daily',
+                                    daysOfWeek: reminder && reminder.daysOfWeek !== undefined ? reminder.daysOfWeek : [1, 2, 3, 4, 5],
+                                    customInterval: reminder && reminder.customInterval !== undefined ? reminder.customInterval : 1,
+                                    customUnit: reminder && reminder.customUnit !== undefined ? reminder.customUnit : 'days'
+                                  };
                                   if (editingHabit) {
                                     setEditingHabit({...editingHabit, reminder: updatedReminder});
                                   } else {
@@ -1641,7 +1661,14 @@ export const HabitDashboard = ({
                                 value={editingHabit ? editingHabit.reminder?.frequency : newHabit.reminder.frequency}
                                 onValueChange={(value) => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
-                                  const updatedReminder = { ...reminder, frequency: value as 'daily' | 'weekly' | 'custom' };
+                                  const updatedReminder = { 
+                                    enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,
+                                    time: reminder && reminder.time ? reminder.time : '09:00',
+                                    frequency: value as 'daily' | 'weekly' | 'custom',
+                                    daysOfWeek: reminder && reminder.daysOfWeek !== undefined ? reminder.daysOfWeek : [1, 2, 3, 4, 5],
+                                    customInterval: reminder && reminder.customInterval !== undefined ? reminder.customInterval : 1,
+                                    customUnit: reminder && reminder.customUnit !== undefined ? reminder.customUnit : 'days'
+                                  };
                                   if (editingHabit) {
                                     setEditingHabit({...editingHabit, reminder: updatedReminder});
                                   } else {
@@ -2444,3 +2471,4 @@ export const HabitDashboard = ({
     </div>
   );
 };
+

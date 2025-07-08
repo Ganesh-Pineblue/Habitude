@@ -1,10 +1,5 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Smile, Heart, Brain, TrendingUp, Calendar, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { CardFooter } from '@/components/ui/card';
+import { Heart, Brain } from 'lucide-react';
 
 interface MoodTrackerProps {
   mood: number;

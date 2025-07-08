@@ -6,10 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
-  Share2, MessageCircle, Heart, Star, Trophy, Users, 
-  TrendingUp, Target, Calendar, Zap, Crown, Award,
+  Share2, MessageCircle, Heart, Star, Trophy, 
+  TrendingUp, Target, Zap, Crown,
   Facebook, Twitter, Instagram, Linkedin, Copy, Check,
-  ExternalLink, Download, Camera, Video, Image as ImageIcon, Sparkles
+  Sparkles
 } from 'lucide-react';
 
 interface SocialPost {
@@ -139,7 +139,7 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
     }
   });
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
-  const [showSocialShareModal, setShowSocialShareModal] = useState<string | null>(null);
+  // const [showSocialShareModal, setShowSocialShareModal] = useState<string | null>(null);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -258,14 +258,14 @@ export const SocialSharing: React.FC<SocialSharingProps> = ({ habits, currentUse
     }
   };
 
-  const generateSocialMediaPreview = (post: SocialPost) => {
-    return {
-      title: `${post.userName} - Habit Progress`,
-      description: post.content,
-      image: post.image || '/public/images/placeholder.svg',
-      url: window.location.href
-    };
-  };
+  // const generateSocialMediaPreview = (post: SocialPost) => {
+  //   return {
+  //     title: `${post.userName} - Habit Progress`,
+  //     description: post.content,
+  //     image: post.image || '/public/images/placeholder.svg',
+  //     url: window.location.href
+  //   };
+  // };
 
   return (
     <div className="space-y-6">

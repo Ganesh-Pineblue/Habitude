@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HabitDashboard } from '@/components/HabitDashboard';
 import { GoalDashboard } from '@/components/GoalDashboard';
 import { AICoach } from '@/components/AICoach';
-import { AIInsights } from '@/components/AIInsights';
 import { LoginForm } from '@/components/LoginForm';
 import { OnboardingFlow } from '@/components/OnboardingFlow';
 import { Header } from '@/components/Homepageheader';
@@ -15,8 +14,7 @@ import MoodSelector from '@/components/MoodSelector';
 import MoodSelectorPopup from '@/components/MoodSelectorPopup';
 import LogoutMoodCapture from '@/components/LogoutMoodCapture';
 import GuidedTour from '@/components/GuidedTour';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Star, Award, Bot } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { moodStorage } from '@/lib/moodStorage';
 import { useUser } from '@/contexts/UserContext';
 
@@ -343,7 +341,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
 
   const completedToday = displayHabits.filter(h => h.completedToday).length;
   const totalStreak = Math.max(...displayHabits.map(h => h.streak));
-  const userPoints = totalStreak * 10 + completedToday * 5;
+  // const userPoints = totalStreak * 10 + completedToday * 5;
 
   return (
     <div className="min-h-screen bg-white">

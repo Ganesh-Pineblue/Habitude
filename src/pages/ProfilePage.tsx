@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { User, Mail, Calendar, Trophy, Edit, Save, X, ArrowLeft, Heart, Target, Star } from 'lucide-react';
+import { useState } from 'react';
+import { User, Calendar, Trophy, ArrowLeft, Heart, Target, Star, X, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -94,12 +92,12 @@ const generations = [
 export const ProfilePage = () => {
   const { currentUser, updateUser } = useUser();
   const [editedUser, setEditedUser] = useState<ExtendedUser>({
-    ...currentUser,
-    generation: currentUser.generation || '',
-    gender: currentUser.gender || '',
-    customGender: currentUser.customGender || '',
-    roleModel: currentUser.roleModel || '',
-    roleModelHabits: currentUser.roleModelHabits || ''
+    ...currentUser!,
+    generation: currentUser?.generation || '',
+    gender: currentUser?.gender || '',
+    customGender: currentUser?.customGender || '',
+    roleModel: currentUser?.roleModel || '',
+    roleModelHabits: currentUser?.roleModelHabits || ''
   });
   const [openRoleModel, setOpenRoleModel] = useState(false);
   const [openGeneration, setOpenGeneration] = useState(false);
@@ -372,7 +370,7 @@ export const ProfilePage = () => {
                             <button
                               type="button"
                               onClick={() => {
-                                const habitsArray = editedUser.roleModelHabits.split(', ');
+                                const habitsArray = editedUser.roleModelHabits?.split(', ') || [];
                                 const updatedHabits = habitsArray.filter((_, i) => i !== index);
                                 setEditedUser({
                                   ...editedUser,

@@ -26,7 +26,8 @@ const categoryColors = {
   health: 'bg-green-100 text-green-800 border-green-200',
   productivity: 'bg-green-100 text-green-800 border-green-200',
   mindfulness: 'bg-green-100 text-green-800 border-green-200',
-  social: 'bg-green-100 text-green-800 border-green-200'
+  social: 'bg-green-100 text-green-800 border-green-200',
+  fitness: 'bg-green-100 text-green-800 border-green-200'
 };
 
 const priorityColors = {

@@ -102,9 +102,9 @@ export const RewardSystem = ({ userPoints, totalStreak }: RewardSystemProps) => 
     // Implementation of adding a new reward
   };
 
-  const updateReward = (reward: Reward) => {
-    // Implementation of updating an existing reward
-  };
+  // const updateReward = (reward: Reward) => {
+  //   // Implementation of updating an existing reward
+  // };
 
   return (
     <div className="space-y-6">
@@ -224,7 +224,10 @@ export const RewardSystem = ({ userPoints, totalStreak }: RewardSystemProps) => 
           </CardContent>
           <CardFooter className="flex justify-end space-x-2">
             <Button 
-              onClick={editingReward ? () => updateReward(editingReward) : addReward}
+              onClick={editingReward ? () => {
+                // updateReward(editingReward);
+                setEditingReward(null);
+              } : addReward}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               {editingReward ? 'Update' : 'Add'} Reward
