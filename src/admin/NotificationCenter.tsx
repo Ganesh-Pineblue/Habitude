@@ -10,18 +10,10 @@ import {
   Send, 
   Mail, 
   Bell, 
-  Users, 
-  Calendar, 
-  Target,
-  Clock,
-  Eye,
-  Plus,
-  Filter,
-  Search,
+  Calendar,
   Edit,
   Trash2,
-  Play,
-  Pause
+  Play
 } from 'lucide-react';
 import {
   Dialog,
@@ -56,8 +48,6 @@ interface Notification {
 export const NotificationCenter = () => {
   const [activeTab, setActiveTab] = useState('compose');
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingNotification, setEditingNotification] = useState<Notification | null>(null);
   const { toast } = useToast();
 
   const [sentNotifications, setSentNotifications] = useState<Notification[]>([
@@ -160,8 +150,10 @@ export const NotificationCenter = () => {
   };
 
   const handleEditNotification = (notification: Notification) => {
-    setEditingNotification(notification);
-    setIsDialogOpen(true);
+    toast({
+      title: "Notification Edited",
+      description: "The notification has been edited.",
+    });
   };
 
   const handleRescheduleNotification = (id: number) => {

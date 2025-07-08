@@ -15,7 +15,7 @@ import {
   ChevronRight,
   TrendingUp
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 
 interface AdminNavigationProps {
   activeSection: string;

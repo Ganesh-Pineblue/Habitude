@@ -78,7 +78,7 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
               </div>
               
               <Button 
-                onClick={() => handleSubmit('password')} 
+                onClick={handleSubmit} 
                 className="w-full bg-[#DAF7A6] hover:bg-[#c4f085] text-gray-900"
                 disabled={loading}
               >
@@ -122,7 +122,7 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
               </div>
               
               <Button 
-                onClick={() => handleSubmit('otp')} 
+                onClick={handleSubmit} 
                 className="w-full bg-[#DAF7A6] hover:bg-[#c4f085] text-gray-900"
                 disabled={loading}
               >

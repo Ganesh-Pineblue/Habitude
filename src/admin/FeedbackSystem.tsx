@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,11 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
-  Filter, 
   MessageSquare, 
   User, 
   Clock,
-  CheckCircle,
   AlertCircle,
   Star,
   Reply,
@@ -199,7 +197,7 @@ export const FeedbackSystem = () => {
     });
   };
 
-  const handleFlagTicket = (id: number) => {
+  const handleFlagTicket = () => {
     toast({
       title: "Ticket Flagged",
       description: "The feedback ticket has been flagged for review.",
@@ -473,7 +471,7 @@ export const FeedbackSystem = () => {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => handleFlagTicket(ticket.id)}
+                            onClick={handleFlagTicket}
                           >
                             <Flag className="w-4 h-4" />
                           </Button>

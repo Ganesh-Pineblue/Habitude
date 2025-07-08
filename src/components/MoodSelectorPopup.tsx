@@ -70,12 +70,6 @@ const moodReasons = {
   ],
 };
 
-const steps = [
-  'Select Mood',
-  'Select Reason',
-  'Suggestions',
-];
-
 const MoodSelectorPopup: React.FC<MoodSelectorPopupProps> = ({ onMoodSelect, onClose, isOpen }) => {
   const [step, setStep] = useState(1); // 1: mood, 2: reason, 3: suggestions
   const [selectedMood, setSelectedMood] = useState<string | null>(null);

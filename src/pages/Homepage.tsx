@@ -52,7 +52,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   const [habitsTabValue, setHabitsTabValue] = useState('habits');
   const [reportsTabValue, setReportsTabValue] = useState<'mood' | 'habits' | 'correlation' | 'insights'>('mood');
   const [currentMood, setCurrentMood] = useState<number>(moodToNumber(userMood));
-  const [hasSelectedMood, setHasSelectedMood] = useState(false);
   const [showMoodPopup, setShowMoodPopup] = useState(false);
   const [showLogoutMoodCapture, setShowLogoutMoodCapture] = useState(false);
   const [showGuidedTour, setShowGuidedTour] = useState(false);
@@ -183,7 +182,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
 
   const performLogout = () => {
     setCurrentUser(null);
-    setHasSelectedMood(false);
     setUserHabits([]);
     setUserGoals([]);
     setCurrentMood(2); // Reset to neutral
@@ -192,7 +190,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   const goToRegistration = () => {
     // Clear user data and set a flag to show registration form
     setCurrentUser(null);
-    setHasSelectedMood(false);
     setUserHabits([]);
     setUserGoals([]);
     setCurrentMood(2); // Reset to neutral
@@ -339,7 +336,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
     return <OnboardingFlow onComplete={handleOnboardingComplete} onBack={goToRegistration} user={currentUser} />;
   }
 
-  const completedToday = displayHabits.filter(h => h.completedToday).length;
   const totalStreak = Math.max(...displayHabits.map(h => h.streak));
   // const userPoints = totalStreak * 10 + completedToday * 5;
 

@@ -19,7 +19,6 @@ import {
   Heart,
   Users,
   CheckCircle2,
-  AlertTriangle,
   Play,
   Pause,
   RotateCcw,
