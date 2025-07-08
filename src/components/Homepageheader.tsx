@@ -4,8 +4,8 @@ import { LogOut, User } from 'lucide-react';
 import { MoodHeader } from './MoodHeader';
 import NotificationsBar from './NotificationsBar';
 import { UserProfileDropdown } from './UserProfileDropdown';
-import { Profile } from './Profile';
 import { ChangePassword } from './ChangePassword';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   name: string;
@@ -22,8 +22,8 @@ interface HeaderProps {
 }
 
 export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect, onUserUpdate }: HeaderProps) => {
-  const [showProfile, setShowProfile] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleMoodSelect = (mood: string) => {
     if (onMoodSelect) {
@@ -32,26 +32,15 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect, onUserUp
   };
 
   const handleProfileClick = () => {
-    setShowProfile(true);
+    navigate('/profile');
   };
 
   const handleChangePasswordClick = () => {
     setShowChangePassword(true);
   };
 
-  const handleProfileClose = () => {
-    setShowProfile(false);
-  };
-
   const handleChangePasswordClose = () => {
     setShowChangePassword(false);
-  };
-
-  const handleProfileSave = (updatedUser: User) => {
-    if (onUserUpdate) {
-      onUserUpdate(updatedUser);
-    }
-    setShowProfile(false);
   };
 
   const handlePasswordChange = (currentPassword: string, newPassword: string) => {
@@ -101,15 +90,6 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect, onUserUp
           <MoodHeader currentMood={currentMood} onMoodSelect={handleMoodSelect} />
         </div>
       </div>
-
-      {/* Profile Modal */}
-      {showProfile && (
-        <Profile
-          user={user}
-          onClose={handleProfileClose}
-          onSave={handleProfileSave}
-        />
-      )}
 
       {/* Change Password Modal */}
       {showChangePassword && (

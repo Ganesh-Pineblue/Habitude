@@ -18,6 +18,7 @@ import GuidedTour from '@/components/GuidedTour';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Star, Award, Bot } from 'lucide-react';
 import { moodStorage } from '@/lib/moodStorage';
+import { useUser } from '@/contexts/UserContext';
 
 interface User {
   name: string;
@@ -48,7 +49,7 @@ const moodToNumber = (mood: string | null): number => {
 };
 
 const Index: React.FC<IndexProps> = ({ userMood }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { currentUser, setCurrentUser } = useUser();
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [habitsTabValue, setHabitsTabValue] = useState('habits');
   const [reportsTabValue, setReportsTabValue] = useState<'mood' | 'habits' | 'correlation' | 'insights'>('mood');
@@ -137,7 +138,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
       // Existing user - go directly to dashboard
       setCurrentUser({ 
         ...user, 
-        streak: 15, 
         onboardingComplete: true, 
         personalityProfile: {
           personalInfo: { firstName: user.name, generation: 'millennial' },
