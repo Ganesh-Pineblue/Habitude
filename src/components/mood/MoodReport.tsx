@@ -1051,7 +1051,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                         dataKey="completedHabits"
                         label={({ category, completedHabits }) => `${category}: ${Math.round(completedHabits)}%`}
                       >
-                        {habits.map((entry, index) => (
+                        {habits.map((_, index) => (
                           <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                         ))}
                       </Pie>
@@ -1117,15 +1117,15 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                               <div className="text-xs text-gray-500">Habits</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-sm font-semibold text-blue-600">{item.habitCompletion}%</div>
+                              <div className="text-sm font-semibold text-blue-600">{item.completionRate ?? 0}%</div>
                               <div className="text-xs text-gray-500">Goals</div>
                             </div>
                             <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              item.correlation === 'high' 
+                              (item.completionRate ?? 0) > 50 
                                 ? 'bg-green-100 text-green-700' 
                                 : 'bg-orange-100 text-orange-700'
                             }`}>
-                              {item.correlation === 'high' ? 'Strong' : 'Weak'} Correlation
+                              {(item.completionRate ?? 0) > 50 ? 'Strong' : 'Weak'} Correlation
                             </div>
                           </div>
                         </div>
@@ -1267,14 +1267,14 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                 <div className="p-3 bg-white rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-800 mb-1">Habit Consistency</h4>
                   <p className="text-sm text-blue-700">
-                    Focus on {habits.reduce((best, cat) => cat.completionRate > best.completionRate ? cat : best).category} habits as they show the best completion rates.
+                    Focus on {habits.reduce((best, cat) => (cat.completionRate ?? 0) > (best.completionRate ?? 0) ? cat : best).category} habits as they show the best completion rates.
                   </p>
                 </div>
                 
                 <div className="p-3 bg-white rounded-lg border border-purple-200">
                   <h4 className="font-medium text-purple-800 mb-1">Weekly Pattern</h4>
                   <p className="text-sm text-purple-700">
-                    Your best performance day is {habits.reduce((best, day) => day.completionRate > best.completionRate ? day : best).category}. Use this momentum to plan important tasks.
+                    Your best performance day is {habits.reduce((best, day) => (day.completionRate ?? 0) > (best.completionRate ?? 0) ? day : best).category}. Use this momentum to plan important tasks.
                   </p>
                 </div>
               </div>
