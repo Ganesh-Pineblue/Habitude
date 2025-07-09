@@ -490,9 +490,7 @@ class AIGoalGenerationService {
   }
 
   // Generate AI-powered goals based on selected habits - creating complementary goals, not duplicates
-  generateGoalsFromHabits(selectedHabits: string[], personalityName: string): any[] {
-
-    
+  generateGoalsFromHabits(selectedHabits: string[]): any[] {
     // Analyze the selected habits to understand the user's focus areas
     const habitCategories = this.analyzeHabitCategories(selectedHabits);
     
@@ -1335,8 +1333,7 @@ export const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     // Generate AI goals based on selected habits
     const aiService = AIGoalGenerationService.getInstance();
     const generatedGoals = aiService.generateGoalsFromHabits(
-      personalitySelection.selectedHabits,
-      personalitySelection.selectedPersonality
+      personalitySelection.selectedHabits
     );
 
     // Convert selected habits to proper habit objects

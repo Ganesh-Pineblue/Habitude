@@ -3,7 +3,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  BarChart3, 
   TrendingUp, 
   Target, 
   Flame,
@@ -119,71 +118,6 @@ const generateMockMoodData = (): MoodData[] => {
   return data;
 };
 
-// Generate mock historical data for habits
-const generateHistoricalData = (habits: Habit[] = []) => {
-  const data = [];
-  const today = new Date();
-  
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    
-    const dayData = {
-      date: date.toISOString().split('T')[0],
-      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      totalHabits: habits.length || 4,
-      completedHabits: Math.floor(Math.random() * ((habits.length || 4) + 1)),
-      completionRate: 0,
-      mood: Math.floor(Math.random() * 5),
-      streaks: (habits.length || 4) * Math.floor(Math.random() * 10)
-    };
-    
-    dayData.completionRate = (dayData.completedHabits / dayData.totalHabits) * 100;
-    data.push(dayData);
-  }
-  
-  return data;
-};
-
-// Generate weekly consistency data
-const generateWeeklyData = (habits: Habit[] = []) => {
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  return weekDays.map(day => ({
-    day,
-    completionRate: Math.floor(Math.random() * 40) + 60,
-    totalHabits: habits.length || 4,
-    completedHabits: Math.floor(Math.random() * (habits.length || 4)) + 1,
-    averageStreak: Math.floor(Math.random() * 10) + 5
-  }));
-};
-
-// Generate category performance data
-const generateCategoryData = (habits: Habit[] = []) => {
-  const categories = ['health', 'productivity', 'mindfulness', 'social'];
-  return categories.map(category => {
-    const categoryHabits = habits.filter(h => h.category === category);
-    const totalHabits = categoryHabits.length || Math.floor(Math.random() * 3) + 1;
-    const completedHabits = categoryHabits.filter(h => h.completedToday).length || Math.floor(Math.random() * totalHabits);
-    
-    return {
-      category: category.charAt(0).toUpperCase() + category.slice(1),
-      completionRate: totalHabits > 0 ? (completedHabits / totalHabits) * 100 : Math.floor(Math.random() * 100),
-      totalHabits,
-      completedHabits,
-      averageStreak: Math.floor(Math.random() * 10) + 5,
-      color: (() => {
-        const colors = {
-          health: '#10b981',
-          productivity: '#3b82f6',
-          mindfulness: '#8b5cf6',
-          social: '#f59e0b'
-        };
-        return colors[category as keyof typeof colors] || '#6b7280';
-      })()
-    };
-  });
-};
-
 // Generate enhanced goal data with more detailed analytics
 const generateEnhancedGoalData = (goals: Goal[] = []) => {
   const mockGoals: Goal[] = [
@@ -292,215 +226,6 @@ const generateEnhancedGoalData = (goals: Goal[] = []) => {
   };
 };
 
-interface CorrelationData {
-  category: string;
-  habitCompletion: number;
-  goalProgress: number;
-  correlation: 'high' | 'low';
-  color: string;
-}
-
-// Generate habit-goal correlation data
-const generateHabitGoalCorrelation = (habits: Habit[] = [], goals: Goal[] = []): CorrelationData[] => {
-  const correlationData: CorrelationData[] = [];
-  const categories = ['health', 'productivity', 'mindfulness', 'social', 'fitness'];
-  
-  categories.forEach(category => {
-    const categoryHabits = habits.filter(h => h.category === category);
-    const categoryGoals = goals.filter(g => g.category === category);
-    
-    const habitCompletionRate = categoryHabits.length > 0 
-      ? categoryHabits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / categoryHabits.length
-      : Math.floor(Math.random() * 40) + 60;
-    
-    const goalProgressRate = categoryGoals.length > 0
-      ? categoryGoals.reduce((sum, g) => sum + Math.min(g.current / g.target, 1), 0) / categoryGoals.length * 100
-      : Math.floor(Math.random() * 40) + 60;
-    
-    correlationData.push({
-      category: category.charAt(0).toUpperCase() + category.slice(1),
-      habitCompletion: Math.round(habitCompletionRate),
-      goalProgress: Math.round(goalProgressRate),
-      correlation: Math.abs(habitCompletionRate - goalProgressRate) < 20 ? 'high' : 'low',
-      color: (() => {
-        const colors = {
-          health: '#10b981',
-          productivity: '#3b82f6',
-          mindfulness: '#8b5cf6',
-          social: '#f59e0b',
-          fitness: '#f43f5e'
-        };
-        return colors[category as keyof typeof colors] || '#6b7280';
-      })()
-    });
-  });
-  
-  return correlationData;
-};
-
-// Generate enhanced habit data with detailed analytics
-const generateEnhancedHabitData = (habits: Habit[] = []) => {
-  const mockHabits: Habit[] = [
-    {
-      id: '1',
-      title: 'Morning Exercise',
-      description: '30 minutes of cardio or strength training',
-      streak: 15,
-      completedToday: true,
-      category: 'health',
-      completionRate: 85,
-      bestStreak: 23,
-      weeklyTarget: 5,
-      currentWeekCompleted: 4
-    },
-    {
-      id: '2',
-      title: 'Read 30 Minutes',
-      description: 'Daily reading for knowledge expansion',
-      streak: 8,
-      completedToday: false,
-      category: 'productivity',
-      completionRate: 72,
-      bestStreak: 12,
-      weeklyTarget: 7,
-      currentWeekCompleted: 5
-    },
-    {
-      id: '3',
-      title: 'Meditation',
-      description: '10 minutes of mindfulness practice',
-      streak: 22,
-      completedToday: true,
-      category: 'mindfulness',
-      completionRate: 91,
-      bestStreak: 22,
-      weeklyTarget: 7,
-      currentWeekCompleted: 6
-    },
-    {
-      id: '4',
-      title: 'Call Family',
-      description: 'Daily check-in with loved ones',
-      streak: 5,
-      completedToday: true,
-      category: 'social',
-      completionRate: 68,
-      bestStreak: 8,
-      weeklyTarget: 5,
-      currentWeekCompleted: 3
-    },
-    {
-      id: '5',
-      title: 'Drink 8 Glasses Water',
-      description: 'Stay hydrated throughout the day',
-      streak: 12,
-      completedToday: true,
-      category: 'health',
-      completionRate: 78,
-      bestStreak: 15,
-      weeklyTarget: 7,
-      currentWeekCompleted: 6
-    },
-    {
-      id: '6',
-      title: 'Journal Writing',
-      description: 'Reflect on daily experiences',
-      streak: 3,
-      completedToday: false,
-      category: 'mindfulness',
-      completionRate: 45,
-      bestStreak: 7,
-      weeklyTarget: 5,
-      currentWeekCompleted: 2
-    }
-  ];
-  
-  const habitsData = habits.length > 0 ? habits : mockHabits;
-  
-  // Generate daily habit completion data
-  const dailyHabitData = habitsData.map(habit => {
-    const days = [];
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const completionRate = habit.completionRate || Math.floor(Math.random() * 40) + 60;
-      const completed = Math.random() < (completionRate / 100);
-      
-      days.push({
-        date: date.toISOString().split('T')[0],
-        habit: habit.title,
-        category: habit.category,
-        completed: completed ? 1 : 0,
-        streak: completed ? (habit.streak || 0) : 0,
-        completionRate: completionRate
-      });
-    }
-    return days;
-  }).flat();
-
-  // Generate habit performance by time of day
-  const timePerformanceData = habitsData.map(habit => ({
-    habit: habit.title,
-    category: habit.category,
-    morning: Math.floor(Math.random() * 30) + 70,
-    afternoon: Math.floor(Math.random() * 30) + 50,
-    evening: Math.floor(Math.random() * 30) + 40,
-    night: Math.floor(Math.random() * 20) + 20
-  }));
-
-  // Generate habit difficulty analysis
-  const difficultyData = habitsData.map(habit => ({
-    habit: habit.title,
-    category: habit.category,
-    difficulty: Math.floor(Math.random() * 3) + 1, // 1-3 scale
-    consistency: habit.completionRate || Math.floor(Math.random() * 40) + 60,
-    motivation: Math.floor(Math.random() * 30) + 70,
-    impact: Math.floor(Math.random() * 30) + 70
-  }));
-
-  // Generate habit streak analysis
-  const streakData = habitsData.map(habit => ({
-    habit: habit.title,
-    category: habit.category,
-    currentStreak: habit.streak || 0,
-    bestStreak: habit.bestStreak || habit.streak || 0,
-    averageStreak: Math.floor((habit.bestStreak || habit.streak || 0) * 0.7),
-    completionRate: habit.completionRate || Math.floor(Math.random() * 40) + 60
-  }));
-
-  return {
-    dailyData: dailyHabitData,
-    timePerformance: timePerformanceData,
-    difficulty: difficultyData,
-    streaks: streakData,
-    habits: habitsData
-  };
-};
-
-// Generate habit category performance over time
-const generateHabitCategoryTrends = (habits: Habit[] = []) => {
-  const categories = ['health', 'productivity', 'mindfulness', 'social'];
-  const trends = [];
-  
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    
-    const dayData = {
-      date: date.toISOString().split('T')[0],
-      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      health: Math.floor(Math.random() * 30) + 70,
-      productivity: Math.floor(Math.random() * 30) + 65,
-      mindfulness: Math.floor(Math.random() * 30) + 60,
-      social: Math.floor(Math.random() * 30) + 55
-    };
-    
-    trends.push(dayData);
-  }
-  
-  return trends;
-};
-
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -537,16 +262,11 @@ const CustomDot = (props: any) => {
   );
 };
 
+const pieColors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'];
+
 export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [], defaultTab = 'mood' }) => {
   const [moodData] = useState<MoodData[]>(generateMockMoodData());
   // const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
-
-  const historicalData = useMemo(() => generateHistoricalData(habits), [habits]);
-  const weeklyData = useMemo(() => generateWeeklyData(habits), [habits]);
-  const categoryData = useMemo(() => generateCategoryData(habits), [habits]);
-  const habitGoalCorrelation = useMemo(() => generateHabitGoalCorrelation(habits, goals), [habits, goals]);
-  const enhancedHabitData = useMemo(() => generateEnhancedHabitData(habits), [habits]);
-  const habitCategoryTrends = useMemo(() => generateHabitCategoryTrends(habits), [habits]);
 
   // Calculate overall statistics
   const overallStats = useMemo(() => {
@@ -685,7 +405,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
               <div>
                 <p className="text-sm text-orange-700">Consistency</p>
                 <p className="text-2xl font-bold text-orange-800">
-                  <AnimatedNumber value={Math.round(habits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / Math.max(habits.length, 1))} suffix="%" duration={1200} />
+                  <AnimatedNumber value={Math.round(habits.reduce((sum, h) => sum + (h.completionRate ?? 0), 0) / Math.max(habits.length, 1))} suffix="%" duration={1200} />
                 </p>
                 <p className="text-xs text-orange-600">overall rate</p>
               </div>
@@ -788,7 +508,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div>
                     <div className="text-sm font-semibold text-gray-700 mb-0.5">Total Habits</div>
                     <div className="text-2xl font-extrabold text-gray-900 flex items-end">
-                      <AnimatedNumber value={enhancedHabitData.habits.length} duration={1200} />
+                      <AnimatedNumber value={habits.length} duration={1200} />
                     </div>
                   </div>
                 </div>
@@ -804,7 +524,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div>
                     <div className="text-sm font-semibold text-gray-700 mb-0.5">Best Streak</div>
                     <div className="text-2xl font-extrabold text-gray-900 flex items-end">
-                      <AnimatedNumber value={Math.max(...enhancedHabitData.streaks.map(s => s.bestStreak))} duration={1200} />
+                      <AnimatedNumber value={Math.max(...habits.map(h => h.streak || 0))} duration={1200} />
                     </div>
                   </div>
                 </div>
@@ -820,9 +540,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div>
                     <div className="text-sm font-semibold text-gray-700 mb-0.5">Today's Progress</div>
                     <div className="text-2xl font-extrabold text-gray-900 flex items-end">
-                      <AnimatedNumber value={enhancedHabitData.habits.filter(h => h.completedToday).length} duration={1200} />
+                      <AnimatedNumber value={habits.filter(h => h.completedToday).length} duration={1200} />
                       /
-                      <AnimatedNumber value={enhancedHabitData.habits.length} duration={1200} delay={200} />
+                      <AnimatedNumber value={habits.length} duration={1200} delay={200} />
                     </div>
                   </div>
                 </div>
@@ -838,106 +558,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div>
                     <div className="text-sm font-semibold text-gray-700 mb-0.5">Avg Completion</div>
                     <div className="text-2xl font-extrabold text-gray-900 flex items-end">
-                      <AnimatedNumber value={Math.round(enhancedHabitData.habits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / enhancedHabitData.habits.length)} suffix="%" duration={1200} />
+                      <AnimatedNumber value={Math.round(habits.reduce((sum, h) => sum + (h.completionRate ?? 0), 0) / habits.length)} suffix="%" duration={1200} />
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Enhanced Habit Visualizations */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Habit Category Trends */}
-            <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-teal-50">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-emerald-800">
-                  <TrendingUp className="w-5 h-5" />
-                  <span>Category Performance Trends</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ChartContainer
-                    config={{
-                      health: { color: "#10b981", label: "Health" },
-                      productivity: { color: "#3b82f6", label: "Productivity" },
-                      mindfulness: { color: "#8b5cf6", label: "Mindfulness" },
-                      social: { color: "#f59e0b", label: "Social" }
-                    }}
-                    className="h-full"
-                  >
-                    <LineChart data={habitCategoryTrends.slice(-14)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="dayName" stroke="#888888" fontSize={12} />
-                      <YAxis stroke="#888888" fontSize={12} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line
-                        type="monotone"
-                        dataKey="health"
-                        stroke="#10b981"
-                        strokeWidth={3}
-                        dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="productivity"
-                        stroke="#3b82f6"
-                        strokeWidth={3}
-                        dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="mindfulness"
-                        stroke="#8b5cf6"
-                        strokeWidth={3}
-                        dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2, fill: "white" }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="social"
-                        stroke="#f59e0b"
-                        strokeWidth={3}
-                        dot={{ fill: "#f59e0b", strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, stroke: "#f59e0b", strokeWidth: 2, fill: "white" }}
-                      />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Habit Streak Analysis */}
-            <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-purple-50">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-indigo-800">
-                  <Flame className="w-5 h-5" />
-                  <span>Streak Performance</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ChartContainer
-                    config={{
-                      currentStreak: { color: "#10b981", label: "Current Streak" },
-                      bestStreak: { color: "#3b82f6", label: "Best Streak" },
-                      averageStreak: { color: "#8b5cf6", label: "Average Streak" }
-                    }}
-                    className="h-full"
-                  >
-                    <BarChart data={enhancedHabitData.streaks} layout="horizontal">
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis type="number" stroke="#888888" fontSize={12} />
-                      <YAxis dataKey="habit" type="category" stroke="#888888" fontSize={12} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="currentStreak" fill="#10b981" radius={[0, 4, 4, 0]} />
-                      <Bar dataKey="bestStreak" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                      <Bar dataKey="averageStreak" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ChartContainer>
                 </div>
               </CardContent>
             </Card>
@@ -953,8 +576,8 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {enhancedHabitData.habits.map((habit) => {
-                  const progress = habit.completionRate || 0;
+                {habits.map((habit) => {
+                  const progress = habit.completionRate ?? 0;
                   const streak = habit.streak || 0;
                   const categoryColor = {
                     health: 'bg-green-100 border-green-300',
@@ -1022,7 +645,14 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   }}
                   className="h-full"
                 >
-                  <BarChart data={enhancedHabitData.timePerformance.slice(0, 4)}>
+                  <BarChart data={habits.map(h => ({
+                    habit: h.title,
+                    morning: 0, // Removed h.timePerformance?.morning
+                    afternoon: 0, // Removed h.timePerformance?.afternoon
+                    evening: 0, // Removed h.timePerformance?.evening
+                    night: 0 // Removed h.timePerformance?.night
+                  }))}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="habit" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
@@ -1051,8 +681,8 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                 <div className="space-y-4">
                   <h4 className="font-semibold text-gray-800 mb-3">🏆 Top Performing Habits</h4>
                   <div className="space-y-3">
-                    {enhancedHabitData.habits
-                      .sort((a, b) => (b.completionRate || 0) - (a.completionRate || 0))
+                    {habits
+                      .sort((a, b) => (b.completionRate ?? 0) - (a.completionRate ?? 0))
                       .slice(0, 3)
                       .map((habit, index) => (
                         <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
@@ -1080,8 +710,8 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                 <div className="space-y-4">
                   <h4 className="font-semibold text-gray-800 mb-3">📈 Areas for Improvement</h4>
                   <div className="space-y-3">
-                    {enhancedHabitData.habits
-                      .sort((a, b) => (a.completionRate || 0) - (b.completionRate || 0))
+                    {habits
+                      .sort((a, b) => (a.completionRate ?? 0) - (b.completionRate ?? 0))
                       .slice(0, 3)
                       .map((habit, index) => (
                         <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
@@ -1117,15 +747,15 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <h5 className="font-medium text-blue-800 mb-1">Category Focus</h5>
                     <p className="text-sm text-blue-700">
-                      {enhancedHabitData.habits.reduce((best, habit) => 
-                        (habit.completionRate || 0) > (best.completionRate || 0) ? habit : best
+                      {habits.reduce((best, habit) => 
+                        (habit.completionRate ?? 0) > (best.completionRate ?? 0) ? habit : best
                       ).category} habits are your strongest category. Use this momentum!
                     </p>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                     <h5 className="font-medium text-purple-800 mb-1">Streak Strategy</h5>
                     <p className="text-sm text-purple-700">
-                      Focus on maintaining your {Math.max(...enhancedHabitData.streaks.map(s => s.currentStreak))} day streak. 
+                      Focus on maintaining your {Math.max(...habits.map(h => h.streak || 0))} day streak. 
                       Consistency is key to habit formation.
                     </p>
                   </div>
@@ -1385,7 +1015,11 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                     }}
                     className="h-full"
                   >
-                    <BarChart data={categoryData} layout="horizontal">
+                    <BarChart data={habits.map(h => ({
+                      category: h.category,
+                      completionRate: h.completionRate ?? 0
+                    }))}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis type="number" stroke="#888888" fontSize={12} />
                       <YAxis dataKey="category" type="category" stroke="#888888" fontSize={12} />
@@ -1407,15 +1041,18 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   >
                     <PieChart>
                       <Pie
-                        data={categoryData}
+                        data={habits.map(h => ({
+                          category: h.category,
+                          completedHabits: h.completedToday ? 100 : 0
+                        }))}
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
                         dataKey="completedHabits"
-                        label={({ category, completionRate }) => `${category}: ${Math.round(completionRate)}%`}
+                        label={({ category, completedHabits }) => `${category}: ${Math.round(completedHabits)}%`}
                       >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        {habits.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                         ))}
                       </Pie>
                       <ChartTooltip content={<ChartTooltipContent />} />
@@ -1445,7 +1082,11 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                     }}
                     className="h-full"
                   >
-                    <BarChart data={habitGoalCorrelation} layout="horizontal">
+                    <BarChart data={habits.map(h => ({
+                      category: h.category,
+                      habitCompletion: h.completedToday ? 100 : 0
+                    }))}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis type="number" stroke="#888888" fontSize={12} />
                       <YAxis dataKey="category" type="category" stroke="#888888" fontSize={12} />
@@ -1461,22 +1102,22 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <div className="bg-white rounded-lg p-4 shadow-sm">
                     <h4 className="font-semibold text-gray-800 mb-3">Correlation Insights</h4>
                     <div className="space-y-3">
-                      {habitGoalCorrelation.map((item, index) => (
+                      {habits.map((item, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center space-x-3">
                             <div 
                               className="w-3 h-3 rounded-full" 
-                              style={{ backgroundColor: item.color }}
+                              style={{ backgroundColor: pieColors[index % pieColors.length] }}
                             />
                             <span className="font-medium text-gray-700">{item.category}</span>
                           </div>
                           <div className="flex items-center space-x-4">
                             <div className="text-center">
-                              <div className="text-sm font-semibold text-green-600">{item.habitCompletion}%</div>
+                              <div className="text-sm font-semibold text-green-600">{item.completedToday ? '100%' : '0%'}</div>
                               <div className="text-xs text-gray-500">Habits</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-sm font-semibold text-blue-600">{item.goalProgress}%</div>
+                              <div className="text-sm font-semibold text-blue-600">{item.habitCompletion}%</div>
                               <div className="text-xs text-gray-500">Goals</div>
                             </div>
                             <div className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -1499,7 +1140,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                       <div className="space-y-2 text-sm text-gray-600">
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full" />
-                          <span>Strong habit-goal alignment in {habitGoalCorrelation.filter(item => item.correlation === 'high').length} categories</span>
+                          <span>Completed habits in {habits.filter(item => item.completedToday).length} categories</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -1528,10 +1169,10 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <span className="text-sm font-medium text-green-800">Best Performance</span>
                 </div>
                 <p className="text-lg font-bold text-green-900">
-                  {weeklyData.reduce((best, day) => day.completionRate > best.completionRate ? day : best).day}
+                  {habits.length > 0 ? (habits.reduce((best, day) => (day.completionRate ?? 0) > (best.completionRate ?? 0) ? day : best).category) : 'N/A'}
                 </p>
                 <p className="text-xs text-green-600">
-                  {Math.round(Math.max(...weeklyData.map(d => d.completionRate)))}% completion rate
+                  {habits.length > 0 ? Math.round(Math.max(...habits.map(d => d.completionRate ?? 0))) : 'N/A'}% completion rate
                 </p>
               </CardContent>
             </Card>
@@ -1543,10 +1184,10 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <span className="text-sm font-medium text-orange-800">Needs Attention</span>
                 </div>
                 <p className="text-lg font-bold text-orange-900">
-                  {weeklyData.reduce((worst, day) => day.completionRate < worst.completionRate ? day : worst).day}
+                  {habits.length > 0 ? (habits.reduce((worst, day) => (day.completionRate ?? 0) < (worst.completionRate ?? 0) ? day : worst).category) : 'N/A'}
                 </p>
                 <p className="text-xs text-orange-600">
-                  {Math.round(Math.min(...weeklyData.map(d => d.completionRate)))}% completion rate
+                  {habits.length > 0 ? Math.round(Math.min(...habits.map(d => d.completionRate ?? 0))) : 'N/A'}% completion rate
                 </p>
               </CardContent>
             </Card>
@@ -1571,7 +1212,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   <span className="text-sm font-medium text-purple-800">Consistency Score</span>
                 </div>
                 <p className="text-lg font-bold text-purple-900">
-                  {Math.round(weeklyData.reduce((sum, day) => sum + day.completionRate, 0) / weeklyData.length)}%
+                  {habits.length > 0 ? Math.round(habits.reduce((sum, day) => sum + (day.completionRate ?? 0), 0) / habits.length) : 'N/A'}%
                 </p>
                 <p className="text-xs text-purple-600">weekly average</p>
               </CardContent>
@@ -1619,21 +1260,21 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                 <div className="p-3 bg-white rounded-lg border border-green-200">
                   <h4 className="font-medium text-green-800 mb-1">Mood Improvement</h4>
                   <p className="text-sm text-green-700">
-                    Your mood tends to improve on days when you complete more habits. Try to maintain consistency, especially on {weeklyData.reduce((worst, day) => day.completionRate < worst.completionRate ? day : worst).day}s.
+                    Your mood tends to improve on days when you complete more habits. Try to maintain consistency, especially in {habits.length > 0 ? (habits.reduce((worst, day) => (day.completionRate ?? 0) < (worst.completionRate ?? 0) ? day : worst).category) : 'N/A'} habits.
                   </p>
                 </div>
                 
                 <div className="p-3 bg-white rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-800 mb-1">Habit Consistency</h4>
                   <p className="text-sm text-blue-700">
-                    Focus on {categoryData.reduce((best, cat) => cat.completionRate > best.completionRate ? cat : best).category} habits as they show the best completion rates.
+                    Focus on {habits.reduce((best, cat) => cat.completionRate > best.completionRate ? cat : best).category} habits as they show the best completion rates.
                   </p>
                 </div>
                 
                 <div className="p-3 bg-white rounded-lg border border-purple-200">
                   <h4 className="font-medium text-purple-800 mb-1">Weekly Pattern</h4>
                   <p className="text-sm text-purple-700">
-                    Your best performance day is {weeklyData.reduce((best, day) => day.completionRate > best.completionRate ? day : best).day}. Use this momentum to plan important tasks.
+                    Your best performance day is {habits.reduce((best, day) => day.completionRate > best.completionRate ? day : best).category}. Use this momentum to plan important tasks.
                   </p>
                 </div>
               </div>

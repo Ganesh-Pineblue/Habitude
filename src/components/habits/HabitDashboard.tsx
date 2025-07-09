@@ -66,24 +66,7 @@ interface Goal {
   sourceHabit?: string;
 }
 
-const roleModels = [
-  { name: "Einstein", habits: ["Read daily", "Think deeply"] },
-  { name: "Gandhi", habits: ["Meditate", "Practice kindness"] },
-  { name: "Oprah", habits: ["Gratitude journal", "Help others"] },
-];
 
-const defaultHabits = [
-  "Exercise",
-  "Drink water",
-  "Sleep early",
-  "Read daily",
-  "Meditate",
-  "Practice kindness",
-  "Gratitude journal",
-  "Help others",
-];
-
-const steps = ["Welcome", "Role Model", "Habits", "Finish"];
 
 
 
@@ -1349,7 +1332,7 @@ export const HabitDashboard = ({
                               <Input
                                 type="time"
                                 value={editingHabit ? editingHabit.reminder?.time : newHabit.reminder.time}
-                                onChange={(e) => {
+                                onChange={() => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
                                   const updatedReminder = { 
                                     enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,
@@ -1464,7 +1447,7 @@ export const HabitDashboard = ({
                               <Input
                                 type="time"
                                 value={editingHabit ? editingHabit.reminder?.time : newHabit.reminder.time}
-                                onChange={(e) => {
+                                onChange={() => {
                                   const reminder = editingHabit ? editingHabit.reminder : newHabit.reminder;
                                   const updatedReminder = { 
                                     enabled: reminder && reminder.enabled !== undefined ? reminder.enabled : false,

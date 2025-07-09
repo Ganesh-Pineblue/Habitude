@@ -347,7 +347,6 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
         user={currentUser} 
         onLogout={handleLogout}
         currentMood={currentMood}
-        onMoodSelect={handleMoodSelect}
         onUserUpdate={handleUserUpdate}
       />
       <main className="container mx-auto px-2 py-2 max-w-sm sm:max-w-md lg:max-w-6xl">

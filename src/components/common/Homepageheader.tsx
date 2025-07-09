@@ -16,19 +16,12 @@ interface HeaderProps {
   user: User;
   onLogout: () => void;
   currentMood?: number;
-  onMoodSelect?: (mood: string) => void;
   onUserUpdate?: (updatedUser: User) => void;
 }
 
-export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: HeaderProps) => {
+export const Header = ({ user, onLogout, currentMood = 2 }: HeaderProps) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const navigate = useNavigate();
-
-  const handleMoodSelect = (mood: string) => {
-    if (onMoodSelect) {
-      onMoodSelect(mood);
-    }
-  };
 
   const handleProfileClick = () => {
     navigate('/profile');
@@ -65,7 +58,7 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: Header
 
           {/* Center - Mood Header */}
           <div className="hidden md:flex">
-            <MoodHeader currentMood={currentMood} onMoodSelect={handleMoodSelect} />
+            <MoodHeader currentMood={currentMood} />
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -86,7 +79,7 @@ export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: Header
 
         {/* Mobile Mood Header */}
         <div className="md:hidden mt-3 flex justify-center">
-          <MoodHeader currentMood={currentMood} onMoodSelect={handleMoodSelect} />
+          <MoodHeader currentMood={currentMood} />
         </div>
       </div>
 
