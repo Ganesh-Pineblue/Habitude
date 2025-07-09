@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
-  Brain, MessageCircle, Heart, Star, Zap, Target, 
-  TrendingUp, Calendar, Clock, Award, Crown, Sparkles,
+  Brain, MessageCircle, Heart, Zap, Target, 
+  Clock, Award, Sparkles,
   Send, RefreshCw, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 
@@ -89,7 +89,7 @@ const motivationalPersonalities = [
   }
 ];
 
-export const AIMotivator: React.FC<AIMotivatorProps> = ({ habits, currentUser, currentMood = 3 }) => {
+export const AIMotivator: React.FC<AIMotivatorProps> = ({ habits, currentMood = 3 }) => {
   const [messages, setMessages] = useState<MotivationalMessage[]>(defaultMessages);
   const [selectedPersonality, setSelectedPersonality] = useState(motivationalPersonalities[0]);
   const [userInput, setUserInput] = useState('');
@@ -149,7 +149,6 @@ export const AIMotivator: React.FC<AIMotivatorProps> = ({ habits, currentUser, c
     setTimeout(() => {
       const completedHabits = habits.filter(h => h.completedToday).length;
       const totalHabits = habits.length;
-      const longestStreak = Math.max(...habits.map(h => h.streak || 0));
       
       let newMessage: MotivationalMessage;
       

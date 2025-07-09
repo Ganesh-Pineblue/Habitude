@@ -22,7 +22,7 @@ interface AIInsightsProps {
   personalityProfile?: any;
 }
 
-export const AIInsights = ({ habits, goals, currentMood, userName = 'User', personalityProfile }: AIInsightsProps) => {
+export const AIInsights = ({ habits, goals, currentMood, userName = 'User' }: AIInsightsProps) => {
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 

@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-
-import { Send, Sparkles, Target, Brain, Heart, Lightbulb, BookOpen, Zap, Star, TrendingUp, Users, Clock } from 'lucide-react';
+import { Send, Sparkles, Target, Brain, Heart, Zap } from 'lucide-react';
 
 interface AICoachProps {
   personalityProfile?: any;
@@ -72,7 +70,7 @@ export const AICoach = ({
 
   const generateComprehensiveResponse = (userInput: string, context: any) => {
     const input = userInput.toLowerCase();
-    const { habits, goals, currentMood, userName, personalityProfile } = context;
+    const { habits, currentMood, personalityProfile } = context;
     
     // Get user insights
     const completedHabits = habits.filter((h: any) => h.completedToday).length;
@@ -167,7 +165,6 @@ export const AICoach = ({
   const completedHabits = habits.filter((h: any) => h.completedToday).length;
   const totalHabits = habits.length;
   const habitProgress = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
-  const longestStreak = habits.length > 0 ? Math.max(...habits.map((h: any) => h.streak || 0)) : 0;
   const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
   const currentMoodLabel = moodLabels[currentMood] || 'Neutral';
 

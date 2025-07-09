@@ -144,14 +144,14 @@ export const NotificationCenter = () => {
     });
   };
 
-  const handleEditNotification = () => {
+  const handleEditNotification = (_notification: Notification) => {
     toast({
       title: "Notification Edited",
       description: "The notification has been edited.",
     });
   };
 
-  const handleRescheduleNotification = () => {
+  const handleRescheduleNotification = (_id: number) => {
     toast({
       title: "Notification Rescheduled",
       description: "The notification has been rescheduled.",

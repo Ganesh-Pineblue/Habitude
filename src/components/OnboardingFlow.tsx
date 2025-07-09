@@ -405,7 +405,7 @@ class AIPersonalityService {
       name,
       category: selectedTemplate.category,
       habits: selectedTemplate.habits,
-      image: this.generatePersonalityImage(name),
+      image: this.generatePersonalityImage(),
       description,
       achievements: selectedTemplate.achievements
     }];
@@ -497,7 +497,7 @@ class AIGoalGenerationService {
     const habitCategories = this.analyzeHabitCategories(selectedHabits);
     
     // Generate complementary goals based on the habit categories
-    const complementaryGoals = this.generateComplementaryGoals(habitCategories, personalityName);
+    const complementaryGoals = this.generateComplementaryGoals(habitCategories);
     
     // Select the best 3-5 goals (not one per habit)
     const selectedGoals = this.selectBestGoals(complementaryGoals, selectedHabits.length);

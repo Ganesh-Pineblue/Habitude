@@ -275,7 +275,6 @@ export const HabitChallenges: React.FC<HabitChallengesProps> = ({ currentUser })
   const [buddies] = useState<AccountabilityBuddy[]>(defaultBuddies);
   const [activeTab, setActiveTab] = useState('challenges');
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
-  const [showFindBuddies, setShowFindBuddies] = useState(false);
 
   const [newChallenge, setNewChallenge] = useState({
     title: '',

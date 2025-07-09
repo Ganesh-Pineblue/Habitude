@@ -13,7 +13,8 @@ import {
   Lightbulb,
   Plus,
   Heart,
-  CheckCircle2
+  CheckCircle2,
+  Users
 } from 'lucide-react';
 
 interface Habit {
@@ -41,15 +42,7 @@ interface Habit {
   aiGenerated?: boolean;
 }
 
-interface TimeBlock {
-  startTime: string;
-  endTime: string;
-  duration: number; // in minutes
-  type: 'idle' | 'busy' | 'transition';
-  energyLevel: 'low' | 'medium' | 'high';
-  context: string;
-  suggestedHabits: MicroHabit[];
-}
+
 
 interface MicroHabit {
   id: string;
@@ -65,17 +58,7 @@ interface MicroHabit {
   priority: 'low' | 'medium' | 'high';
 }
 
-interface UserPattern {
-  wakeTime: string;
-  sleepTime: string;
-  workHours: { start: string; end: string };
-  energyPeaks: string[];
-  energyLows: string[];
-  commonIdleTimes: string[];
-  habitCompletionPatterns: { [habitId: string]: { [time: string]: number } };
-  moodPatterns: { [time: string]: number };
-  productivityPatterns: { [time: string]: number };
-}
+
 
 interface AdaptiveHabitSuggestionEngineProps {
   habits: Habit[];
@@ -91,7 +74,7 @@ export const AdaptiveHabitSuggestionEngine: React.FC<AdaptiveHabitSuggestionEngi
   currentMood,
   currentTime,
   onAddHabit,
-  onCompleteHabit,
+
   personalityProfile
 }) => {
   const [currentSuggestions, setCurrentSuggestions] = useState<MicroHabit[]>([]);
@@ -267,8 +250,6 @@ export const AdaptiveHabitSuggestionEngine: React.FC<AdaptiveHabitSuggestionEngi
     }
 
     const currentHour = currentTime.getHours();
-    const currentMinute = currentTime.getMinutes();
-    const currentTimeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
 
     // Determine current context
     let context = 'general';
