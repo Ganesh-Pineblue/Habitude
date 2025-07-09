@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
-import { Send, Sparkles, Target, Brain, Heart, Lightbulb, BookOpen } from 'lucide-react';
+import { Send, Sparkles, Target, Brain, Heart, Lightbulb, BookOpen, Zap, Star, TrendingUp, Users, Clock } from 'lucide-react';
 
 interface AICoachProps {
   personalityProfile?: any;
@@ -163,113 +164,196 @@ export const AICoach = ({
     "Science of habit formation"
   ];
 
+  const completedHabits = habits.filter((h: any) => h.completedToday).length;
+  const totalHabits = habits.length;
+  const habitProgress = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
+  const longestStreak = habits.length > 0 ? Math.max(...habits.map((h: any) => h.streak || 0)) : 0;
+  const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
+  const currentMoodLabel = moodLabels[currentMood] || 'Neutral';
+
   return (
-    <div className="space-y-4">
-      <Card className="border-0 shadow-sm bg-white">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-              <BookOpen className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI Knowledge Companion</h2>
-              <p className="text-sm text-gray-600 font-normal">Your personal encyclopedia & life coach</p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent>
-          {/* User Progress Summary */}
-          {(habits.length > 0 || goals.length > 0) && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-              <div className="flex items-center space-x-2 mb-3">
-                <Brain className="w-5 h-5 text-blue-600" />
-                <span className="font-medium text-gray-900">Your Personal Context</span>
-              </div>
-              <div className="space-y-2 text-sm text-gray-700">
-                {habits.length > 0 && (
-                  <div>📊 Daily Progress: {habits.filter(h => h.completedToday).length}/{habits.length} habits completed</div>
-                )}
-                {goals.length > 0 && (
-                  <div>🎯 Active Goals: {goals.length} goals in progress</div>
-                )}
-                <div>😊 Current Mood: {['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'][currentMood] || 'Neutral'}</div>
-                {habits.length > 0 && (
-                  <div>🔥 Longest Streak: {Math.max(...habits.map(h => h.streak || 0))} days</div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Chat Messages */}
-          <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                  message.sender === 'user'
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                    : 'bg-gradient-to-r from-slate-50 to-slate-100 text-slate-800'
-                }`}>
-                  {message.sender === 'coach' && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src="/placeholder.svg" />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                          <BookOpen className="w-3 h-3" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-xs font-medium text-slate-600">AI Companion</span>
-                    </div>
-                  )}
-                  <p className="text-sm whitespace-pre-line">{message.content}</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-2rem)]">
+          
+          {/* Left Sidebar - User Context & Quick Actions */}
+          <div className="lg:col-span-1 space-y-6">
+            
+            {/* AI Coach Header */}
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden relative">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <CardHeader className="relative z-10">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
+                    <Brain className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold">AI Knowledge Companion</CardTitle>
+                    <p className="text-blue-100">Your personal encyclopedia & life coach</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              </CardHeader>
+            </Card>
 
-          {/* Suggested Questions */}
-          <div className="mb-4">
-            <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center">
-              <Sparkles className="w-4 h-4 mr-1 text-blue-600" />
-              Explore These Topics:
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {suggestedQuestions.map((question, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setInputValue(question)}
-                  className="text-xs h-8 text-left justify-start hover:bg-blue-50 hover:border-blue-200"
+            {/* Quick Actions */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center space-x-2 text-lg">
+                  <Zap className="w-5 h-5 text-purple-600" />
+                  <span>Quick Actions</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start text-left h-auto p-3 hover:bg-purple-50 hover:border-purple-200"
+                  onClick={() => setInputValue("How can I improve my productivity?")}
                 >
-                  {question}
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Target className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Productivity Tips</div>
+                      <div className="text-xs text-gray-500">Optimize your workflow</div>
+                    </div>
+                  </div>
                 </Button>
-              ))}
-            </div>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start text-left h-auto p-3 hover:bg-blue-50 hover:border-blue-200"
+                  onClick={() => setInputValue("Explain the science of habit formation")}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Brain className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Habit Science</div>
+                      <div className="text-xs text-gray-500">Build lasting habits</div>
+                    </div>
+                  </div>
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start text-left h-auto p-3 hover:bg-green-50 hover:border-green-200"
+                  onClick={() => setInputValue("How can I improve my mental health?")}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Heart className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Mental Wellness</div>
+                      <div className="text-xs text-gray-500">Boost your mood</div>
+                    </div>
+                  </div>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Input Area */}
-          <div className="flex space-x-2">
-            <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask me anything - from science to philosophy, productivity to creativity..."
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1"
-            />
-            <Button 
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim()}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+          {/* Main Chat Area */}
+          <div className="lg:col-span-2">
+            <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm h-full flex flex-col">
+              <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-slate-50 to-blue-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                        <Brain className="w-5 h-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle className="text-lg">AI Knowledge Companion</CardTitle>
+                      <p className="text-sm text-gray-600">Ask me anything - I'm here to help!</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-gray-500">Online</span>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="flex-1 flex flex-col p-0">
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                        message.sender === 'user'
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                          : 'bg-gradient-to-r from-slate-50 to-blue-50 text-slate-800 shadow-md border border-slate-200'
+                      }`}>
+                        {message.sender === 'coach' && (
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src="/placeholder.svg" />
+                              <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                                <Brain className="w-3 h-3" />
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-xs font-medium text-slate-600">AI Companion</span>
+                          </div>
+                        )}
+                        <p className="text-sm whitespace-pre-line leading-relaxed">{message.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Suggested Questions */}
+                <div className="p-6 border-t border-gray-100 bg-gradient-to-r from-slate-50 to-blue-50">
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-slate-700 mb-3 flex items-center">
+                      <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
+                      Explore These Topics:
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {suggestedQuestions.map((question, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setInputValue(question)}
+                          className="text-xs h-auto p-2 text-left justify-start hover:bg-blue-50 hover:border-blue-200 rounded-lg"
+                        >
+                          {question}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Input Area */}
+                  <div className="flex space-x-3">
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Ask me anything - from science to philosophy, productivity to creativity..."
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      className="flex-1 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      disabled={!inputValue.trim()}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl px-6 shadow-lg"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

@@ -184,6 +184,323 @@ const generateCategoryData = (habits: Habit[] = []) => {
   });
 };
 
+// Generate enhanced goal data with more detailed analytics
+const generateEnhancedGoalData = (goals: Goal[] = []) => {
+  const mockGoals: Goal[] = [
+    {
+      id: '1',
+      title: 'Lose 10 lbs',
+      description: 'Achieve target weight through consistent exercise and healthy eating',
+      target: 10,
+      current: 6.5,
+      unit: 'lbs',
+      deadline: '2025-08-01',
+      category: 'health',
+      priority: 'high'
+    },
+    {
+      id: '2',
+      title: 'Read 24 Books',
+      description: 'Complete 2 books per month to expand knowledge',
+      target: 24,
+      current: 12,
+      unit: 'books',
+      deadline: '2025-12-31',
+      category: 'productivity',
+      priority: 'medium'
+    },
+    {
+      id: '3',
+      title: 'Meditate 100 Days',
+      description: 'Build a consistent meditation practice',
+      target: 100,
+      current: 75,
+      unit: 'days',
+      deadline: '2025-09-15',
+      category: 'mindfulness',
+      priority: 'high'
+    },
+    {
+      id: '4',
+      title: 'Run 500 Miles',
+      description: 'Build endurance and cardiovascular health',
+      target: 500,
+      current: 320,
+      unit: 'miles',
+      deadline: '2025-11-30',
+      category: 'fitness',
+      priority: 'medium'
+    },
+    {
+      id: '5',
+      title: 'Learn Spanish',
+      description: 'Achieve conversational fluency',
+      target: 100,
+      current: 45,
+      unit: 'lessons',
+      deadline: '2025-10-15',
+      category: 'productivity',
+      priority: 'low'
+    }
+  ];
+  
+  const goalsData = goals.length > 0 ? goals : mockGoals;
+  
+  // Generate weekly progress data for each goal
+  const weeklyProgressData = goalsData.map(goal => {
+    const weeks = [];
+    const totalWeeks = Math.ceil((new Date(goal.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24 * 7));
+    
+    for (let i = 0; i < Math.min(totalWeeks, 12); i++) {
+      const weekProgress = Math.min(goal.current / goal.target, 1) * (i + 1) / totalWeeks;
+      weeks.push({
+        week: `Week ${i + 1}`,
+        progress: Math.round(weekProgress * 100),
+        target: Math.round(((i + 1) / totalWeeks) * 100),
+        category: goal.category,
+        goalTitle: goal.title
+      });
+    }
+    return weeks;
+  }).flat();
+
+  // Generate monthly trend data
+  const monthlyTrendData = goalsData.map(goal => ({
+    month: new Date().toLocaleDateString('en-US', { month: 'short' }),
+    goal: goal.title,
+    progress: Math.round((goal.current / goal.target) * 100),
+    category: goal.category,
+    priority: goal.priority,
+    daysLeft: Math.ceil((new Date(goal.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+  }));
+
+  // Generate goal completion timeline
+  const timelineData = goalsData.map(goal => ({
+    goal: goal.title,
+    startDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    endDate: new Date(goal.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    progress: Math.round((goal.current / goal.target) * 100),
+    category: goal.category,
+    status: goal.current >= goal.target ? 'completed' : goal.current / goal.target > 0.7 ? 'on-track' : 'needs-attention'
+  }));
+
+  return {
+    weeklyProgress: weeklyProgressData,
+    monthlyTrend: monthlyTrendData,
+    timeline: timelineData,
+    goals: goalsData
+  };
+};
+
+interface CorrelationData {
+  category: string;
+  habitCompletion: number;
+  goalProgress: number;
+  correlation: 'high' | 'low';
+  color: string;
+}
+
+// Generate habit-goal correlation data
+const generateHabitGoalCorrelation = (habits: Habit[] = [], goals: Goal[] = []): CorrelationData[] => {
+  const correlationData: CorrelationData[] = [];
+  const categories = ['health', 'productivity', 'mindfulness', 'social', 'fitness'];
+  
+  categories.forEach(category => {
+    const categoryHabits = habits.filter(h => h.category === category);
+    const categoryGoals = goals.filter(g => g.category === category);
+    
+    const habitCompletionRate = categoryHabits.length > 0 
+      ? categoryHabits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / categoryHabits.length
+      : Math.floor(Math.random() * 40) + 60;
+    
+    const goalProgressRate = categoryGoals.length > 0
+      ? categoryGoals.reduce((sum, g) => sum + Math.min(g.current / g.target, 1), 0) / categoryGoals.length * 100
+      : Math.floor(Math.random() * 40) + 60;
+    
+    correlationData.push({
+      category: category.charAt(0).toUpperCase() + category.slice(1),
+      habitCompletion: Math.round(habitCompletionRate),
+      goalProgress: Math.round(goalProgressRate),
+      correlation: Math.abs(habitCompletionRate - goalProgressRate) < 20 ? 'high' : 'low',
+      color: (() => {
+        const colors = {
+          health: '#10b981',
+          productivity: '#3b82f6',
+          mindfulness: '#8b5cf6',
+          social: '#f59e0b',
+          fitness: '#f43f5e'
+        };
+        return colors[category as keyof typeof colors] || '#6b7280';
+      })()
+    });
+  });
+  
+  return correlationData;
+};
+
+// Generate enhanced habit data with detailed analytics
+const generateEnhancedHabitData = (habits: Habit[] = []) => {
+  const mockHabits: Habit[] = [
+    {
+      id: '1',
+      title: 'Morning Exercise',
+      description: '30 minutes of cardio or strength training',
+      streak: 15,
+      completedToday: true,
+      category: 'health',
+      completionRate: 85,
+      bestStreak: 23,
+      weeklyTarget: 5,
+      currentWeekCompleted: 4
+    },
+    {
+      id: '2',
+      title: 'Read 30 Minutes',
+      description: 'Daily reading for knowledge expansion',
+      streak: 8,
+      completedToday: false,
+      category: 'productivity',
+      completionRate: 72,
+      bestStreak: 12,
+      weeklyTarget: 7,
+      currentWeekCompleted: 5
+    },
+    {
+      id: '3',
+      title: 'Meditation',
+      description: '10 minutes of mindfulness practice',
+      streak: 22,
+      completedToday: true,
+      category: 'mindfulness',
+      completionRate: 91,
+      bestStreak: 22,
+      weeklyTarget: 7,
+      currentWeekCompleted: 6
+    },
+    {
+      id: '4',
+      title: 'Call Family',
+      description: 'Daily check-in with loved ones',
+      streak: 5,
+      completedToday: true,
+      category: 'social',
+      completionRate: 68,
+      bestStreak: 8,
+      weeklyTarget: 5,
+      currentWeekCompleted: 3
+    },
+    {
+      id: '5',
+      title: 'Drink 8 Glasses Water',
+      description: 'Stay hydrated throughout the day',
+      streak: 12,
+      completedToday: true,
+      category: 'health',
+      completionRate: 78,
+      bestStreak: 15,
+      weeklyTarget: 7,
+      currentWeekCompleted: 6
+    },
+    {
+      id: '6',
+      title: 'Journal Writing',
+      description: 'Reflect on daily experiences',
+      streak: 3,
+      completedToday: false,
+      category: 'mindfulness',
+      completionRate: 45,
+      bestStreak: 7,
+      weeklyTarget: 5,
+      currentWeekCompleted: 2
+    }
+  ];
+  
+  const habitsData = habits.length > 0 ? habits : mockHabits;
+  
+  // Generate daily habit completion data
+  const dailyHabitData = habitsData.map(habit => {
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const completionRate = habit.completionRate || Math.floor(Math.random() * 40) + 60;
+      const completed = Math.random() < (completionRate / 100);
+      
+      days.push({
+        date: date.toISOString().split('T')[0],
+        habit: habit.title,
+        category: habit.category,
+        completed: completed ? 1 : 0,
+        streak: completed ? (habit.streak || 0) : 0,
+        completionRate: completionRate
+      });
+    }
+    return days;
+  }).flat();
+
+  // Generate habit performance by time of day
+  const timePerformanceData = habitsData.map(habit => ({
+    habit: habit.title,
+    category: habit.category,
+    morning: Math.floor(Math.random() * 30) + 70,
+    afternoon: Math.floor(Math.random() * 30) + 50,
+    evening: Math.floor(Math.random() * 30) + 40,
+    night: Math.floor(Math.random() * 20) + 20
+  }));
+
+  // Generate habit difficulty analysis
+  const difficultyData = habitsData.map(habit => ({
+    habit: habit.title,
+    category: habit.category,
+    difficulty: Math.floor(Math.random() * 3) + 1, // 1-3 scale
+    consistency: habit.completionRate || Math.floor(Math.random() * 40) + 60,
+    motivation: Math.floor(Math.random() * 30) + 70,
+    impact: Math.floor(Math.random() * 30) + 70
+  }));
+
+  // Generate habit streak analysis
+  const streakData = habitsData.map(habit => ({
+    habit: habit.title,
+    category: habit.category,
+    currentStreak: habit.streak || 0,
+    bestStreak: habit.bestStreak || habit.streak || 0,
+    averageStreak: Math.floor((habit.bestStreak || habit.streak || 0) * 0.7),
+    completionRate: habit.completionRate || Math.floor(Math.random() * 40) + 60
+  }));
+
+  return {
+    dailyData: dailyHabitData,
+    timePerformance: timePerformanceData,
+    difficulty: difficultyData,
+    streaks: streakData,
+    habits: habitsData
+  };
+};
+
+// Generate habit category performance over time
+const generateHabitCategoryTrends = (habits: Habit[] = []) => {
+  const categories = ['health', 'productivity', 'mindfulness', 'social'];
+  const trends = [];
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    
+    const dayData = {
+      date: date.toISOString().split('T')[0],
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      health: Math.floor(Math.random() * 30) + 70,
+      productivity: Math.floor(Math.random() * 30) + 65,
+      mindfulness: Math.floor(Math.random() * 30) + 60,
+      social: Math.floor(Math.random() * 30) + 55
+    };
+    
+    trends.push(dayData);
+  }
+  
+  return trends;
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -227,6 +544,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
   const historicalData = useMemo(() => generateHistoricalData(habits), [habits]);
   const weeklyData = useMemo(() => generateWeeklyData(habits), [habits]);
   const categoryData = useMemo(() => generateCategoryData(habits), [habits]);
+  const habitGoalCorrelation = useMemo(() => generateHabitGoalCorrelation(habits, goals), [habits, goals]);
+  const enhancedHabitData = useMemo(() => generateEnhancedHabitData(habits), [habits]);
+  const habitCategoryTrends = useMemo(() => generateHabitCategoryTrends(habits), [habits]);
 
   // Calculate overall statistics
   const overallStats = useMemo(() => {
@@ -259,43 +579,9 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
     };
   }, [moodData]);
 
-  // Mock goals data if not provided
-  const mockGoals: Goal[] = [
-    {
-      id: '1',
-      title: 'Lose 10 lbs',
-      description: 'Achieve target weight through consistent exercise and healthy eating',
-      target: 10,
-      current: 6.5,
-      unit: 'lbs',
-      deadline: '2025-08-01',
-      category: 'health',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Read 24 Books',
-      description: 'Complete 2 books per month to expand knowledge',
-      target: 24,
-      current: 12,
-      unit: 'books',
-      deadline: '2025-12-31',
-      category: 'productivity',
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      title: 'Meditate 100 Days',
-      description: 'Build a consistent meditation practice',
-      target: 100,
-      current: 75,
-      unit: 'days',
-      deadline: '2025-09-15',
-      category: 'mindfulness',
-      priority: 'high'
-    }
-  ];
-  const goalsData = goals.length > 0 ? goals : mockGoals;
+  // Enhanced goal data with detailed analytics
+  const enhancedGoalData = useMemo(() => generateEnhancedGoalData(goals), [goals]);
+  const goalsData = enhancedGoalData.goals;
 
   // Goal analytics
   const totalGoals = goalsData.length;
@@ -313,13 +599,16 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
       total: catGoals.length,
       completed,
       progress: catGoals.length > 0 ? Math.round(catGoals.reduce((sum, g) => sum + Math.min(g.current / g.target, 1), 0) / catGoals.length * 100) : 0,
-      color: {
-        health: '#10b981',
-        productivity: '#3b82f6',
-        mindfulness: '#8b5cf6',
-        social: '#f59e0b',
-        fitness: '#f43f5e'
-      }[category]
+      color: (() => {
+        const colors = {
+          health: '#10b981',
+          productivity: '#3b82f6',
+          mindfulness: '#8b5cf6',
+          social: '#f59e0b',
+          fitness: '#f43f5e'
+        };
+        return colors[category as keyof typeof colors] || '#6b7280';
+      })()
     };
   });
 
@@ -488,75 +777,365 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
 
         {/* Habits Tab */}
         <TabsContent value="habits" className="space-y-6">
-          <Card className="border-0 shadow-sm bg-white">
+          {/* Habit Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-green-100 to-green-50 min-h-[120px] flex flex-col justify-between">
+              <CardContent className="p-6 flex flex-col h-full justify-between">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="rounded-2xl p-2 shadow-md bg-green-500/20">
+                    <Target className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-0.5">Total Habits</div>
+                    <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                      <AnimatedNumber value={enhancedHabitData.habits.length} duration={1200} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-blue-100 to-blue-50 min-h-[120px] flex flex-col justify-between">
+              <CardContent className="p-6 flex flex-col h-full justify-between">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="rounded-2xl p-2 shadow-md bg-blue-500/20">
+                    <Flame className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-0.5">Best Streak</div>
+                    <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                      <AnimatedNumber value={Math.max(...enhancedHabitData.streaks.map(s => s.bestStreak))} duration={1200} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-purple-100 to-purple-50 min-h-[120px] flex flex-col justify-between">
+              <CardContent className="p-6 flex flex-col h-full justify-between">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="rounded-2xl p-2 shadow-md bg-purple-500/20">
+                    <CheckCircle2 className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-0.5">Today's Progress</div>
+                    <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                      <AnimatedNumber value={enhancedHabitData.habits.filter(h => h.completedToday).length} duration={1200} />
+                      /
+                      <AnimatedNumber value={enhancedHabitData.habits.length} duration={1200} delay={200} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-orange-100 to-orange-50 min-h-[120px] flex flex-col justify-between">
+              <CardContent className="p-6 flex flex-col h-full justify-between">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="rounded-2xl p-2 shadow-md bg-orange-500/20">
+                    <Activity className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-700 mb-0.5">Avg Completion</div>
+                    <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                      <AnimatedNumber value={Math.round(enhancedHabitData.habits.reduce((sum, h) => sum + (h.completionRate || 0), 0) / enhancedHabitData.habits.length)} suffix="%" duration={1200} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Enhanced Habit Visualizations */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Habit Category Trends */}
+            <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-emerald-800">
+                  <TrendingUp className="w-5 h-5" />
+                  <span>Category Performance Trends</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ChartContainer
+                    config={{
+                      health: { color: "#10b981", label: "Health" },
+                      productivity: { color: "#3b82f6", label: "Productivity" },
+                      mindfulness: { color: "#8b5cf6", label: "Mindfulness" },
+                      social: { color: "#f59e0b", label: "Social" }
+                    }}
+                    className="h-full"
+                  >
+                    <LineChart data={habitCategoryTrends.slice(-14)}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="dayName" stroke="#888888" fontSize={12} />
+                      <YAxis stroke="#888888" fontSize={12} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line
+                        type="monotone"
+                        dataKey="health"
+                        stroke="#10b981"
+                        strokeWidth={3}
+                        dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="productivity"
+                        stroke="#3b82f6"
+                        strokeWidth={3}
+                        dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="mindfulness"
+                        stroke="#8b5cf6"
+                        strokeWidth={3}
+                        dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2, fill: "white" }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="social"
+                        stroke="#f59e0b"
+                        strokeWidth={3}
+                        dot={{ fill: "#f59e0b", strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: "#f59e0b", strokeWidth: 2, fill: "white" }}
+                      />
+                    </LineChart>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Habit Streak Analysis */}
+            <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-purple-50">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-indigo-800">
+                  <Flame className="w-5 h-5" />
+                  <span>Streak Performance</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ChartContainer
+                    config={{
+                      currentStreak: { color: "#10b981", label: "Current Streak" },
+                      bestStreak: { color: "#3b82f6", label: "Best Streak" },
+                      averageStreak: { color: "#8b5cf6", label: "Average Streak" }
+                    }}
+                    className="h-full"
+                  >
+                    <BarChart data={enhancedHabitData.streaks} layout="horizontal">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis type="number" stroke="#888888" fontSize={12} />
+                      <YAxis dataKey="habit" type="category" stroke="#888888" fontSize={12} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="currentStreak" fill="#10b981" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="bestStreak" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="averageStreak" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Habit Performance Matrix */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-orange-50">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Target className="w-5 h-5 text-green-600" />
-                <span>Habit Completion Trends</span>
+              <CardTitle className="flex items-center space-x-2 text-amber-800">
+                <Target className="w-5 h-5" />
+                <span>Habit Performance Matrix</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-96">
-                <ChartContainer
-                  config={{
-                    completion: { color: "#10b981", label: "Completion Rate" },
-                    mood: { color: "#8b5cf6", label: "Mood" }
-                  }}
-                  className="h-full"
-                >
-                  <LineChart data={historicalData.slice(-7)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="dayName" stroke="#888888" fontSize={12} />
-                    <YAxis stroke="#888888" fontSize={12} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line
-                      type="monotone"
-                      dataKey="completionRate"
-                      stroke="#10b981"
-                      strokeWidth={3}
-                      dot={{ fill: "#10b981", strokeWidth: 2, r: 6 }}
-                      activeDot={{ r: 8, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="mood"
-                      stroke="#8b5cf6"
-                      strokeWidth={2}
-                      dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2, fill: "white" }}
-                    />
-                  </LineChart>
-                </ChartContainer>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {enhancedHabitData.habits.map((habit) => {
+                  const progress = habit.completionRate || 0;
+                  const streak = habit.streak || 0;
+                  const categoryColor = {
+                    health: 'bg-green-100 border-green-300',
+                    productivity: 'bg-blue-100 border-blue-300',
+                    mindfulness: 'bg-purple-100 border-purple-300',
+                    social: 'bg-orange-100 border-orange-300'
+                  }[habit.category];
+                  
+                  return (
+                    <Card key={habit.id} className={`border-2 ${categoryColor} shadow-md hover:shadow-lg transition-shadow`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-gray-800 text-sm">{habit.title}</h4>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            habit.completedToday ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'
+                          }`}>
+                            {habit.completedToday ? 'Done' : 'Pending'}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs text-gray-600">
+                            <span>Completion</span>
+                            <span>{progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-500 ${
+                                progress >= 80 ? 'bg-green-500' :
+                                progress >= 60 ? 'bg-yellow-500' :
+                                progress >= 40 ? 'bg-orange-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>Streak: {streak} days</span>
+                            <span className="capitalize">{habit.category}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
 
-          {/* Weekly Consistency */}
-          <Card className="border-0 shadow-sm bg-white">
+          {/* Time Performance Analysis */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-cyan-50 to-blue-50">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
-                <span>Weekly Consistency Pattern</span>
+              <CardTitle className="flex items-center space-x-2 text-cyan-800">
+                <Activity className="w-5 h-5" />
+                <span>Time Performance Analysis</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
                 <ChartContainer
                   config={{
-                    completionRate: { color: "#10b981", label: "Completion Rate" },
-                    averageStreak: { color: "#f59e0b", label: "Average Streak" }
+                    morning: { color: "#10b981", label: "Morning" },
+                    afternoon: { color: "#3b82f6", label: "Afternoon" },
+                    evening: { color: "#8b5cf6", label: "Evening" },
+                    night: { color: "#f59e0b", label: "Night" }
                   }}
                   className="h-full"
                 >
-                  <BarChart data={weeklyData}>
+                  <BarChart data={enhancedHabitData.timePerformance.slice(0, 4)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="day" stroke="#888888" fontSize={12} />
+                    <XAxis dataKey="habit" stroke="#888888" fontSize={12} />
                     <YAxis stroke="#888888" fontSize={12} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="completionRate" fill="#10b981" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="averageStreak" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="morning" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="afternoon" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="evening" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="night" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ChartContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Habit Insights & Recommendations */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-violet-50 to-purple-50">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-violet-800">
+                <Brain className="w-5 h-5" />
+                <span>Habit Insights & Recommendations</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Top Performers */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-800 mb-3">🏆 Top Performing Habits</h4>
+                  <div className="space-y-3">
+                    {enhancedHabitData.habits
+                      .sort((a, b) => (b.completionRate || 0) - (a.completionRate || 0))
+                      .slice(0, 3)
+                      .map((habit, index) => (
+                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                              index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-500'
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-800">{habit.title}</p>
+                              <p className="text-xs text-gray-500 capitalize">{habit.category}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-green-600">{habit.completionRate}%</p>
+                            <p className="text-xs text-gray-500">{habit.streak} day streak</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Areas for Improvement */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-800 mb-3">📈 Areas for Improvement</h4>
+                  <div className="space-y-3">
+                    {enhancedHabitData.habits
+                      .sort((a, b) => (a.completionRate || 0) - (b.completionRate || 0))
+                      .slice(0, 3)
+                      .map((habit, index) => (
+                        <div key={habit.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-red-500">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-800">{habit.title}</p>
+                              <p className="text-xs text-gray-500 capitalize">{habit.category}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-red-600">{habit.completionRate}%</p>
+                            <p className="text-xs text-gray-500">{habit.streak} day streak</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Smart Recommendations */}
+              <div className="mt-6 p-4 bg-white rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-800 mb-3">💡 Smart Recommendations</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <h5 className="font-medium text-green-800 mb-1">Best Time to Build Habits</h5>
+                    <p className="text-sm text-green-700">
+                      Your morning habits show the highest success rate. Consider adding more habits to your morning routine.
+                    </p>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <h5 className="font-medium text-blue-800 mb-1">Category Focus</h5>
+                    <p className="text-sm text-blue-700">
+                      {enhancedHabitData.habits.reduce((best, habit) => 
+                        (habit.completionRate || 0) > (best.completionRate || 0) ? habit : best
+                      ).category} habits are your strongest category. Use this momentum!
+                    </p>
+                  </div>
+                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <h5 className="font-medium text-purple-800 mb-1">Streak Strategy</h5>
+                    <p className="text-sm text-purple-700">
+                      Focus on maintaining your {Math.max(...enhancedHabitData.streaks.map(s => s.currentStreak))} day streak. 
+                      Consistency is key to habit formation.
+                    </p>
+                  </div>
+                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <h5 className="font-medium text-orange-800 mb-1">Weekly Planning</h5>
+                    <p className="text-sm text-orange-700">
+                      Plan your most challenging habits for your best performing days to increase success rate.
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -634,34 +1213,159 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                   </CardContent>
                 </Card>
               </div>
-              {/* Category Progress */}
-              <div className="h-80">
-                <ChartContainer
-                  config={categoryGoalData.reduce((acc, cat) => {
-                    acc[cat.category] = { color: cat.color, label: cat.category };
-                    return acc;
-                  }, {})}
-                  className="h-full"
-                >
-                  <BarChart data={categoryGoalData} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis type="number" stroke="#888888" fontSize={12} />
-                    <YAxis dataKey="category" type="category" stroke="#888888" fontSize={12} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="progress" radius={[0, 4, 4, 0]}>
-                      {categoryGoalData.map((entry, index) => (
-                        <Cell key={`cell-goal-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ChartContainer>
+
+              {/* Enhanced Goal Visualizations */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                {/* Goal Progress Timeline */}
+                <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-purple-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-indigo-800">
+                      <Activity className="w-5 h-5" />
+                      <span>Goal Progress Timeline</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64">
+                      <ChartContainer
+                        config={{
+                          progress: { color: "#10b981", label: "Progress" },
+                          target: { color: "#3b82f6", label: "Target" }
+                        }}
+                        className="h-full"
+                      >
+                        <LineChart data={enhancedGoalData.weeklyProgress.slice(-8)}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="week" stroke="#888888" fontSize={12} />
+                          <YAxis stroke="#888888" fontSize={12} />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Line
+                            type="monotone"
+                            dataKey="progress"
+                            stroke="#10b981"
+                            strokeWidth={3}
+                            dot={{ fill: "#10b981", strokeWidth: 2, r: 6 }}
+                            activeDot={{ r: 8, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="target"
+                            stroke="#3b82f6"
+                            strokeWidth={2}
+                            strokeDasharray="5 5"
+                            dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                            activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "white" }}
+                          />
+                        </LineChart>
+                      </ChartContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Goal Category Distribution */}
+                <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-teal-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-emerald-800">
+                      <PieChart className="w-5 h-5" />
+                      <span>Goal Categories</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64">
+                      <ChartContainer
+                        config={categoryGoalData.reduce((acc: any, cat) => {
+                          acc[cat.category] = { color: cat.color, label: cat.category };
+                          return acc;
+                        }, {})}
+                        className="h-full"
+                      >
+                        <PieChart>
+                          <Pie
+                            data={categoryGoalData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="total"
+                            label={({ category, total }) => `${category}: ${total}`}
+                          >
+                            {categoryGoalData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                        </PieChart>
+                      </ChartContainer>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
+
+              {/* Goal Priority Matrix */}
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-orange-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-amber-800">
+                    <Target className="w-5 h-5" />
+                    <span>Goal Priority Matrix</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {goalsData.map((goal) => {
+                      const progress = Math.round((goal.current / goal.target) * 100);
+                      const daysLeft = Math.ceil((new Date(goal.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                      const priorityColor = {
+                        high: 'bg-red-100 border-red-300',
+                        medium: 'bg-yellow-100 border-yellow-300',
+                        low: 'bg-green-100 border-green-300'
+                      }[goal.priority];
+                      
+                      return (
+                        <Card key={goal.id} className={`border-2 ${priorityColor} shadow-md hover:shadow-lg transition-shadow`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold text-gray-800 text-sm">{goal.title}</h4>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                goal.priority === 'high' ? 'bg-red-500 text-white' :
+                                goal.priority === 'medium' ? 'bg-yellow-500 text-white' :
+                                'bg-green-500 text-white'
+                              }`}>
+                                {goal.priority}
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-xs text-gray-600">
+                                <span>Progress</span>
+                                <span>{progress}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full transition-all duration-500 ${
+                                    progress >= 80 ? 'bg-green-500' :
+                                    progress >= 60 ? 'bg-yellow-500' :
+                                    progress >= 40 ? 'bg-orange-500' :
+                                    'bg-red-500'
+                                  }`}
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                              <div className="flex justify-between text-xs text-gray-500">
+                                <span>{goal.current}/{goal.target} {goal.unit}</span>
+                                <span>{daysLeft} days left</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Correlation Tab */}
         <TabsContent value="correlation" className="space-y-6">
+          {/* Mood & Habit Correlation */}
           <Card className="border-0 shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -717,6 +1421,97 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [],
                       <ChartTooltip content={<ChartTooltipContent />} />
                     </PieChart>
                   </ChartContainer>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Habit & Goal Correlation */}
+          <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-purple-50">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-indigo-800">
+                <Target className="w-5 h-5" />
+                <span>Habit & Goal Correlation Analysis</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Correlation Matrix */}
+                <div className="h-80">
+                  <ChartContainer
+                    config={{
+                      habitCompletion: { color: "#10b981", label: "Habit Completion" },
+                      goalProgress: { color: "#3b82f6", label: "Goal Progress" }
+                    }}
+                    className="h-full"
+                  >
+                    <BarChart data={habitGoalCorrelation} layout="horizontal">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis type="number" stroke="#888888" fontSize={12} />
+                      <YAxis dataKey="category" type="category" stroke="#888888" fontSize={12} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="habitCompletion" fill="#10b981" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="goalProgress" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+
+                {/* Correlation Insights */}
+                <div className="space-y-4">
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <h4 className="font-semibold text-gray-800 mb-3">Correlation Insights</h4>
+                    <div className="space-y-3">
+                      {habitGoalCorrelation.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="font-medium text-gray-700">{item.category}</span>
+                          </div>
+                          <div className="flex items-center space-x-4">
+                            <div className="text-center">
+                              <div className="text-sm font-semibold text-green-600">{item.habitCompletion}%</div>
+                              <div className="text-xs text-gray-500">Habits</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-semibold text-blue-600">{item.goalProgress}%</div>
+                              <div className="text-xs text-gray-500">Goals</div>
+                            </div>
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              item.correlation === 'high' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {item.correlation === 'high' ? 'Strong' : 'Weak'} Correlation
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Summary Card */}
+                  <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-0">
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold text-gray-800 mb-2">Key Findings</h4>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full" />
+                          <span>Strong habit-goal alignment in {habitGoalCorrelation.filter(item => item.correlation === 'high').length} categories</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                          <span>Focus on improving consistency in areas with weak correlation</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                          <span>Use habit completion as a predictor for goal achievement</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </CardContent>

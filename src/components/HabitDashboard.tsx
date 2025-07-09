@@ -1763,7 +1763,7 @@ export const HabitDashboard = ({
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">🤖 AI-Generated Habits</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">AI-Generated Habits</h3>
                   <p className="text-gray-600">Habits created based on your role model selection</p>
                 </div>
               </div>
