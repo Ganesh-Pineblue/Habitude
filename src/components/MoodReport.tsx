@@ -14,7 +14,9 @@ import {
   Award,
   Brain,
   Heart,
-  Smile
+  Smile,
+  Trophy,
+  Calendar
 } from 'lucide-react';
 import {
   ChartContainer,
@@ -55,9 +57,25 @@ interface Habit {
   };
 }
 
+interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  target: number;
+  current: number;
+  unit: string;
+  deadline: string;
+  category: 'health' | 'productivity' | 'mindfulness' | 'social' | 'fitness';
+  priority: 'low' | 'medium' | 'high';
+  aiGenerated?: boolean;
+  sourceHabit?: string;
+  personalityInspiration?: string;
+}
+
 interface MoodReportProps {
   habits?: Habit[];
-  defaultTab?: 'mood' | 'habits' | 'correlation' | 'insights';
+  goals?: Goal[];
+  defaultTab?: 'mood' | 'habits' | 'goals' | 'correlation' | 'insights';
 }
 
 const generateMockMoodData = (): MoodData[] => {
@@ -202,7 +220,7 @@ const CustomDot = (props: any) => {
   );
 };
 
-export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab = 'mood' }) => {
+export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], goals = [], defaultTab = 'mood' }) => {
   const [moodData] = useState<MoodData[]>(generateMockMoodData());
   // const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
 
@@ -240,6 +258,70 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
       totalDays: moodData.length
     };
   }, [moodData]);
+
+  // Mock goals data if not provided
+  const mockGoals: Goal[] = [
+    {
+      id: '1',
+      title: 'Lose 10 lbs',
+      description: 'Achieve target weight through consistent exercise and healthy eating',
+      target: 10,
+      current: 6.5,
+      unit: 'lbs',
+      deadline: '2025-08-01',
+      category: 'health',
+      priority: 'high'
+    },
+    {
+      id: '2',
+      title: 'Read 24 Books',
+      description: 'Complete 2 books per month to expand knowledge',
+      target: 24,
+      current: 12,
+      unit: 'books',
+      deadline: '2025-12-31',
+      category: 'productivity',
+      priority: 'medium'
+    },
+    {
+      id: '3',
+      title: 'Meditate 100 Days',
+      description: 'Build a consistent meditation practice',
+      target: 100,
+      current: 75,
+      unit: 'days',
+      deadline: '2025-09-15',
+      category: 'mindfulness',
+      priority: 'high'
+    }
+  ];
+  const goalsData = goals.length > 0 ? goals : mockGoals;
+
+  // Goal analytics
+  const totalGoals = goalsData.length;
+  const completedGoals = goalsData.filter(g => g.current >= g.target).length;
+  const totalProgress = goalsData.reduce((sum, goal) => sum + Math.min(goal.current / goal.target, 1), 0) / (goalsData.length || 1) * 100;
+  const urgentGoals = goalsData.filter(g => {
+    const daysLeft = Math.ceil((new Date(g.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    return daysLeft <= 30 && g.current < g.target;
+  }).length;
+  const categoryGoalData = ['health', 'productivity', 'mindfulness', 'social', 'fitness'].map(category => {
+    const catGoals = goalsData.filter(g => g.category === category);
+    const completed = catGoals.filter(g => g.current >= g.target).length;
+    return {
+      category: category.charAt(0).toUpperCase() + category.slice(1),
+      total: catGoals.length,
+      completed,
+      progress: catGoals.length > 0 ? Math.round(catGoals.reduce((sum, g) => sum + Math.min(g.current / g.target, 1), 0) / catGoals.length * 100) : 0,
+      color: {
+        health: '#10b981',
+        productivity: '#3b82f6',
+        mindfulness: '#8b5cf6',
+        social: '#f59e0b',
+        fitness: '#f43f5e'
+      }[category]
+    };
+  });
 
   return (
     <div className="w-full space-y-6">
@@ -325,7 +407,7 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
 
       {/* Tabbed Content */}
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6 bg-gray-100 backdrop-blur-sm p-1 rounded-2xl shadow-lg border border-gray-200">
+        <TabsList className="grid w-full grid-cols-5 mb-6 bg-gray-100 backdrop-blur-sm p-1 rounded-2xl shadow-lg border border-gray-200">
           <TabsTrigger value="mood" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
             <Heart className="w-4 h-4" />
             <span>Mood</span>
@@ -333,6 +415,10 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
           <TabsTrigger value="habits" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
             <Target className="w-4 h-4" />
             <span>Habits</span>
+          </TabsTrigger>
+          <TabsTrigger value="goals" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white">
+            <Trophy className="w-4 h-4" />
+            <span>Goals</span>
           </TabsTrigger>
           <TabsTrigger value="correlation" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
             <TrendingUp className="w-4 h-4" />
@@ -469,6 +555,104 @@ export const MoodReport: React.FC<MoodReportProps> = ({ habits = [], defaultTab 
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="completionRate" fill="#10b981" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="averageStreak" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Goals Tab */}
+        <TabsContent value="goals" className="space-y-6">
+          <Card className="border-0 shadow-sm bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Trophy className="w-5 h-5 text-blue-600" />
+                <span>Goal Progress & Analytics</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-blue-100 to-blue-50 min-h-[120px] flex flex-col justify-between">
+                  <CardContent className="p-6 flex flex-col h-full justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="rounded-2xl p-2 shadow-md bg-blue-500/20">
+                        <Target className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 mb-0.5">Total Goals</div>
+                        <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                          <AnimatedNumber value={totalGoals} duration={1200} />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-orange-100 to-orange-50 min-h-[120px] flex flex-col justify-between">
+                  <CardContent className="p-6 flex flex-col h-full justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="rounded-2xl p-2 shadow-md bg-orange-500/20">
+                        <TrendingUp className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 mb-0.5">Avg Progress</div>
+                        <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                          <AnimatedNumber value={Number(totalProgress.toFixed(0))} suffix="%" duration={1200} />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-purple-100 to-purple-50 min-h-[120px] flex flex-col justify-between">
+                  <CardContent className="p-6 flex flex-col h-full justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="rounded-2xl p-2 shadow-md bg-purple-500/20">
+                        <Calendar className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 mb-0.5">Urgent</div>
+                        <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                          <AnimatedNumber value={urgentGoals} duration={1200} />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-green-100 to-green-50 min-h-[120px] flex flex-col justify-between">
+                  <CardContent className="p-6 flex flex-col h-full justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="rounded-2xl p-2 shadow-md bg-green-500/20">
+                        <Trophy className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 mb-0.5">Completed</div>
+                        <div className="text-2xl font-extrabold text-gray-900 flex items-end">
+                          <AnimatedNumber value={completedGoals} duration={1200} />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              {/* Category Progress */}
+              <div className="h-80">
+                <ChartContainer
+                  config={categoryGoalData.reduce((acc, cat) => {
+                    acc[cat.category] = { color: cat.color, label: cat.category };
+                    return acc;
+                  }, {})}
+                  className="h-full"
+                >
+                  <BarChart data={categoryGoalData} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" stroke="#888888" fontSize={12} />
+                    <YAxis dataKey="category" type="category" stroke="#888888" fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="progress" radius={[0, 4, 4, 0]}>
+                      {categoryGoalData.map((entry, index) => (
+                        <Cell key={`cell-goal-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ChartContainer>
               </div>

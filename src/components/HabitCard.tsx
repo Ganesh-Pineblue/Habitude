@@ -244,13 +244,13 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
 
   return (
     <>
-      <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${
+      <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] habit-card ${
         isBadHabit 
           ? 'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-lg' 
           : habit.completedToday 
             ? `bg-gradient-to-br from-${config.color}-50 to-${config.color}-100 border-${config.color}-200 shadow-lg` 
             : 'bg-white border-gray-200 shadow-md hover:border-gray-300'
-      } ${habit.aiGenerated ? 'ring-2 ring-blue-100' : ''}`}>
+      } ${habit.aiGenerated ? 'ring-2 ring-blue-100' : ''}`} data-habit-card>
         
         {/* Gradient accent line */}
         <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${config.gradient}`} />

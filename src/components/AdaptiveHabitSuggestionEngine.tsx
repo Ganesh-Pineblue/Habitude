@@ -11,7 +11,9 @@ import {
   Activity, 
   Sparkles,
   Lightbulb,
-  Plus
+  Plus,
+  Heart,
+  CheckCircle2
 } from 'lucide-react';
 
 interface Habit {

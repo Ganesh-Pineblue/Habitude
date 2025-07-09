@@ -28,6 +28,9 @@ interface TourStep {
   icon: React.ReactNode;
   color: string;
   gradient: string;
+  highlightSelector: string;
+  highlightClass: string;
+  showTryButton?: boolean;
 }
 
 const tourSteps: TourStep[] = [
@@ -37,7 +40,9 @@ const tourSteps: TourStep[] = [
     description: 'Let me show you what each button in your habit cards does. These buttons help you manage your habits effectively.',
     icon: <Rocket className="w-8 h-8 text-white" />,
     color: 'from-blue-500 to-purple-500',
-    gradient: 'bg-gradient-to-br from-blue-500 to-purple-500'
+    gradient: 'bg-gradient-to-br from-blue-500 to-purple-500',
+    highlightSelector: '.habit-card, [data-habit-card]',
+    highlightClass: 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl scale-105'
   },
   {
     id: 'suggestion-button',
@@ -45,7 +50,10 @@ const tourSteps: TourStep[] = [
     description: 'The yellow lightbulb button shows AI suggestions for improving this habit. Click it to get personalized tips!',
     icon: <Lightbulb className="w-8 h-8 text-white" />,
     color: 'from-yellow-500 to-orange-500',
-    gradient: 'bg-gradient-to-br from-yellow-500 to-orange-500'
+    gradient: 'bg-gradient-to-br from-yellow-500 to-orange-500',
+    highlightSelector: 'button[title*="Show AI Suggestion"]',
+    highlightClass: 'ring-4 ring-yellow-500 ring-opacity-70 shadow-2xl scale-110 animate-pulse',
+    showTryButton: true
   },
   {
     id: 'schedule-button',
@@ -53,7 +61,9 @@ const tourSteps: TourStep[] = [
     description: 'The green "SCHEDULE" button lets you set specific times and reminders for this habit. Plan when to do it!',
     icon: <Calendar className="w-8 h-8 text-white" />,
     color: 'from-green-500 to-emerald-500',
-    gradient: 'bg-gradient-to-br from-green-500 to-emerald-500'
+    gradient: 'bg-gradient-to-br from-green-500 to-emerald-500',
+    highlightSelector: 'button[title="Schedule Habit"]',
+    highlightClass: 'ring-4 ring-green-500 ring-opacity-70 shadow-2xl scale-110 animate-pulse'
   },
   {
     id: 'goal-button',
@@ -61,7 +71,9 @@ const tourSteps: TourStep[] = [
     description: 'The blue/purple target button creates long-term goals based on this habit. Turn habits into achievements!',
     icon: <Target className="w-8 h-8 text-white" />,
     color: 'from-blue-500 to-purple-500',
-    gradient: 'bg-gradient-to-br from-blue-500 to-purple-500'
+    gradient: 'bg-gradient-to-br from-blue-500 to-purple-500',
+    highlightSelector: 'button[title*="Generate Goal"]',
+    highlightClass: 'ring-4 ring-blue-500 ring-opacity-70 shadow-2xl scale-110 animate-pulse'
   },
   {
     id: 'calendar-button',
@@ -69,7 +81,9 @@ const tourSteps: TourStep[] = [
     description: 'The blue calendar button opens an AI-coordinated calendar view. See how this habit fits with your schedule!',
     icon: <Calendar className="w-8 h-8 text-white" />,
     color: 'from-indigo-500 to-blue-500',
-    gradient: 'bg-gradient-to-br from-indigo-500 to-blue-500'
+    gradient: 'bg-gradient-to-br from-indigo-500 to-blue-500',
+    highlightSelector: 'button[title*="AI Coordinated Calendar"]',
+    highlightClass: 'ring-4 ring-indigo-500 ring-opacity-70 shadow-2xl scale-110 animate-pulse'
   },
   {
     id: 'delete-button',
@@ -77,7 +91,9 @@ const tourSteps: TourStep[] = [
     description: 'The red trash button removes this habit from your tracker. Use it when you want to stop tracking a habit.',
     icon: <Trash2 className="w-8 h-8 text-white" />,
     color: 'from-red-500 to-rose-500',
-    gradient: 'bg-gradient-to-br from-red-500 to-rose-500'
+    gradient: 'bg-gradient-to-br from-red-500 to-rose-500',
+    highlightSelector: 'button[title*="Delete Habit"]',
+    highlightClass: 'ring-4 ring-red-500 ring-opacity-70 shadow-2xl scale-110 animate-pulse'
   },
   {
     id: 'complete',
@@ -85,7 +101,9 @@ const tourSteps: TourStep[] = [
     description: 'Now you know what each button does! Use them to get the most out of your habit tracking experience.',
     icon: <Star className="w-8 h-8 text-white" />,
     color: 'from-green-500 to-emerald-500',
-    gradient: 'bg-gradient-to-br from-green-500 to-emerald-500'
+    gradient: 'bg-gradient-to-br from-green-500 to-emerald-500',
+    highlightSelector: '',
+    highlightClass: ''
   }
 ];
 
@@ -97,6 +115,53 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onComplete, onSkip }) =>
   const currentTourStep = tourSteps[currentStep];
   const progress = ((currentStep + 1) / tourSteps.length) * 100;
 
+  // Function to highlight elements
+  const highlightElements = (step: TourStep) => {
+    // Remove previous highlights
+    document.querySelectorAll('.tour-highlight').forEach(el => {
+      el.classList.remove('tour-highlight');
+      // Remove all potential highlight classes
+      el.classList.remove(
+        'ring-4', 'ring-opacity-50', 'ring-opacity-70', 'shadow-2xl', 'scale-105', 'scale-110', 'animate-pulse',
+        'ring-blue-500', 'ring-yellow-500', 'ring-green-500', 'ring-indigo-500', 'ring-red-500'
+      );
+    });
+
+    if (step.highlightSelector && step.highlightClass) {
+      const elements = document.querySelectorAll(step.highlightSelector);
+      
+      if (elements.length === 0) {
+        // Show a subtle indicator if no elements are found
+        console.log(`No elements found for selector: ${step.highlightSelector}`);
+      }
+      
+      elements.forEach(el => {
+        el.classList.add('tour-highlight', ...step.highlightClass.split(' '));
+        
+        // Scroll element into view if it's not visible
+        if (el instanceof HTMLElement) {
+          el.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+          });
+        }
+      });
+    }
+  };
+
+  // Function to remove highlights
+  const removeHighlights = () => {
+    document.querySelectorAll('.tour-highlight').forEach(el => {
+      el.classList.remove('tour-highlight');
+      // Remove all potential highlight classes
+      el.classList.remove(
+        'ring-4', 'ring-opacity-50', 'ring-opacity-70', 'shadow-2xl', 'scale-105', 'scale-110', 'animate-pulse',
+        'ring-blue-500', 'ring-yellow-500', 'ring-green-500', 'ring-indigo-500', 'ring-red-500'
+      );
+    });
+  };
+
   useEffect(() => {
     // Show tour after a short delay
     const timer = setTimeout(() => {
@@ -105,6 +170,27 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onComplete, onSkip }) =>
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Highlight elements when step changes
+  useEffect(() => {
+    if (isVisible && currentTourStep) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        highlightElements(currentTourStep);
+      }, 100);
+    }
+
+    return () => {
+      removeHighlights();
+    };
+  }, [currentStep, isVisible]);
+
+  // Cleanup highlights when tour is hidden
+  useEffect(() => {
+    if (!isVisible) {
+      removeHighlights();
+    }
+  }, [isVisible]);
 
   // Keyboard support
   useEffect(() => {
@@ -145,6 +231,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onComplete, onSkip }) =>
   };
 
   const handleComplete = () => {
+    removeHighlights();
     setIsVisible(false);
     setTimeout(() => {
       onComplete();
@@ -152,6 +239,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onComplete, onSkip }) =>
   };
 
   const handleSkip = () => {
+    removeHighlights();
     setIsVisible(false);
     setTimeout(() => {
       onSkip();
@@ -220,6 +308,26 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onComplete, onSkip }) =>
               <p className="text-gray-700 mb-6 text-center leading-relaxed">
                 {currentTourStep.description}
               </p>
+
+              {/* Try it now button */}
+              {currentTourStep.showTryButton && (
+                <div className="mb-4 text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const elements = document.querySelectorAll(currentTourStep.highlightSelector);
+                      if (elements.length > 0) {
+                        const firstElement = elements[0] as HTMLElement;
+                        firstElement.click();
+                      }
+                    }}
+                    className="text-xs border-gray-300 text-gray-600 hover:bg-gray-50"
+                  >
+                    Try it now
+                  </Button>
+                </div>
+              )}
 
               {/* Navigation Buttons */}
               <div className="flex items-center justify-between">
