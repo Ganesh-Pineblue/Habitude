@@ -71,7 +71,7 @@ const moodReasons = {
 };
 
 const MoodSelectorPopup: React.FC<MoodSelectorPopupProps> = ({ onMoodSelect, onClose, isOpen }) => {
-  const [step, setStep] = useState(1); // 1: mood, 2: reason, 3: suggestions
+  const [step, setStep] = useState(1); // 1: mood, 2: reason, 3: suggestions, 4: thank you
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [customReason, setCustomReason] = useState<string>('');
@@ -104,7 +104,7 @@ const MoodSelectorPopup: React.FC<MoodSelectorPopupProps> = ({ onMoodSelect, onC
 
   const handleMoodComplete = (mood: string, reason: string) => {
     onMoodSelect(`${mood} - ${reason}`);
-    handleClose();
+    setStep(4); // Go to thank you step
   };
 
   const handlePrevious = () => {
@@ -363,6 +363,34 @@ const MoodSelectorPopup: React.FC<MoodSelectorPopupProps> = ({ onMoodSelect, onC
                       className="bg-green-500 hover:bg-green-600 text-white"
                     >
                       Done
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+              
+              {step === 4 && (
+                <motion.div
+                  key="step4"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <div className="text-center mb-8">
+                    <span className="text-5xl mb-4 block drop-shadow-lg">🙏</span>
+                    <h2 className="text-2xl font-extrabold text-green-900 drop-shadow-sm mb-3">
+                      Thank you for sharing!
+                    </h2>
+                    <p className="text-base text-gray-700">
+                      Your mood has been recorded. Have a wonderful day!
+                    </p>
+                  </div>
+                  <div className="flex justify-center items-center">
+                    <Button
+                      onClick={handleClose}
+                      className="bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-xl transition-colors"
+                    >
+                      Close
                     </Button>
                   </div>
                 </motion.div>

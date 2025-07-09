@@ -62,6 +62,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   const [triggerGoalAddForm, setTriggerGoalAddForm] = useState(false);
   const [triggerGoalEditId, setTriggerGoalEditId] = useState<string | null>(null);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+  const [hasLoggedMoodToday, setHasLoggedMoodToday] = useState(moodStorage.hasLoggedMoodToday());
   
   // Mock habit data for gamification (fallback)
   const mockHabits = [
@@ -155,6 +156,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
     // Save mood entry to storage
     const [moodLabel, reason] = mood.split(' - ');
     moodStorage.saveMoodEntry(moodLabel, reason || 'No reason provided', 'login');
+    setHasLoggedMoodToday(true);
   };
 
   const handleMoodPopupClose = () => {
@@ -448,7 +450,15 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
 
             <TabsContent value="my-mood">
               <div className="flex justify-center items-center min-h-[400px]">
-                <MoodSelector onMoodSelect={handleMoodSelect} />
+                {hasLoggedMoodToday ? (
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-8 shadow-md text-center">
+                    <span className="text-4xl mb-2 block">🙏</span>
+                    <h2 className="text-xl font-bold text-green-900 mb-2">You've already shared your mood today!</h2>
+                    <p className="text-gray-700">Come back tomorrow to share again.</p>
+                  </div>
+                ) : (
+                  <MoodSelector onMoodSelect={handleMoodSelect} />
+                )}
               </div>
             </TabsContent>
 
@@ -471,11 +481,15 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
       </div>
 
       {/* Mood Selector Popup */}
-      <MoodSelectorPopup
-        isOpen={showMoodPopup}
-        onMoodSelect={handleMoodSelect}
-        onClose={handleMoodPopupClose}
-      />
+      {hasLoggedMoodToday ? (
+        <></>
+      ) : (
+        <MoodSelectorPopup
+          isOpen={showMoodPopup}
+          onMoodSelect={handleMoodSelect}
+          onClose={handleMoodPopupClose}
+        />
+      )}
 
       {/* Logout Mood Capture */}
       <LogoutMoodCapture
