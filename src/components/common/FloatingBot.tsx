@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X, MessageCircle, Brain, Bot } from 'lucide-react';
-import { AICoach } from './AICoach';
-import { AIInsights } from './AIInsights';
+import { AICoach } from '../ai/AICoach';
+import { AIInsights } from '../ai/AIInsights';
 
 interface FloatingBotProps {
   personalityProfile?: any;

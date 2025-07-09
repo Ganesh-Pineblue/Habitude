@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
-import { MoodHeader } from './MoodHeader';
+import { User } from 'lucide-react';
+import { MoodHeader } from '../mood/MoodHeader';
 import NotificationsBar from './NotificationsBar';
-import { UserProfileDropdown } from './UserProfileDropdown';
-import { ChangePassword } from './ChangePassword';
+import { UserProfileDropdown } from '../auth/UserProfileDropdown';
+import { ChangePassword } from '../auth/ChangePassword';
 import { useNavigate } from 'react-router-dom';
 
 interface User {
@@ -21,7 +20,7 @@ interface HeaderProps {
   onUserUpdate?: (updatedUser: User) => void;
 }
 
-export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect, onUserUpdate }: HeaderProps) => {
+export const Header = ({ user, onLogout, currentMood = 2, onMoodSelect }: HeaderProps) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const navigate = useNavigate();
 

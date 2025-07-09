@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Brain, ArrowRight, ArrowLeft, Sparkles, User, CheckCircle, Search, Loader2, Zap } from 'lucide-react';
-import { FriendlyChatbotLogo } from './FriendlyChatbotLogo';
+import { FriendlyChatbotLogo } from '../common/FriendlyChatbotLogo';
 
 interface OnboardingFlowProps {
   onComplete: (personalityProfile: any) => void;

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 // HabitStrengthMeter integrated directly
-import { AICoordinatedCalendar } from './AICoordinatedCalendar';
+import { AICoordinatedCalendar } from '../ai/AICoordinatedCalendar';
 
 interface Habit {
   id: string;

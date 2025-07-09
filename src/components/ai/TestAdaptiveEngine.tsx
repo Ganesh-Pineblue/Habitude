@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AdaptiveHabitSuggestionEngine } from './AdaptiveHabitSuggestionEngine';
+import { AdaptiveHabitSuggestionEngine } from '../habits/AdaptiveHabitSuggestionEngine';
 
 export const TestAdaptiveEngine: React.FC = () => {
   const [currentMood, setCurrentMood] = useState(4);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card } from './ui/card';
+import { Card } from '@/components/ui/card';
 
 const placeholderNotifications = [
   { id: 2, message: 'Goal deadline: Submit project by tomorrow' },

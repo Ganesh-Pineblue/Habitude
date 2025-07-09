@@ -152,21 +152,15 @@ export const AICoach = ({
   };
 
   const suggestedQuestions = [
-    "Explain quantum physics simply",
-    "History of ancient civilizations", 
-    "How does the brain work?",
+    "How can I build better habits?",
+    "What's the science behind motivation?",
+    "How do I stay consistent with my goals?",
     "Best productivity techniques",
     "Philosophy of happiness",
     "Future of technology",
     "Psychology of motivation",
     "Science of habit formation"
   ];
-
-  const completedHabits = habits.filter((h: any) => h.completedToday).length;
-  const totalHabits = habits.length;
-  const habitProgress = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
-  const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
-  const currentMoodLabel = moodLabels[currentMood] || 'Neutral';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-4">

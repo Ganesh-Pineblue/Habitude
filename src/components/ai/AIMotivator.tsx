@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
-  Brain, MessageCircle, Heart, Zap, Target, 
+  Brain, MessageCircle, Heart, Target, 
   Clock, Award, Sparkles,
   Send, RefreshCw, ThumbsUp, ThumbsDown
 } from 'lucide-react';

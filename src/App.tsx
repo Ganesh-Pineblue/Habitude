@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Homepage";
 import NotFound from "./pages/NotFound";
-import { TestAdaptiveEngine } from "./components/TestAdaptiveEngine";
+import { TestAdaptiveEngine } from "./components/ai/TestAdaptiveEngine";
 import { ProfilePage } from "./pages/ProfilePage";
 import { UserProvider } from "./contexts/UserContext";
 import { AdminPanel } from "./pages/AdminPanel";

@@ -25,7 +25,7 @@ interface ModernDashboardProps {
   onNavigateToInsights?: () => void;
 }
 
-export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, personalityProfile, onNavigateToCalendar, onNavigateToAnalytics, onNavigateToInsights }: ModernDashboardProps) => {
+export const ModernDashboard = ({ habits, goals = [], currentMood, totalStreak, onNavigateToAnalytics, onNavigateToInsights }: ModernDashboardProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
   
   const completedToday = habits.filter(h => h.completedToday).length;

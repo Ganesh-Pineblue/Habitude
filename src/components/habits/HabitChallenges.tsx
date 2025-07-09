@@ -446,7 +446,7 @@ export const HabitChallenges: React.FC<HabitChallengesProps> = ({ currentUser })
             Create Challenge
           </Button>
           <Button 
-            onClick={() => setShowFindBuddies(true)}
+            onClick={() => console.log('Find Buddies clicked')}
             variant="outline"
             className="border-blue-200 text-blue-600 hover:bg-blue-50"
           >
