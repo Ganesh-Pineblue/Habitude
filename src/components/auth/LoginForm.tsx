@@ -14,17 +14,33 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
   const [registerError, setRegisterError] = useState('');
   const [registerShowPassword, setRegisterShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // LOGIN FLOW
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Extract name from email for demo purposes
-    const name = form.email.split('@')[0] || 'User';
-    onLogin({ name, email: form.email }, false);
+    setLoginError('');
+    setIsLoggingIn(true);
+
+    try {
+      const response = await loginService.login(form.email, form.password);
+      
+      if (response.success) {
+        onLogin({ name: response.user.name, email: response.user.email }, false);
+      } else {
+        setLoginError(response.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoginError('Login failed. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   // SOCIAL LOGIN HANDLERS
@@ -231,11 +247,18 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
                   </button>
                 </div>
                 
+                {loginError && (
+                  <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+                    {loginError}
+                  </div>
+                )}
+                
                 <button
                   type="submit"
-                  className="w-full h-10 rounded-lg bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl mt-4"
+                  disabled={isLoggingIn}
+                  className="w-full h-10 rounded-lg bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Enter into your habits
+                  {isLoggingIn ? 'Signing in...' : 'Enter into your habits'}
                 </button>
               </form>
               <div className="mt-4 text-center">

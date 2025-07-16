@@ -36,25 +36,74 @@ export class LoginService {
   }
 
   /**
-   * Login user (handled locally as requested)
+   * Login user via backend API
    * @param email - User email
    * @param password - User password
    * @returns Promise with user data
    */
   async loginUser(email: string, password: string): Promise<{ success: boolean; user: any; message?: string }> {
-    // Local login implementation as requested
-    // In a real application, this would call the backend API
-    const name = email.split('@')[0] || 'User';
-    
+    try {
+      const response = await userService.loginUser({ email, password });
+      return {
+        success: response.success,
+        user: response.user,
+        message: response.message
+      };
+    } catch (error) {
+      console.error('Login service error:', error);
+      return {
+        success: false,
+        user: { email, name: email.split('@')[0] || 'User' },
+        message: 'Login failed. Please try again.'
+      };
+    }
+  }
+
+  /**
+   * Validate login data
+   * @param email - User email
+   * @param password - User password
+   * @returns Validation result
+   */
+  validateLoginData(email: string, password: string): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    if (!email || email.trim().length === 0) {
+      errors.push('Email is required');
+    } else if (!this.isValidEmail(email)) {
+      errors.push('Please enter a valid email address');
+    }
+
+    if (!password || password.length === 0) {
+      errors.push('Password is required');
+    }
+
     return {
-      success: true,
-      user: {
-        name,
-        email,
-        authProvider: 'email'
-      },
-      message: 'Login successful (local)'
+      isValid: errors.length === 0,
+      errors
     };
+  }
+
+  /**
+   * Login user with validation
+   * @param email - User email
+   * @param password - User password
+   * @returns Promise with login result
+   */
+  async login(email: string, password: string): Promise<{ success: boolean; user: any; message?: string }> {
+    // Validate login data first
+    const validation = this.validateLoginData(email, password);
+    
+    if (!validation.isValid) {
+      return {
+        success: false,
+        user: { email, name: email.split('@')[0] || 'User' },
+        message: validation.errors.join(', ')
+      };
+    }
+
+    // Call the login API
+    return await this.loginUser(email, password);
   }
 
   /**

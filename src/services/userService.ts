@@ -96,22 +96,47 @@ export class UserService {
   }
 
   /**
-   * Login user (placeholder for future implementation)
+   * Login user via backend API
    * @param loginData - User login data
    * @returns Promise<UserLoginResponse>
    */
   async loginUser(loginData: UserLoginRequest): Promise<UserLoginResponse> {
-    // This is a placeholder for future login implementation
-    // Currently, login is handled locally in LoginForm.tsx
-    return {
-      user: {
+    try {
+      const response: ApiResponse<any> = await api.post<any>('/auth/login', {
         email: loginData.email,
-        name: loginData.email.split('@')[0] || 'User',
-        authProvider: 'email'
-      },
-      success: true,
-      message: 'Login successful (local)'
-    };
+        password: loginData.password
+      });
+
+      if (response.status === 200 && response.data.success) {
+        return {
+          user: response.data.user,
+          success: true,
+          message: response.data.message || 'Login successful'
+        };
+      } else {
+        return {
+          user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
+          success: false,
+          message: response.data.message || 'Login failed'
+        };
+      }
+    } catch (error: any) {
+      console.error('User login error:', error);
+      
+      if (error.response?.status === 401) {
+        return {
+          user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
+          success: false,
+          message: 'Invalid email or password'
+        };
+      }
+      
+      return {
+        user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
+        success: false,
+        message: error.response?.data?.message || 'Login failed. Please try again.'
+      };
+    }
   }
 
   /**
