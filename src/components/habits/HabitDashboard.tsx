@@ -4,7 +4,7 @@ import { HabitChallenges } from './HabitChallenges';
 import { SocialSharing } from '../social/SocialSharing';
 import { AccountabilityBuddies } from '../gamification/AccountabilityBuddies';
 import { AIMotivator } from '../ai/AIMotivator';
-import { AdaptiveHabitSuggestionEngine } from './AdaptiveHabitSuggestionEngine';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp } from 'lucide-react';
+import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp, CheckCircle } from 'lucide-react';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
 interface Habit {
@@ -220,6 +220,7 @@ export const HabitDashboard = ({
   }, [habits, onHabitsUpdate]);
 
   const [currentMood] = useState<number>(4);
+  const [habitsView, setHabitsView] = useState<'ongoing' | 'completed'>('ongoing');
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [schedulingHabit, setSchedulingHabit] = useState<Habit | null>(null);
@@ -1013,14 +1014,10 @@ export const HabitDashboard = ({
       
       {/* Tabbed Content */}
       <Tabs defaultValue="habits" className="w-full" value={tabValue} onValueChange={onTabChange}>
-        <TabsList className="grid w-full grid-cols-4 mb-6 bg-gray-100 backdrop-blur-sm p-1 rounded-2xl shadow-lg border border-gray-200">
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 backdrop-blur-sm p-1 rounded-2xl shadow-lg border border-gray-200">
           <TabsTrigger value="habits" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
             <Target className="w-4 h-4" />
             <span>My Habits</span>
-          </TabsTrigger>
-          <TabsTrigger value="suggestions" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
-            <Sparkles className="w-4 h-4" />
-            <span>Suggestions</span>
           </TabsTrigger>
           <TabsTrigger value="challenges" className="flex items-center space-x-2 rounded-xl font-medium text-gray-600 data-[state=active]:text-green-600 data-[state=active]:bg-white">
             <Trophy className="w-4 h-4" />
@@ -1033,9 +1030,44 @@ export const HabitDashboard = ({
         </TabsList>
         
         <TabsContent value="habits" className="space-y-6">
-          {/* Add Habit Button */}
-          <div className="flex justify-between items-center">
+          {/* Header Row with Toggle Buttons */}
+          <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold text-gray-900">My Habits</h2>
+            
+            {/* Toggle Buttons */}
+            <div className="bg-gray-100 p-1 rounded-2xl shadow-lg border border-gray-200">
+              <div className="flex space-x-1">
+                <button
+                  onClick={() => setHabitsView('ongoing')}
+                  className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center space-x-2 ${
+                    habitsView === 'ongoing'
+                      ? 'bg-white text-green-600 shadow-md transform scale-105'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>Ongoing</span>
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                    {habits.filter(h => h.streak > 0).length}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setHabitsView('completed')}
+                  className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center space-x-2 ${
+                    habitsView === 'completed'
+                      ? 'bg-white text-green-600 shadow-md transform scale-105'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Completed</span>
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                    {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length}
+                  </span>
+                </button>
+              </div>
+            </div>
+            
             <Button 
               onClick={() => setShowAddForm(true)}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg"
@@ -1877,34 +1909,143 @@ export const HabitDashboard = ({
             </DialogContent>
           </Dialog>
 
-          {/* User Created Good Habits */}
-          {userCreatedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">My Good Habits</h3>
-                  <p className="text-gray-600">Habits you've created to improve yourself</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {userCreatedHabits.filter(h => h.habitType !== 'bad' && !h.id.includes('_positive')).map((habit) => (
-                  <div key={habit.id} className="relative group">
-                    <HabitCard 
-                      habit={habit} 
-                      onToggle={() => toggleHabit(habit.id)}
-                      onSchedule={() => handleScheduleHabit(habit)}
-                      onGenerateGoal={() => generateGoalForHabit(habit)}
-                      onDelete={() => deleteHabit(habit.id)}
-                      onAddHabit={addHabitFromSuggestion}
-                    />
-                    <CompactStrengthMeter habit={habit} />
+          {/* Habits Content */}
+          {/* Ongoing Habits Content */}
+          {habitsView === 'ongoing' && (
+            <div className="space-y-8">
+              {/* Ongoing Good Habits */}
+              {habits.filter(h => h.streak > 0 && h.habitType !== 'bad').length > 0 && (
+                <div className="mb-8">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
+                      <Activity className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">Currently Active</h3>
+                      <p className="text-gray-600">Habits you're actively working on ({habits.filter(h => h.streak > 0 && h.habitType !== 'bad').length})</p>
+                    </div>
                   </div>
-                ))}
-              </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {habits.filter(h => h.streak > 0 && h.habitType !== 'bad').map((habit) => (
+                      <div key={habit.id} className="relative group">
+                        <HabitCard 
+                          habit={habit} 
+                          onToggle={() => toggleHabit(habit.id)}
+                          onSchedule={() => handleScheduleHabit(habit)}
+                          onGenerateGoal={() => generateGoalForHabit(habit)}
+                          onDelete={() => deleteHabit(habit.id)}
+                          onAddHabit={addHabitFromSuggestion}
+                        />
+                        <CompactStrengthMeter habit={habit} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Ongoing Bad Habits */}
+              {habits.filter(h => h.streak > 0 && h.habitType === 'bad').length > 0 && (
+                <div className="mb-8">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
+                      <AlertTriangle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">Bad Habits Being Tracked</h3>
+                      <p className="text-gray-600">Habits you're working to reduce or eliminate ({habits.filter(h => h.streak > 0 && h.habitType === 'bad').length})</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {habits.filter(h => h.streak > 0 && h.habitType === 'bad').map((habit) => (
+                      <div key={habit.id} className="relative group">
+                        <HabitCard 
+                          habit={habit} 
+                          onToggle={() => toggleHabit(habit.id)}
+                          onSchedule={() => handleScheduleHabit(habit)}
+                          onGenerateGoal={() => generateGoalForHabit(habit)}
+                          onDelete={() => deleteHabit(habit.id)}
+                          onAddHabit={addHabitFromSuggestion}
+                        />
+                        <CompactStrengthMeter habit={habit} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* No ongoing habits */}
+              {habits.filter(h => h.streak > 0).length === 0 && (
+                <div className="text-center py-16">
+                  <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Activity className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No Ongoing Habits</h3>
+                  <p className="text-gray-600 mb-6 text-lg">Start tracking your habits to see them here</p>
+                  <Button 
+                    onClick={() => setShowAddForm(true)}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add Your First Habit
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Completed Habits Content */}
+          {habitsView === 'completed' && (
+            <div className="space-y-8">
+              {/* Completed Good Habits */}
+              {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length > 0 && (
+                <div className="mb-8">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">Successfully Completed</h3>
+                      <p className="text-gray-600">Habits you've successfully established ({habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length})</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').map((habit) => (
+                      <div key={habit.id} className="relative group">
+                        <HabitCard 
+                          habit={habit} 
+                          onToggle={() => toggleHabit(habit.id)}
+                          onSchedule={() => handleScheduleHabit(habit)}
+                          onGenerateGoal={() => generateGoalForHabit(habit)}
+                          onDelete={() => deleteHabit(habit.id)}
+                          onAddHabit={addHabitFromSuggestion}
+                        />
+                        <CompactStrengthMeter habit={habit} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* No completed habits */}
+              {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length === 0 && (
+                <div className="text-center py-16">
+                  <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No Completed Habits Yet</h3>
+                  <p className="text-gray-600 mb-6 text-lg">Keep working on your habits to see them here</p>
+                  <Button 
+                    onClick={() => setShowAddForm(true)}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add New Habit
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -1927,16 +2068,7 @@ export const HabitDashboard = ({
           )}
         </TabsContent>
         
-        <TabsContent value="suggestions">
-          <AdaptiveHabitSuggestionEngine
-            habits={habits}
-            currentMood={currentMood}
-            currentTime={new Date()}
-            onAddHabit={addHabit}
-            onCompleteHabit={toggleHabit}
-            personalityProfile={null}
-          />
-        </TabsContent>
+
         
         <TabsContent value="challenges">
           <Tabs defaultValue="challenges" className="w-full">
