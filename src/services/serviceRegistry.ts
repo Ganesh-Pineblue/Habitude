@@ -1,5 +1,6 @@
 import { userService } from './userService';
 import { loginService } from './LoginService';
+import { onboardingService } from './OnboardingService';
 
 /**
  * ServiceRegistry - Central registry for all application services
@@ -26,6 +27,7 @@ export class ServiceRegistry {
   private registerServices(): void {
     this.services.set('userService', userService);
     this.services.set('loginService', loginService);
+    this.services.set('onboardingService', onboardingService);
   }
 
   /**
