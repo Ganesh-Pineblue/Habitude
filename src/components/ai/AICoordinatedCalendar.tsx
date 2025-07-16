@@ -159,6 +159,8 @@ export const AICoordinatedCalendar = ({
     outlook: false,
     apple: false
   });
+
+
   
   // Simulate calendar connection
   useEffect(() => {
@@ -1468,340 +1470,374 @@ export const AICoordinatedCalendar = ({
     );
   };
 
-  // Improved Settings Panel Component
-  const renderSettingsPanel = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Dimmed and blurred background */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowSettings(false)} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-700 animate-fade-in">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10 rounded-t-2xl">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Calendar Settings</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-            onClick={() => setShowSettings(false)}
-            aria-label="Close settings"
-          >
-            <X className="w-6 h-6" />
-          </Button>
-        </div>
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-1 p-6 space-y-10">
-          {/* Calendar Connections */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Calendar Connections</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-5 h-5 text-blue-600" />
-                    <span className="font-medium">Google Calendar</span>
-                  </div>
-                  <Switch 
-                    checked={connectedCalendars.google}
-                    onCheckedChange={(checked) => {
-                      setConnectedCalendars(prev => ({ ...prev, google: checked }));
-                      if (checked) connectCalendar();
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Sync with your Google Calendar events
-                </p>
-              </div>
-              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Monitor className="w-5 h-5 text-blue-700" />
-                    <span className="font-medium">Outlook Calendar</span>
-                  </div>
-                  <Switch 
-                    checked={connectedCalendars.outlook}
-                    onCheckedChange={(checked) => {
-                      setConnectedCalendars(prev => ({ ...prev, outlook: checked }));
-                      if (checked) connectCalendar();
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Sync with your Outlook Calendar events
-                </p>
-              </div>
-              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Mobile className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium">Phone Calendar</span>
-                  </div>
-                  <Switch 
-                    checked={connectedCalendars.apple}
-                    onCheckedChange={(checked) => {
-                      setConnectedCalendars(prev => ({ ...prev, apple: checked }));
-                      if (checked) connectCalendar();
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Sync with your phone calendar events
-                </p>
-              </div>
+  // Settings Modal Component
+  const renderSettingsModal = () => {
+    if (!showSettings) return null;
+    
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+          onClick={() => setShowSettings(false)} 
+        />
+        
+        {/* Modal */}
+        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-700 transform transition-all duration-300 ease-out scale-100 opacity-100 z-50">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-t-2xl">
+            <div className="flex items-center gap-3">
+              <Settings2 className="w-6 h-6 text-blue-600" />
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Calendar Settings</h2>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => setShowSettings(false)}
+              aria-label="Close settings"
+            >
+              <X className="w-6 h-6" />
+            </Button>
           </div>
-          {/* Scheduling Preferences */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Scheduling Preferences</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Work Start Time</label>
-                  <Input
-                    type="time"
-                    value={userPreferences.workStartTime}
-                    onChange={(e) => setUserPreferences(prev => ({ ...prev, workStartTime: e.target.value }))}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Work End Time</label>
-                  <Input
-                    type="time"
-                    value={userPreferences.workEndTime}
-                    onChange={(e) => setUserPreferences(prev => ({ ...prev, workEndTime: e.target.value }))}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Preferred Habit Duration (minutes)</label>
-                  <Input
-                    type="number"
-                    value={userPreferences.preferredHabitDuration}
-                    onChange={(e) => setUserPreferences(prev => ({ ...prev, preferredHabitDuration: parseInt(e.target.value) || 30 }))}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Energy Peak Hours</label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="time"
-                      value={userPreferences.energyPeakHours[0]}
-                      onChange={(e) => setUserPreferences(prev => ({ 
-                        ...prev, 
-                        energyPeakHours: [e.target.value, prev.energyPeakHours[1]] 
-                      }))}
-                    />
-                    <Input
-                      type="time"
-                      value={userPreferences.energyPeakHours[1]}
-                      onChange={(e) => setUserPreferences(prev => ({ 
-                        ...prev, 
-                        energyPeakHours: [prev.energyPeakHours[0], e.target.value] 
-                      }))}
+          
+          {/* Scrollable Content */}
+          <div className="overflow-y-auto flex-1 p-6 space-y-8">
+            {/* Calendar Connections */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <Mail className="w-5 h-5 text-blue-600" />
+                Calendar Connections
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-blue-600" />
+                      <span className="font-medium">Google Calendar</span>
+                    </div>
+                    <Switch 
+                      checked={connectedCalendars.google}
+                      onCheckedChange={(checked) => {
+                        setConnectedCalendars(prev => ({ ...prev, google: checked }));
+                        if (checked) connectCalendar();
+                      }}
                     />
                   </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Sync with your Google Calendar events
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Weather Consideration</span>
-                  <Switch 
-                    checked={userPreferences.weatherConsideration}
-                    onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, weatherConsideration: checked }))}
-                  />
+                <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Monitor className="w-5 h-5 text-blue-700" />
+                      <span className="font-medium">Outlook Calendar</span>
+                    </div>
+                    <Switch 
+                      checked={connectedCalendars.outlook}
+                      onCheckedChange={(checked) => {
+                        setConnectedCalendars(prev => ({ ...prev, outlook: checked }));
+                        if (checked) connectCalendar();
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Sync with your Outlook Calendar events
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Location Awareness</span>
-                  <Switch 
-                    checked={userPreferences.locationAwareness}
-                    onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, locationAwareness: checked }))}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Auto Schedule</span>
-                  <Switch 
-                    checked={userPreferences.autoSchedule}
-                    onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, autoSchedule: checked }))}
-                  />
+                <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Mobile className="w-5 h-5 text-gray-600" />
+                      <span className="font-medium">Phone Calendar</span>
+                    </div>
+                    <Switch 
+                      checked={connectedCalendars.apple}
+                      onCheckedChange={(checked) => {
+                        setConnectedCalendars(prev => ({ ...prev, apple: checked }));
+                        if (checked) connectCalendar();
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Sync with your phone calendar events
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-          {/* Notification Settings */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Notification Settings</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Conflict Notifications</span>
-                <Switch 
-                  checked={notificationSettings.enableConflictNotifications}
-                  onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, enableConflictNotifications: checked }))}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Alternative Suggestions</span>
-                <Switch 
-                  checked={notificationSettings.enableAlternativeSuggestions}
-                  onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, enableAlternativeSuggestions: checked }))}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Notification Sound</span>
-                <Switch 
-                  checked={notificationSettings.notificationSound}
-                  onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, notificationSound: checked }))}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Auto Resolve Conflicts</span>
-                <Switch 
-                  checked={notificationSettings.autoResolveConflicts}
-                  onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, autoResolveConflicts: checked }))}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Conflict Severity Threshold</label>
-                <Select 
-                  value={notificationSettings.conflictSeverityThreshold}
-                  onValueChange={(value: 'low' | 'medium' | 'high' | 'critical') => 
-                    setNotificationSettings(prev => ({ ...prev, conflictSeverityThreshold: value }))
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-white dark:bg-gray-900 rounded-b-2xl sticky bottom-0">
-          <Button variant="outline" onClick={() => setShowSettings(false)}>
-            Cancel
-          </Button>
-          <Button onClick={() => {
-            setShowSettings(false);
-            toast({
-              title: "Settings Saved",
-              description: "Your calendar settings have been updated successfully.",
-              duration: 3000
-            });
-          }}>
-            Save Settings
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <Card className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AI-Coordinated Calendar
-            </CardTitle>
             
-            {/* View Mode Selector */}
-            <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
-              {(['day', 'week', 'month', 'ai-suggestions', 'time-blocks', 'calendar-sync', 'smart-schedule'] as ViewMode[]).map((mode) => (
-                <Button
-                  key={mode}
-                  size="sm"
-                  variant={viewMode === mode ? "default" : "ghost"}
-                  onClick={() => setViewMode(mode)}
-                  className={`
-                    ${viewMode === mode 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+            {/* Scheduling Preferences */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-green-600" />
+                Scheduling Preferences
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Work Start Time</label>
+                    <Input
+                      type="time"
+                      value={userPreferences.workStartTime}
+                      onChange={(e) => setUserPreferences(prev => ({ ...prev, workStartTime: e.target.value }))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Work End Time</label>
+                    <Input
+                      type="time"
+                      value={userPreferences.workEndTime}
+                      onChange={(e) => setUserPreferences(prev => ({ ...prev, workEndTime: e.target.value }))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Preferred Habit Duration (minutes)</label>
+                    <Input
+                      type="number"
+                      value={userPreferences.preferredHabitDuration}
+                      onChange={(e) => setUserPreferences(prev => ({ ...prev, preferredHabitDuration: parseInt(e.target.value) || 30 }))}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Energy Peak Hours</label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        type="time"
+                        value={userPreferences.energyPeakHours[0]}
+                        onChange={(e) => setUserPreferences(prev => ({ 
+                          ...prev, 
+                          energyPeakHours: [e.target.value, prev.energyPeakHours[1]] 
+                        }))}
+                      />
+                      <Input
+                        type="time"
+                        value={userPreferences.energyPeakHours[1]}
+                        onChange={(e) => setUserPreferences(prev => ({ 
+                          ...prev, 
+                          energyPeakHours: [prev.energyPeakHours[0], e.target.value] 
+                        }))}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Weather Consideration</span>
+                      <Switch 
+                        checked={userPreferences.weatherConsideration}
+                        onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, weatherConsideration: checked }))}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Location Awareness</span>
+                      <Switch 
+                        checked={userPreferences.locationAwareness}
+                        onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, locationAwareness: checked }))}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Auto Schedule</span>
+                      <Switch 
+                        checked={userPreferences.autoSchedule}
+                        onCheckedChange={(checked) => setUserPreferences(prev => ({ ...prev, autoSchedule: checked }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Notification Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-purple-600" />
+                Notification Settings
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Conflict Notifications</span>
+                  <Switch 
+                    checked={notificationSettings.enableConflictNotifications}
+                    onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, enableConflictNotifications: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Alternative Suggestions</span>
+                  <Switch 
+                    checked={notificationSettings.enableAlternativeSuggestions}
+                    onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, enableAlternativeSuggestions: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Notification Sound</span>
+                  <Switch 
+                    checked={notificationSettings.notificationSound}
+                    onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, notificationSound: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Auto Resolve Conflicts</span>
+                  <Switch 
+                    checked={notificationSettings.autoResolveConflicts}
+                    onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, autoResolveConflicts: checked }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Conflict Severity Threshold</label>
+                  <Select 
+                    value={notificationSettings.conflictSeverityThreshold}
+                    onValueChange={(value: 'low' | 'medium' | 'high' | 'critical') => 
+                      setNotificationSettings(prev => ({ ...prev, conflictSeverityThreshold: value }))
                     }
-                    transition-all duration-200
-                  `}
-                >
-                  {mode === 'day' && <CalendarDays className="w-4 h-4" />}
-                  {mode === 'week' && <Calendar className="w-4 h-4" />}
-                  {mode === 'month' && <CalendarCheck className="w-4 h-4" />}
-                  {mode === 'ai-suggestions' && <BrainCircuit className="w-4 h-4" />}
-                  {mode === 'time-blocks' && <Clock className="w-4 h-4" />}
-                  {mode === 'calendar-sync' && <RefreshCw className="w-4 h-4" />}
-                  {mode === 'smart-schedule' && <Target className="w-4 h-4" />}
-                </Button>
-              ))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="critical">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            {/* Navigation */}
-            <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  const newDate = new Date(currentDate);
-                  newDate.setDate(currentDate.getDate() - 1);
-                  setCurrentDate(newDate);
-                }}
-                className="hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              
-              <span className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                {currentDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </span>
-              
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  const newDate = new Date(currentDate);
-                  newDate.setDate(currentDate.getDate() + 1);
-                  setCurrentDate(newDate);
-                }}
-                className="hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            {/* Settings */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowSettings(!showSettings)}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50"
+          {/* Footer */}
+          <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3 bg-white dark:bg-gray-900 rounded-b-2xl">
+            <Button variant="outline" onClick={() => setShowSettings(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowSettings(false);
+                toast({
+                  title: "Settings Saved",
+                  description: "Your calendar settings have been updated successfully.",
+                  duration: 3000
+                });
+              }}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >
-              <Settings2 className="w-4 h-4 mr-2" />
-              Settings
+              Save Settings
             </Button>
           </div>
         </div>
-      </CardHeader>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Card className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                AI-Coordinated Calendar
+              </CardTitle>
+              
+              {/* View Mode Selector */}
+              <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
+                {(['day', 'week', 'month', 'ai-suggestions', 'time-blocks', 'calendar-sync', 'smart-schedule'] as ViewMode[]).map((mode) => (
+                  <Button
+                    key={mode}
+                    size="sm"
+                    variant={viewMode === mode ? "default" : "ghost"}
+                    onClick={() => setViewMode(mode)}
+                    className={`
+                      ${viewMode === mode 
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }
+                      transition-all duration-200
+                    `}
+                  >
+                    {mode === 'day' && <CalendarDays className="w-4 h-4" />}
+                    {mode === 'week' && <Calendar className="w-4 h-4" />}
+                    {mode === 'month' && <CalendarCheck className="w-4 h-4" />}
+                    {mode === 'ai-suggestions' && <BrainCircuit className="w-4 h-4" />}
+                    {mode === 'time-blocks' && <Clock className="w-4 h-4" />}
+                    {mode === 'calendar-sync' && <RefreshCw className="w-4 h-4" />}
+                    {mode === 'smart-schedule' && <Target className="w-4 h-4" />}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Navigation */}
+              <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const newDate = new Date(currentDate);
+                    newDate.setDate(currentDate.getDate() - 1);
+                    setCurrentDate(newDate);
+                  }}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                
+                <span className="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {currentDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
+                
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const newDate = new Date(currentDate);
+                    newDate.setDate(currentDate.getDate() + 1);
+                    setCurrentDate(newDate);
+                  }}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              {/* Settings */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowSettings(true)}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              >
+                <Settings2 className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-6">
+          {viewMode === 'day' && renderDayView()}
+          {viewMode === 'ai-suggestions' && renderAISuggestions()}
+          {viewMode === 'calendar-sync' && renderCalendarSync()}
+          {viewMode === 'time-blocks' && renderTimeBlocks()}
+          {viewMode === 'smart-schedule' && renderAISuggestions()}
+          {viewMode === 'week' && renderCalendarView()}
+          {viewMode === 'month' && renderCalendarView()}
+        </CardContent>
+      </Card>
       
-      <CardContent className="p-6">
-        {viewMode === 'day' && renderDayView()}
-        {viewMode === 'ai-suggestions' && renderAISuggestions()}
-        {viewMode === 'calendar-sync' && renderCalendarSync()}
-        {viewMode === 'time-blocks' && renderTimeBlocks()}
-        {viewMode === 'smart-schedule' && renderAISuggestions()}
-        {viewMode === 'week' && renderCalendarView()}
-        {viewMode === 'month' && renderCalendarView()}
-        {showSettings && renderSettingsPanel()}
-      </CardContent>
-    </Card>
+      {/* Settings Modal - Rendered outside the main card */}
+      {renderSettingsModal()}
+    </>
   );
 }; 

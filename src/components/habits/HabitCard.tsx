@@ -481,34 +481,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
               </div>
             </div>
 
-            {/* Strength Indicator */}
-            <div className="flex justify-center">
-              {(() => {
-                const strengthScore = Math.round(
-                  (habit.completionRate || 0) * 0.4 +
-                  Math.min((habit.streak / 30) * 100, 100) * 0.25 +
-                  (habit.targetTime ? 100 : 0) * 0.15 +
-                  (habit.completedToday ? 100 : 0) * 0.2 +
-                  Math.min((habit.currentWeekCompleted || 0) / (habit.weeklyTarget || 7) * 100, 100) * 0.2
-                );
-                
-                const getStrengthLevel = (score: number) => {
-                  if (score >= 90) return { name: 'Identity', color: 'text-orange-600', bg: 'bg-orange-100', border: 'border-orange-200' };
-                  if (score >= 75) return { name: 'Auto', color: 'text-purple-600', bg: 'bg-purple-100', border: 'border-purple-200' };
-                  if (score >= 50) return { name: 'Est.', color: 'text-blue-600', bg: 'bg-blue-100', border: 'border-blue-200' };
-                  if (score >= 25) return { name: 'Root', color: 'text-green-600', bg: 'bg-green-100', border: 'border-green-200' };
-                  return { name: 'Seed', color: 'text-gray-600', bg: 'bg-gray-100', border: 'border-gray-200' };
-                };
-                
-                const level = getStrengthLevel(strengthScore);
-                
-                return (
-                  <div className={`px-4 py-2 rounded-full text-sm font-bold ${level.bg} ${level.color} ${level.border} border-2 shadow-sm`}>
-                    {level.name} Level ({strengthScore}%)
-                  </div>
-                );
-              })()}
-            </div>
+
 
 
           </div>
@@ -526,97 +499,6 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Habit Strength Meter */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Habit Strength Analysis</h3>
-              {/* Integrated HabitStrengthMeter */}
-              {(() => {
-                const strengthLevels = [
-                  { name: 'Seed', minScore: 0, maxScore: 25, color: 'text-gray-600', bgColor: 'bg-gray-100', icon: <Circle className="w-4 h-4" />, description: 'Just starting out - every step counts!', nextMilestone: 'Reach 25% consistency to grow roots' },
-                  { name: 'Rooted', minScore: 25, maxScore: 50, color: 'text-green-600', bgColor: 'bg-green-100', icon: <Lightbulb className="w-4 h-4" />, description: 'Building a foundation - keep it up!', nextMilestone: 'Reach 50% consistency to become established' },
-                  { name: 'Established', minScore: 50, maxScore: 75, color: 'text-blue-600', bgColor: 'bg-blue-100', icon: <TrendingUp className="w-4 h-4" />, description: 'Growing strong - you\'re making progress!', nextMilestone: 'Reach 75% consistency to become automatic' },
-                  { name: 'Automatic', minScore: 75, maxScore: 90, color: 'text-purple-600', bgColor: 'bg-purple-100', icon: <Zap className="w-4 h-4" />, description: 'Almost effortless - you\'re doing great!', nextMilestone: 'Reach 90% consistency to become an identity habit' },
-                  { name: 'Identity', minScore: 90, maxScore: 100, color: 'text-orange-600', bgColor: 'bg-orange-100', icon: <Target className="w-4 h-4" />, description: 'Part of who you are - incredible!', nextMilestone: 'Maintain this level - you\'re a master!' }
-                ];
-
-                const strengthScore = Math.round(
-                  (habit.completionRate || 0) * 0.4 +
-                  Math.min((habit.streak / 30) * 100, 100) * 0.25 +
-                  (habit.targetTime ? 100 : 0) * 0.15 +
-                  (habit.completedToday ? 100 : 0) * 0.2 +
-                  Math.min((habit.currentWeekCompleted || 0) / (habit.weeklyTarget || 7) * 100, 100) * 0.2
-                );
-
-                const currentLevel = strengthLevels.find(level => 
-                  strengthScore >= level.minScore && strengthScore <= level.maxScore
-                ) || strengthLevels[0];
-
-                const levelProgress = currentLevel.maxScore - currentLevel.minScore;
-                const progressWithinLevel = levelProgress > 0 
-                  ? ((strengthScore - currentLevel.minScore) / levelProgress) * 100 
-                  : 100;
-
-                const factors = [
-                  { name: 'Consistency', value: habit.completionRate || 0, weight: 40, icon: <TrendingUp className="w-3 h-3" /> },
-                  { name: 'Streak', value: Math.min((habit.streak / 30) * 100, 100), weight: 25, icon: <Target className="w-3 h-3" /> },
-                  { name: 'Timing', value: habit.targetTime ? 100 : 0, weight: 15, icon: <Clock className="w-3 h-3" /> },
-                  { name: 'Today', value: habit.completedToday ? 100 : 0, weight: 20, icon: <CheckCircle2 className="w-3 h-3" /> },
-                  { name: 'Weekly', value: Math.min((habit.currentWeekCompleted || 0) / (habit.weeklyTarget || 7) * 100, 100), weight: 20, icon: <Calendar className="w-3 h-3" /> }
-                ];
-
-                return (
-                  <div className="space-y-4">
-                    {/* Main Strength Meter */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-700">Strength Score</span>
-                        <span className="text-2xl font-bold text-gray-900">{strengthScore}%</span>
-                      </div>
-                      <Progress value={progressWithinLevel} className="h-3" />
-                      <div className="flex items-center space-x-2">
-                        <div className={`p-2 rounded-lg ${currentLevel.bgColor}`}>
-                          <div className={currentLevel.color}>
-                            {currentLevel.icon}
-                          </div>
-                        </div>
-                        <div>
-                          <Badge variant="outline" className={`${currentLevel.color} border-current`}>
-                            {currentLevel.name}
-                          </Badge>
-                          <p className="text-sm text-gray-600 mt-1">{currentLevel.description}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Factor Breakdown */}
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-gray-700">Strength Factors</h4>
-                      <div className="space-y-2">
-                        {factors.map((factor, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <div className="text-gray-500">{factor.icon}</div>
-                              <span className="text-sm text-gray-600">{factor.name}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-16 bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${factor.value}%` }}
-                                />
-                              </div>
-                              <span className="text-sm font-medium text-gray-700 w-8 text-right">
-                                {Math.round(factor.value)}%
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
 
             {/* Detailed Progress Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
