@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { loginService } from '../../services/LoginService';
 
 interface LoginFormProps {
   onLogin: (user: { name: string; email: string }, isSignUp: boolean) => void;
@@ -12,6 +13,7 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
   const [registerError, setRegisterError] = useState('');
   const [registerShowPassword, setRegisterShowPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // LOGIN FLOW
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,19 +65,44 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
     setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegisterError('');
-    if (!registerForm.name || !registerForm.email || !registerForm.password) {
-      setRegisterError('Please fill in all fields.');
+    setIsRegistering(true);
+    
+    // Validate registration data
+    const validation = loginService.validateRegistrationData({
+      name: registerForm.name,
+      email: registerForm.email,
+      password: registerForm.password
+    });
+
+    if (!validation.isValid) {
+      setRegisterError(validation.errors.join(', '));
+      setIsRegistering(false);
       return;
     }
-    if (registerForm.password.length < 6) {
-      setRegisterError('Password must be at least 6 characters long.');
-      return;
+
+    try {
+      // Call the registration service
+      const response = await loginService.registerUser({
+        name: registerForm.name,
+        email: registerForm.email,
+        password: registerForm.password
+      });
+
+      if (response.success) {
+        // Registration successful, trigger onboarding
+        onLogin({ name: registerForm.name, email: registerForm.email }, true);
+      } else {
+        setRegisterError(response.message || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setRegisterError('Registration failed. Please try again.');
+    } finally {
+      setIsRegistering(false);
     }
-    // Registration successful, trigger onboarding
-    onLogin({ name: registerForm.name, email: registerForm.email }, true);
   };
 
   return (
@@ -285,9 +312,10 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
 
                 <button
                   type="submit"
-                  className="w-full h-10 mt-6 rounded-lg bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02]"
+                  disabled={isRegistering}
+                  className="w-full h-10 mt-6 rounded-lg bg-[#DAF7A6] hover:bg-[#b6e07d] text-[#333] font-semibold text-sm shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Create Account
+                  {isRegistering ? 'Creating Account...' : 'Create Account'}
                 </button>
 
                 <div className="mt-4 text-center">
