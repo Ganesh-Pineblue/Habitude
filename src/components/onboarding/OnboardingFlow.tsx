@@ -6,11 +6,12 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Brain, ArrowRight, ArrowLeft, Sparkles, User, CheckCircle, Search, Loader2, Zap } from 'lucide-react';
 import { FriendlyChatbotLogo } from '../common/FriendlyChatbotLogo';
+import { onboardingService } from '../../services/OnboardingService';
 
 interface OnboardingFlowProps {
   onComplete: (personalityProfile: any) => void;
   onBack: () => void;
-  user: { name: string; email: string };
+  user: { name: string; email: string; id?: number };
 }
 
 interface PersonalInfo {
@@ -1250,7 +1251,7 @@ class HabitConversionService {
   }
 }
 
-export const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
+export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1329,41 +1330,149 @@ export const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     }
   };
 
-  const handleComplete = () => {
-    // Generate AI goals based on selected habits
-    const aiService = AIGoalGenerationService.getInstance();
-    const generatedGoals = aiService.generateGoalsFromHabits(
-      personalitySelection.selectedHabits
-    );
+  const handleComplete = async () => {
+    try {
+      // Generate AI goals based on selected habits
+      const aiService = AIGoalGenerationService.getInstance();
+      const generatedGoals = aiService.generateGoalsFromHabits(
+        personalitySelection.selectedHabits
+      );
 
-    // Convert selected habits to proper habit objects
-    const habitService = HabitConversionService.getInstance();
-    const generatedHabits = habitService.convertHabitsToObjects(
-      personalitySelection.selectedHabits,
-      personalitySelection.selectedPersonality
-    );
+      // Convert selected habits to proper habit objects
+      const habitService = HabitConversionService.getInstance();
+      const generatedHabits = habitService.convertHabitsToObjects(
+        personalitySelection.selectedHabits,
+        personalitySelection.selectedPersonality
+      );
 
-    const personalityProfile = {
-      personalInfo,
-      personalitySelection,
-      generatedGoals,
-      generatedHabits,
-      generatedAt: new Date().toISOString()
-    };
-    onComplete(personalityProfile);
+      // Get selected personality data
+      const selectedPersonalityData = famousPersonalities.find(p => p.name === personalitySelection.selectedPersonality) ||
+        searchResults.find(p => p.name === personalitySelection.selectedPersonality);
+
+      // Prepare onboarding data for backend
+      const onboardingData = {
+        userId: user.id || 1, // Use actual user ID from props
+        firstName: personalInfo.firstName || user.name.split(' ')[0] || 'User',
+        generation: personalInfo.generation,
+        gender: personalInfo.gender,
+        selectedPersonality: personalitySelection.selectedPersonality,
+        personalityCategory: selectedPersonalityData?.category || 'Unknown',
+        personalityDescription: 'Selected personality for habit building',
+        personalityImage: selectedPersonalityData?.image || '/images/default-personality.jpg',
+        personalityAchievements: [],
+        selectedHabits: personalitySelection.selectedHabits,
+        generatedHabits: generatedHabits,
+        generatedGoals: generatedGoals,
+        currentStep: 2,
+        totalSteps: 2,
+        isCompleted: true,
+        skippedPersonality: false
+      };
+
+      // Validate onboarding data
+      const validation = onboardingService.validateOnboardingData(onboardingData);
+      if (!validation.isValid) {
+        console.error('Onboarding validation failed:', validation.errors);
+        // Still complete the flow locally even if backend fails
+        const personalityProfile = {
+          personalInfo,
+          personalitySelection,
+          generatedGoals,
+          generatedHabits,
+          generatedAt: new Date().toISOString()
+        };
+        onComplete(personalityProfile);
+        return;
+      }
+
+      // Call backend API to create onboarding flow
+      const response = await onboardingService.createOnboardingFlow(onboardingData);
+      
+      if (response.success) {
+        console.log('Onboarding flow created successfully:', response.onboardingFlow);
+      } else {
+        console.error('Failed to create onboarding flow:', response.message);
+      }
+
+      // Complete the flow locally regardless of backend success
+      const personalityProfile = {
+        personalInfo,
+        personalitySelection,
+        generatedGoals,
+        generatedHabits,
+        generatedAt: new Date().toISOString(),
+        onboardingFlowId: response.onboardingFlow?.id
+      };
+      onComplete(personalityProfile);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      // Fallback to local completion
+      const personalityProfile = {
+        personalInfo,
+        personalitySelection,
+        generatedGoals: [],
+        generatedHabits: [],
+        generatedAt: new Date().toISOString()
+      };
+      onComplete(personalityProfile);
+    }
   };
 
-  const handleSkipPersonality = () => {
-    // Skip personality selection and complete with empty selection
-    const personalityProfile = {
-      personalInfo,
-      personalitySelection: {
+  const handleSkipPersonality = async () => {
+    try {
+      // Create onboarding flow with skipped personality
+      const onboardingData = {
+        userId: user.id || 1,
+        firstName: personalInfo.firstName || user.name.split(' ')[0] || 'User',
+        generation: personalInfo.generation,
+        gender: personalInfo.gender,
         selectedPersonality: '',
-        selectedHabits: []
-      },
-      generatedAt: new Date().toISOString()
-    };
-    onComplete(personalityProfile);
+        personalityCategory: 'Skipped',
+        personalityDescription: 'Personality selection skipped',
+        personalityImage: '/images/default-personality.jpg',
+        personalityAchievements: [],
+        selectedHabits: [],
+        generatedHabits: [],
+        generatedGoals: [],
+        currentStep: 2,
+        totalSteps: 2,
+        isCompleted: true,
+        skippedPersonality: true
+      };
+
+      // Call backend API to create onboarding flow
+      const response = await onboardingService.createOnboardingFlow(onboardingData);
+      
+      if (response.success) {
+        console.log('Onboarding flow created successfully (skipped):', response.onboardingFlow);
+      } else {
+        console.error('Failed to create onboarding flow (skipped):', response.message);
+      }
+
+      // Complete the flow locally
+      const personalityProfile = {
+        personalInfo,
+        personalitySelection: {
+          selectedPersonality: '',
+          selectedHabits: []
+        },
+        generatedAt: new Date().toISOString(),
+        onboardingFlowId: response.onboardingFlow?.id
+      };
+      onComplete(personalityProfile);
+    } catch (error) {
+      console.error('Error completing onboarding (skipped):', error);
+      // Fallback to local completion
+      const personalityProfile = {
+        personalInfo,
+        personalitySelection: {
+          selectedPersonality: '',
+          selectedHabits: []
+        },
+        generatedAt: new Date().toISOString()
+      };
+      onComplete(personalityProfile);
+    }
   };
 
   const selectedPersonalityData = famousPersonalities.find(p => p.name === personalitySelection.selectedPersonality) ||

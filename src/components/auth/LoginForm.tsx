@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { loginService } from '../../services/LoginService';
 
 interface LoginFormProps {
-  onLogin: (user: { name: string; email: string }, isSignUp: boolean) => void;
+  onLogin: (user: { name: string; email: string; id?: number }, isSignUp: boolean) => void;
   showRegistrationByDefault?: boolean;
 }
 
@@ -108,8 +108,12 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
       });
 
       if (response.success) {
-        // Registration successful, trigger onboarding
-        onLogin({ name: registerForm.name, email: registerForm.email }, true);
+        // Registration successful, trigger onboarding with user ID
+        onLogin({ 
+          name: registerForm.name, 
+          email: registerForm.email, 
+          id: response.user.id 
+        }, true);
       } else {
         setRegisterError(response.message || 'Registration failed. Please try again.');
       }

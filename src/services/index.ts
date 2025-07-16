@@ -21,6 +21,17 @@ export {
   LoginService 
 } from './LoginService';
 
+// Onboarding Service
+export { 
+  onboardingService, 
+  OnboardingService
+} from './OnboardingService';
+export type {
+  OnboardingFlow,
+  OnboardingFlowRequest,
+  OnboardingFlowResponse
+} from './OnboardingService';
+
 // Service Registry
 export { 
   serviceRegistry, 
