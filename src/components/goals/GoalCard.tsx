@@ -23,17 +23,17 @@ interface GoalCardProps {
 }
 
 const categoryColors = {
-  health: 'bg-green-100 text-green-800 border-green-200',
-  productivity: 'bg-green-100 text-green-800 border-green-200',
-  mindfulness: 'bg-green-100 text-green-800 border-green-200',
-  social: 'bg-green-100 text-green-800 border-green-200',
-  fitness: 'bg-green-100 text-green-800 border-green-200'
+  health: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  productivity: 'bg-blue-100 text-blue-800 border-blue-200',
+  mindfulness: 'bg-purple-100 text-purple-800 border-purple-200',
+  social: 'bg-rose-100 text-rose-800 border-rose-200',
+  fitness: 'bg-orange-100 text-orange-800 border-orange-200'
 };
 
 const priorityColors = {
-  high: 'bg-green-100 text-green-800 border-green-200',
-  medium: 'bg-green-100 text-green-800 border-green-200',
-  low: 'bg-green-100 text-green-800 border-green-200'
+  high: 'bg-red-100 text-red-800 border-red-200',
+  medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  low: 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
 export const GoalCard = ({ goal, onEdit }: GoalCardProps) => {

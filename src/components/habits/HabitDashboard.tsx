@@ -61,7 +61,10 @@ export const HabitDashboard = ({
   // Fetch habits from API when user is available
   useEffect(() => {
     const fetchHabits = async () => {
+      console.log('Fetching habits for user:', currentUser?.id);
+      
       if (!currentUser?.id) {
+        console.log('No user ID available, skipping habit fetch');
         setLoading(false);
         return;
       }
@@ -70,15 +73,20 @@ export const HabitDashboard = ({
         setLoading(true);
         setError(null);
         
+        console.log('Calling habitService.getHabitsByUserId with user ID:', currentUser.id);
         const response = await habitService.getHabitsByUserId(currentUser.id);
+        
+        console.log('Habit service response:', response);
         
         if (response.success) {
           // Convert backend habits to frontend format
           const frontendHabits = response.habits.map(habit => 
             habitService.convertToFrontendHabit(habit)
           );
+          console.log('Converted frontend habits:', frontendHabits);
           setHabits(frontendHabits);
         } else {
+          console.error('Habit service returned error:', response.message);
           setError(response.message || 'Failed to fetch habits');
           // Only use initialHabits as fallback if we have no habits yet
           if (habits.length === 0 && initialHabits.length > 0) {

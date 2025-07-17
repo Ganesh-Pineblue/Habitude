@@ -31,7 +31,8 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
       const response = await loginService.login(form.email, form.password);
       
       if (response.success) {
-        onLogin({ name: response.user.name, email: response.user.email }, false);
+        console.log('Login successful, user data:', response.user);
+        onLogin({ name: response.user.name, email: response.user.email, id: response.user.id }, false);
       } else {
         setLoginError(response.message || 'Login failed. Please try again.');
       }
@@ -49,7 +50,8 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
     console.log('Google login clicked');
     const name = 'Google User';
     const email = 'google@example.com';
-    onLogin({ name, email }, false);
+    const id = 1; // TODO: Get actual user ID from Google OAuth
+    onLogin({ name, email, id }, false);
   };
 
   const handleFacebookLogin = () => {
@@ -57,7 +59,8 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
     console.log('Facebook login clicked');
     const name = 'Facebook User';
     const email = 'facebook@example.com';
-    onLogin({ name, email }, false);
+    const id = 2; // TODO: Get actual user ID from Facebook OAuth
+    onLogin({ name, email, id }, false);
   };
 
   const handleAppleLogin = () => {
@@ -65,7 +68,8 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
     console.log('Apple login clicked');
     const name = 'Apple User';
     const email = 'apple@example.com';
-    onLogin({ name, email }, false);
+    const id = 3; // TODO: Get actual user ID from Apple OAuth
+    onLogin({ name, email, id }, false);
   };
 
   const handleInstagramLogin = () => {
@@ -73,7 +77,8 @@ export const LoginForm = ({ onLogin, showRegistrationByDefault = false }: LoginF
     console.log('Instagram login clicked');
     const name = 'Instagram User';
     const email = 'instagram@example.com';
-    onLogin({ name, email }, false);
+    const id = 4; // TODO: Get actual user ID from Instagram OAuth
+    onLogin({ name, email, id }, false);
   };
 
   // REGISTER FLOW

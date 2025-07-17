@@ -19,6 +19,7 @@ import { moodStorage } from '@/lib/moodStorage';
 import { useUser } from '@/contexts/UserContext';
 
 interface User {
+  id?: number;
   name: string;
   email: string;
   streak?: number;
@@ -124,6 +125,9 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   ];
 
   const handleLogin = (user: User, isSignUp: boolean) => {
+    console.log('Homepage received user data:', user);
+    console.log('Is signup:', isSignUp);
+    
     if (isSignUp) {
       // New user - go directly to onboarding (removed Welcome Back screen)
       setCurrentUser({ 

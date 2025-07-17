@@ -118,7 +118,12 @@ export class HabitService {
    */
   async getHabitsByUserId(userId: number): Promise<HabitResponse> {
     try {
+      console.log('habitService.getHabitsByUserId called with userId:', userId);
+      console.log('Making API call to:', `/habits/user/${userId}`);
+      
       const response: ApiResponse<Habit[]> = await api.get<Habit[]>(`/habits/user/${userId}`);
+      
+      console.log('API response received:', response);
       
       return {
         habits: response.data,
@@ -127,6 +132,7 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Get habits error:', error);
+      console.error('Error details:', error.response?.data);
       
       return {
         habits: [],

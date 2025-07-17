@@ -55,33 +55,45 @@ const categoryConfig = {
   health: {
     color: 'emerald',
     gradient: 'from-emerald-500 to-teal-600',
-    bg: 'bg-emerald-50',
+    bg: 'bg-gradient-to-br from-emerald-50 to-emerald-100',
     border: 'border-emerald-200',
     text: 'text-emerald-700',
+    textLight: 'text-emerald-600',
+    textLighter: 'text-emerald-500',
+    bgHover: 'hover:bg-emerald-100',
     icon: '🏃‍♂️'
   },
   productivity: {
     color: 'blue',
     gradient: 'from-blue-500 to-indigo-600',
-    bg: 'bg-blue-50',
+    bg: 'bg-gradient-to-br from-blue-50 to-blue-100',
     border: 'border-blue-200',
     text: 'text-blue-700',
+    textLight: 'text-blue-600',
+    textLighter: 'text-blue-500',
+    bgHover: 'hover:bg-blue-100',
     icon: '⚡'
   },
   mindfulness: {
     color: 'purple',
     gradient: 'from-purple-500 to-violet-600',
-    bg: 'bg-purple-50',
+    bg: 'bg-gradient-to-br from-purple-50 to-purple-100',
     border: 'border-purple-200',
     text: 'text-purple-700',
+    textLight: 'text-purple-600',
+    textLighter: 'text-purple-500',
+    bgHover: 'hover:bg-purple-100',
     icon: '🧘‍♀️'
   },
   social: {
     color: 'rose',
     gradient: 'from-rose-500 to-pink-600',
-    bg: 'bg-rose-50',
+    bg: 'bg-gradient-to-br from-rose-50 to-rose-100',
     border: 'border-rose-200',
     text: 'text-rose-700',
+    textLight: 'text-rose-600',
+    textLighter: 'text-rose-500',
+    bgHover: 'hover:bg-rose-100',
     icon: '👥'
   }
 };
@@ -248,7 +260,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
         isBadHabit 
           ? 'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-lg' 
           : habit.completedToday 
-            ? `bg-gradient-to-br from-${config.color}-50 to-${config.color}-100 border-${config.color}-200 shadow-lg` 
+            ? `${config.bg} ${config.border} shadow-lg` 
             : 'bg-white border-gray-200 shadow-md hover:border-gray-300'
       } ${habit.aiGenerated ? 'ring-2 ring-blue-100' : ''}`} data-habit-card>
         
@@ -283,7 +295,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                     isBadHabit
                       ? 'text-red-600 hover:text-red-700 hover:bg-red-100 border border-red-200'
                       : habit.completedToday 
-                        ? `text-${config.color}-600 hover:text-${config.color}-700 hover:bg-${config.color}-100 border border-${config.color}-200` 
+                        ? `${config.text} ${config.bgHover} border ${config.border}` 
                         : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
@@ -412,30 +424,7 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
               </div>
             )}
 
-            {/* Schedule Information */}
-            {(habit.targetTime || (habit.reminder && habit.reminder.enabled)) && (
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                <div className="flex items-center space-x-2 mb-3">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-800">Schedule</span>
-                </div>
-                <div className="space-y-2 text-sm text-blue-700">
-                  {habit.targetTime && (
-                    <div className="flex items-center space-x-2 bg-white/50 p-2 rounded-lg">
-                      <span>Target time:</span>
-                      <span className="font-medium">{habit.targetTime}</span>
-                    </div>
-                  )}
-                  {habit.reminder && habit.reminder.enabled && (
-                    <div className="flex items-center space-x-2 bg-white/50 p-2 rounded-lg">
-                      <Bell className="w-4 h-4 text-blue-400" />
-                      <span>Reminder:</span>
-                      <span className="font-medium">{habit.reminder.time} ({habit.reminder.frequency})</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+
 
             {/* Progress - Only show for good habits */}
             {!isBadHabit && (
@@ -458,24 +447,24 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
             
             {/* Streak Information */}
             <div className={`flex items-center justify-between p-4 rounded-xl ${
-              isBadHabit ? 'bg-gradient-to-r from-red-100 to-rose-100' : `bg-gradient-to-r from-${config.color}-100 to-${config.color}-50`
+              isBadHabit ? 'bg-gradient-to-r from-red-100 to-rose-100' : `${config.bg}`
             }`}>
               <div className="flex items-center space-x-2">
-                <Flame className={`w-6 h-6 ${isBadHabit ? 'text-red-600' : `text-${config.color}-600`}`} />
+                <Flame className={`w-6 h-6 ${isBadHabit ? 'text-red-600' : config.textLight}`} />
                 <div>
-                  <div className={`text-lg font-bold ${isBadHabit ? 'text-red-700' : `text-${config.color}-700`}`}>
+                  <div className={`text-lg font-bold ${isBadHabit ? 'text-red-700' : config.text}`}>
                     {habit.streak}
                   </div>
-                  <div className={`text-xs ${isBadHabit ? 'text-red-600' : `text-${config.color}-600`}`}>
+                  <div className={`text-xs ${isBadHabit ? 'text-red-600' : config.textLight}`}>
                     day streak
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-sm font-medium ${isBadHabit ? 'text-red-600' : `text-${config.color}-600`}`}>
+                <div className={`text-sm font-medium ${isBadHabit ? 'text-red-600' : config.textLight}`}>
                   Best: {habit.bestStreak || habit.streak} days
                 </div>
-                <div className={`text-xs ${isBadHabit ? 'text-red-500' : `text-${config.color}-500`}`}>
+                <div className={`text-xs ${isBadHabit ? 'text-red-500' : config.textLighter}`}>
                   {habit.completionRate || 0}% completion
                 </div>
               </div>

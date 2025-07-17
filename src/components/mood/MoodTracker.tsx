@@ -8,7 +8,8 @@ interface MoodTrackerProps {
 
 const moodEmojis = ['😢', '😕', '😐', '🙂', '😊'];
 const moodLabels = ['Very Sad', 'Sad', 'Neutral', 'Good', 'Great'];
-const moodColors = ['bg-green-200', 'bg-green-200', 'bg-green-200', 'bg-green-200', 'bg-green-200'];
+const moodColors = ['bg-red-200', 'bg-orange-200', 'bg-yellow-200', 'bg-blue-200', 'bg-green-200'];
+const ringColors = ['ring-red-300', 'ring-orange-300', 'ring-yellow-300', 'ring-blue-300', 'ring-green-300'];
 
 export const MoodTracker = ({ mood, onMoodChange }: MoodTrackerProps) => {
   return (
@@ -29,7 +30,7 @@ export const MoodTracker = ({ mood, onMoodChange }: MoodTrackerProps) => {
               onClick={() => onMoodChange(index)}
               className={`flex flex-col items-center space-y-2 p-4 rounded-xl transition-all duration-300 ${
                 mood === index
-                  ? `${moodColors[index]} scale-110 shadow-lg ring-2 ring-green-300`
+                  ? `${moodColors[index]} scale-110 shadow-lg ring-2 ${ringColors[index]}`
                   : 'hover:bg-white/50 hover:scale-105'
               }`}
             >
