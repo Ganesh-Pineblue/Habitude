@@ -1,4 +1,4 @@
-import { api, ApiResponse } from './api';
+import { api, ApiResponse, authApi } from './api';
 
 // User types based on the backend Users model
 export interface User {
@@ -96,7 +96,7 @@ export class UserService {
   }
 
   /**
-   * Login user via backend API
+   * Login user via backend API using enhanced authApi
    * @param loginData - User login data
    * @returns Promise<UserLoginResponse>
    */
@@ -106,33 +106,31 @@ export class UserService {
       console.log('API base URL:', 'http://localhost:8080/api/v1');
       console.log('Login endpoint:', '/auth/login');
       
-      const response: ApiResponse<any> = await api.post<any>('/auth/login', {
+      // Use the enhanced authApi for login
+      const response = await authApi.login({
         email: loginData.email,
         password: loginData.password
       });
 
       console.log('Login response:', response);
 
-      if (response.status === 200 && response.data.token) {
-        // Store auth token if provided
-        localStorage.setItem('authToken', response.data.token);
-        
+      if (response && response.token) {
         return {
           user: {
-            id: response.data.userId,
-            email: response.data.email,
-            name: response.data.name
+            id: response.userId || response.id,
+            email: response.email,
+            name: response.name || response.firstName || loginData.email.split('@')[0] || 'User'
           },
-          token: response.data.token,
+          token: response.token,
           success: true,
           message: 'Login successful'
         };
       } else {
-        console.log('Login failed - response status:', response.status, 'data:', response.data);
+        console.log('Login failed - response:', response);
         return {
           user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
           success: false,
-          message: response.data.message || 'Login failed'
+          message: response?.message || 'Login failed'
         };
       }
     } catch (error: any) {
@@ -165,6 +163,19 @@ export class UserService {
         success: false,
         message: error.response?.data?.message || 'Login failed. Please try again.'
       };
+    }
+  }
+
+  /**
+   * Logout user using enhanced authApi
+   * @returns Promise<void>
+   */
+  async logoutUser(): Promise<void> {
+    try {
+      await authApi.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout fails, we should clear local tokens
     }
   }
 
@@ -209,6 +220,38 @@ export class UserService {
     } catch (error: any) {
       console.error('Get all users error:', error);
       return [];
+    }
+  }
+
+  /**
+   * Change user password
+   * @param currentPassword - Current password
+   * @param newPassword - New password
+   * @returns Promise<boolean>
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+    try {
+      const response = await api.post('/auth/change-password', {
+        currentPassword,
+        newPassword
+      });
+      return response.status === 200;
+    } catch (error: any) {
+      console.error('Change password error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Refresh user token
+   * @returns Promise<string | null>
+   */
+  async refreshToken(): Promise<string | null> {
+    try {
+      return await authApi.refresh();
+    } catch (error: any) {
+      console.error('Token refresh error:', error);
+      return null;
     }
   }
 }

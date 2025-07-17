@@ -62,9 +62,11 @@ export const HabitDashboard = ({
   useEffect(() => {
     const fetchHabits = async () => {
       console.log('Fetching habits for user:', currentUser?.id);
+      console.log('Current user object:', currentUser);
       
       if (!currentUser?.id) {
         console.log('No user ID available, skipping habit fetch');
+        console.log('Current user state:', currentUser);
         setLoading(false);
         return;
       }
@@ -77,8 +79,11 @@ export const HabitDashboard = ({
         const response = await habitService.getHabitsByUserId(currentUser.id);
         
         console.log('Habit service response:', response);
+        console.log('Response habits:', response.habits);
+        console.log('Response habits type:', typeof response.habits);
+        console.log('Response habits is array:', Array.isArray(response.habits));
         
-        if (response.success) {
+        if (response.success && response.habits && Array.isArray(response.habits)) {
           // Convert backend habits to frontend format
           const frontendHabits = response.habits.map(habit => 
             habitService.convertToFrontendHabit(habit)
@@ -86,19 +91,32 @@ export const HabitDashboard = ({
           console.log('Converted frontend habits:', frontendHabits);
           setHabits(frontendHabits);
         } else {
-          console.error('Habit service returned error:', response.message);
-          setError(response.message || 'Failed to fetch habits');
-          // Only use initialHabits as fallback if we have no habits yet
-          if (habits.length === 0 && initialHabits.length > 0) {
+          console.error('Habit service returned error or invalid data:', response);
+          console.error('Response structure:', {
+            success: response.success,
+            habits: response.habits,
+            habitsType: typeof response.habits,
+            isArray: Array.isArray(response.habits)
+          });
+          
+          // Try to use initialHabits as fallback
+          if (initialHabits.length > 0) {
+            console.log('Using initial habits as fallback');
             setHabits(initialHabits);
+          } else {
+            setError(response.message || 'Failed to fetch habits - invalid response format');
           }
         }
       } catch (error) {
         console.error('Error fetching habits:', error);
-        setError('Failed to fetch habits. Please try again.');
-        // Only use initialHabits as fallback if we have no habits yet
-        if (habits.length === 0 && initialHabits.length > 0) {
+        console.error('Error details:', error);
+        
+        // Try to use initialHabits as fallback
+        if (initialHabits.length > 0) {
+          console.log('Using initial habits as fallback due to error');
           setHabits(initialHabits);
+        } else {
+          setError('Failed to fetch habits. Please try again.');
         }
       } finally {
         setLoading(false);
@@ -917,8 +935,12 @@ export const HabitDashboard = ({
     );
   }
 
+
+
   return (
     <div className="space-y-8">
+
+
       {/* Enhanced Quick Stats - Integrated */}
       {(() => {
         const completedToday = habits.filter(h => h.completedToday).length;

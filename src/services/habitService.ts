@@ -128,15 +128,36 @@ export class HabitService {
       const response: ApiResponse<Habit[]> = await api.get<Habit[]>(`/habits/user/${userId}`);
       
       console.log('API response received:', response);
+      console.log('API response data:', response.data);
+      console.log('API response data type:', typeof response.data);
+      console.log('API response data is array:', Array.isArray(response.data));
+      
+      // Handle different possible response structures
+      let habitsArray: Habit[] = [];
+      
+      if (Array.isArray(response.data)) {
+        habitsArray = response.data;
+      } else if (response.data && Array.isArray(response.data.habits)) {
+        habitsArray = response.data.habits;
+      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        habitsArray = response.data.data;
+      } else {
+        console.warn('Unexpected response structure:', response.data);
+        habitsArray = [];
+      }
+      
+      console.log('Processed habits array:', habitsArray);
       
       return {
-        habits: response.data,
+        habits: habitsArray,
         success: true,
         message: 'Habits retrieved successfully'
       };
     } catch (error: any) {
       console.error('Get habits error:', error);
       console.error('Error details:', error.response?.data);
+      
+
       
       return {
         habits: [],
@@ -162,6 +183,8 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Create habit error:', error);
+      
+
       
       return {
         habits: [],
@@ -196,6 +219,8 @@ export class HabitService {
       console.error('Error status:', error.response?.status);
       console.error('Error message:', error.message);
       
+
+      
       return {
         habits: [],
         success: false,
@@ -220,6 +245,8 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Delete habit error:', error);
+      
+
       
       return {
         habits: [],
@@ -277,6 +304,8 @@ export class HabitService {
       console.error('Toggle habit completion error:', error);
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
+      
+
       
       return {
         habits: [],

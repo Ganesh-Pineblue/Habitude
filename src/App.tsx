@@ -39,6 +39,8 @@ const LoginPage = () => {
     console.log('Login page received user data:', user);
     console.log('Is signup:', isSignUp);
     
+
+    
     if (isSignUp) {
       // New user - go directly to onboarding
       setCurrentUser({ 

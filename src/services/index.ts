@@ -1,13 +1,17 @@
-// API Gateway
-export { api } from './api';
-export type { ApiResponse, ApiError } from './api';
+// API and Core Services
+export { 
+  api, 
+  ApiResponse, 
+  ApiError,
+  authApi,
+  checkNetworkConnectivity,
+  checkBackendHealth 
+} from './api';
 
 // User Service
 export { 
   userService, 
-  UserService
-} from './userService';
-export type {
+  UserService,
   User,
   UserRegistrationRequest,
   UserRegistrationResponse,
@@ -21,15 +25,20 @@ export {
   LoginService 
 } from './LoginService';
 
+// Auth Service
+export {
+  authService,
+  AuthService,
+  LoginCredentials,
+  LoginResponse,
+  AuthState,
+  ChangePasswordRequest
+} from './authService';
+
 // Onboarding Service
 export { 
   onboardingService, 
-  OnboardingService
-} from './OnboardingService';
-export type {
-  OnboardingFlow,
-  OnboardingFlowRequest,
-  OnboardingFlowResponse
+  OnboardingService 
 } from './OnboardingService';
 
 // Service Registry
