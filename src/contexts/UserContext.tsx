@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
+  id?: number; // Add user ID
   name: string;
   email: string;
   generation?: string;

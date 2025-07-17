@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { HabitDashboard } from '@/components/habits/HabitDashboard';
 import { GoalDashboard } from '@/components/goals/GoalDashboard';
 import { AICoach } from '@/components/ai/AICoach';
@@ -325,10 +325,16 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   };
 
   // Use generated habits if available, otherwise use mock habits
-  const displayHabits = userHabits.length > 0 ? userHabits : mockHabits;
+  const displayHabits = useMemo(() => 
+    userHabits.length > 0 ? userHabits : mockHabits, 
+    [userHabits]
+  );
   
   // Use generated goals if available, otherwise use mock goals
-  const displayGoals = userGoals.length > 0 ? userGoals : mockGoals;
+  const displayGoals = useMemo(() => 
+    userGoals.length > 0 ? userGoals : mockGoals, 
+    [userGoals]
+  );
 
   if (!currentUser) {
     return <LoginForm onLogin={handleLogin} showRegistrationByDefault={showRegistrationForm} />;

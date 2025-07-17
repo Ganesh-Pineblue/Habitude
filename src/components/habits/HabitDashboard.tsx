@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { HabitCard } from './HabitCard';
 import { HabitChallenges } from './HabitChallenges';
 import { SocialSharing } from '../social/SocialSharing';
 import { AccountabilityBuddies } from '../gamification/AccountabilityBuddies';
 import { AIMotivator } from '../ai/AIMotivator';
+import { habitService, type FrontendHabit } from '../../services/habitService';
+import { useUser } from '../../contexts/UserContext';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,41 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp, CheckCircle } from 'lucide-react';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
-interface Habit {
-  id: string;
-  title: string;
-  description: string;
-  streak: number;
-  completedToday: boolean;
-  targetTime?: string;
-  category: 'health' | 'productivity' | 'mindfulness' | 'social';
-  habitType?: 'good' | 'bad';
-  aiSuggestion?: string;
-  weeklyTarget?: number;
-  currentWeekCompleted?: number;
-  bestStreak?: number;
-  completionRate?: number;
-  // Bad habit specific fields
-  badHabitDetails?: {
-    frequency: number; // times per day/week
-    frequencyUnit: 'times_per_day' | 'times_per_week';
-    timeOfDay: string[]; // array of times when the habit occurs
-    triggers: string[]; // what triggers this habit
-    severity: 'low' | 'medium' | 'high';
-    impact: string; // description of negative impact
-  };
-  reminder?: {
-    enabled: boolean;
-    time: string;
-    frequency: 'daily' | 'weekly' | 'custom';
-    daysOfWeek?: number[]; // 0 = Sunday, 1 = Monday, etc.
-    customInterval?: number; // for custom frequency
-    customUnit?: 'days' | 'weeks' | 'months';
-  };
-  aiGenerated?: boolean;
-  pairedBadHabitId?: string;
-  pairedBadHabitTitle?: string;
-}
+// Using FrontendHabit from the service instead of local interface
 
 interface Goal {
   id: string;
@@ -85,132 +53,52 @@ export const HabitDashboard = ({
   onHabitsUpdate?: (habits: any[]) => void;
   onGoalGenerated?: (goal: Goal) => void;
 } = {}) => {
-  const [habits, setHabits] = useState<Habit[]>(initialHabits.length > 0 ? initialHabits : [
-    {
-      id: '1',
-      title: 'Morning Meditation',
-      description: '10 minutes of mindfulness to start the day',
-      streak: 12,
-      completedToday: true,
-      targetTime: '7:00 AM',
-      category: 'mindfulness',
-      habitType: 'good',
-      aiSuggestion: 'Perfect timing! Your stress levels are lowest in the morning.',
-      weeklyTarget: 7,
-      currentWeekCompleted: 5,
-      bestStreak: 15,
-      completionRate: 92,
-      reminder: {
-        enabled: true,
-        time: '07:00',
-        frequency: 'daily',
-        daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-        customInterval: 1,
-        customUnit: 'days'
-      },
-      aiGenerated: true
-    },
-    {
-      id: '2',
-      title: 'Drink Water',
-      description: '8 glasses throughout the day for optimal hydration',
-      streak: 5,
-      completedToday: false,
-      category: 'health',
-      habitType: 'good',
-      aiSuggestion: 'Try setting hourly reminders - you tend to forget after lunch.',
-      weeklyTarget: 7,
-      currentWeekCompleted: 4,
-      bestStreak: 21,
-      completionRate: 78,
-      reminder: {
-        enabled: true,
-        time: '10:00',
-        frequency: 'daily',
-        daysOfWeek: [1, 2, 3, 4, 5],
-        customInterval: 1,
-        customUnit: 'days'
-      },
-      aiGenerated: true
-    },
-    {
-      id: '3',
-      title: 'Evening Journal',
-      description: 'Reflect on the day and plan tomorrow',
-      streak: 8,
-      completedToday: false,
-      targetTime: '9:00 PM',
-      category: 'mindfulness',
-      habitType: 'good',
-      aiSuggestion: 'Your mood improves 23% on days you journal!',
-      weeklyTarget: 5,
-      currentWeekCompleted: 3,
-      bestStreak: 12,
-      completionRate: 85,
-      reminder: {
-        enabled: true,
-        time: '21:00',
-        frequency: 'weekly',
-        daysOfWeek: [1, 2, 3, 4, 5],
-        customInterval: 1,
-        customUnit: 'days'
-      },
-      aiGenerated: true
-    },
-    {
-      id: '4',
-      title: 'Exercise',
-      description: '30 minutes of physical activity',
-      streak: 3,
-      completedToday: true,
-      targetTime: '6:00 PM',
-      category: 'health',
-      habitType: 'good',
-      aiSuggestion: 'Consistency is key! Your energy levels peak after workouts.',
-      weeklyTarget: 5,
-      currentWeekCompleted: 3,
-      bestStreak: 14,
-      completionRate: 80,
-      reminder: {
-        enabled: false,
-        time: '18:00',
-        frequency: 'daily',
-        daysOfWeek: [1, 2, 3, 4, 5],
-        customInterval: 1,
-        customUnit: 'days'
-      },
-      aiGenerated: true
-    },
-    {
-      id: '5',
-      title: 'Smoking',
-      description: 'Cigarette smoking habit',
-      streak: 0,
-      completedToday: false,
-      category: 'health',
-      habitType: 'bad',
-      weeklyTarget: 0,
-      currentWeekCompleted: 0,
-      bestStreak: 0,
-      completionRate: 0,
-      badHabitDetails: {
-        frequency: 10,
-        frequencyUnit: 'times_per_day',
-        timeOfDay: ['8:00 AM', '12:00 PM', '6:00 PM', '9:00 PM'],
-        triggers: ['Stress', 'After meals', 'Social situations'],
-        severity: 'high',
-        impact: 'Negative impact on lung health and overall well-being'
-      },
-      aiGenerated: false
-    }
-  ]);
+  const { currentUser } = useUser();
+  const [habits, setHabits] = useState<FrontendHabit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Update habits when initialHabits prop changes
+  // Fetch habits from API when user is available
   useEffect(() => {
-    if (initialHabits.length > 0) {
-      setHabits(initialHabits);
-    }
-  }, [initialHabits]);
+    const fetchHabits = async () => {
+      if (!currentUser?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await habitService.getHabitsByUserId(currentUser.id);
+        
+        if (response.success) {
+          // Convert backend habits to frontend format
+          const frontendHabits = response.habits.map(habit => 
+            habitService.convertToFrontendHabit(habit)
+          );
+          setHabits(frontendHabits);
+        } else {
+          setError(response.message || 'Failed to fetch habits');
+          // Only use initialHabits as fallback if we have no habits yet
+          if (habits.length === 0 && initialHabits.length > 0) {
+            setHabits(initialHabits);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching habits:', error);
+        setError('Failed to fetch habits. Please try again.');
+        // Only use initialHabits as fallback if we have no habits yet
+        if (habits.length === 0 && initialHabits.length > 0) {
+          setHabits(initialHabits);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHabits();
+  }, [currentUser?.id]); // Removed initialHabits from dependencies
 
   // Notify parent component when habits change
   useEffect(() => {
@@ -221,9 +109,9 @@ export const HabitDashboard = ({
 
   const [currentMood] = useState<number>(4);
   const [habitsView, setHabitsView] = useState<'ongoing' | 'completed'>('ongoing');
-  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [editingHabit, setEditingHabit] = useState<FrontendHabit | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [schedulingHabit, setSchedulingHabit] = useState<Habit | null>(null);
+  const [schedulingHabit, setSchedulingHabit] = useState<FrontendHabit | null>(null);
   const [newHabit, setNewHabit] = useState({
     title: '',
     description: '',
@@ -249,175 +137,147 @@ export const HabitDashboard = ({
     }
   });
 
-  const addHabit = () => {
-    const habit: Habit = {
-      id: Date.now().toString(),
-      ...newHabit,
-      streak: 0,
-      completedToday: false,
-      currentWeekCompleted: 0,
-      bestStreak: 0,
-      completionRate: 0,
-      aiGenerated: true
-    };
-    
-    if (newHabit.habitType === 'bad') {
-      // Disable reminder for the bad habit after creation
-      habit.reminder = {
-        ...habit.reminder,
-        enabled: false,
-        time: habit.reminder?.time || '09:00',
-        frequency: habit.reminder?.frequency || 'daily',
-        daysOfWeek: habit.reminder?.daysOfWeek || [1, 2, 3, 4, 5],
-        customInterval: habit.reminder?.customInterval || 1,
-        customUnit: habit.reminder?.customUnit || 'days'
-      };
-      // Create a new array including the new bad habit
-      const newHabitsArray = [...habits, habit];
-      // Generate the positive habit using the new array
-      const positiveHabit: Habit = (() => {
-        // Use the same logic as createPositiveHabitForBadHabit, but pass newHabitsArray
-        const alternativesList = getPositiveHabitAlternatives(habit.title, habit.category);
-        const normalize = (str: string) => str.trim().toLowerCase();
-        const badHabitNormTitle = normalize(habit.title);
-        const pairedPositiveHabits = newHabitsArray.filter(h =>
-          h.habitType === 'good' &&
-          h.id.includes('_positive') &&
-          h.pairedBadHabitTitle &&
-          normalize(h.pairedBadHabitTitle) === badHabitNormTitle
-        );
-        const usedTitles = pairedPositiveHabits.map(h => normalize(h.title));
-        const availableAlternatives = alternativesList.filter(alt =>
-          !usedTitles.includes(normalize(alt.title))
-        );
-        let selectedAlternative;
-        if (availableAlternatives.length > 0) {
-          selectedAlternative = availableAlternatives[0];
-        } else {
-          const allCount = pairedPositiveHabits.length;
-          const baseIndex = allCount % alternativesList.length;
-          const baseAlternative = alternativesList[baseIndex];
-          const suffix = Math.floor(allCount / alternativesList.length) + 2;
-          selectedAlternative = {
-            ...baseAlternative,
-            title: `${baseAlternative.title} ${suffix}`
-          };
-        }
-        return {
-          id: Date.now().toString() + '_positive',
-          title: selectedAlternative.title,
-          description: selectedAlternative.description,
-          streak: 0,
-          completedToday: false,
-          category: selectedAlternative.category as 'health' | 'productivity' | 'mindfulness' | 'social',
-          habitType: 'good' as const,
-          weeklyTarget: 7,
-          currentWeekCompleted: 0,
-          bestStreak: 0,
-          completionRate: 0,
-          aiGenerated: false,
-          reminder: habit.reminder ? {
-            ...habit.reminder,
-            enabled: true
-          } : {
-            enabled: true,
-            time: '09:00',
-            frequency: 'daily' as const,
-            daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-            customInterval: 1,
-            customUnit: 'days' as const
-          },
-          aiSuggestion: `This positive habit will help you replace "${habit.title}". Try to do this instead when you feel the urge for the bad habit.`,
-          pairedBadHabitId: habit.id,
-          pairedBadHabitTitle: habit.title
-        };
-      })();
-      const updatedHabits = [...habits, habit, positiveHabit];
-      setHabits(updatedHabits);
-      setTimeout(() => {
-        alert(`✅ Positive habit "${positiveHabit.title}" has been automatically created to help you replace "${habit.title}". Only the positive habit will be reminded to help you focus on the replacement!`);
-      }, 100);
-    } else {
-      // Regular good habit
-      const updatedHabits = [...habits, habit];
-      setHabits(updatedHabits);
+  const addHabit = useCallback(async () => {
+    if (!currentUser?.id) {
+      alert('Please log in to add habits');
+      return;
     }
-    setNewHabit({
-      title: '',
-      description: '',
-      targetTime: '',
-      category: 'health',
-      habitType: 'good',
-      weeklyTarget: 7,
-      badHabitDetails: {
-        frequency: 0,
-        frequencyUnit: 'times_per_day',
-        timeOfDay: [],
-        triggers: [],
-        severity: 'low',
-        impact: ''
-      },
-      reminder: {
-        enabled: false,
-        time: '09:00',
-        frequency: 'daily',
-        daysOfWeek: [1, 2, 3, 4, 5],
-        customInterval: 1,
-        customUnit: 'days'
+
+    try {
+      const habitData = habitService.convertToBackendHabit(newHabit, currentUser.id);
+      const response = await habitService.createHabit(habitData);
+      
+      if (response.success) {
+        const newHabitFrontend = habitService.convertToFrontendHabit(response.habits[0]);
+        setHabits(prevHabits => [...prevHabits, newHabitFrontend]);
+        
+        // Reset form
+        setNewHabit({
+          title: '',
+          description: '',
+          targetTime: '',
+          category: 'health',
+          habitType: 'good',
+          weeklyTarget: 7,
+          badHabitDetails: {
+            frequency: 0,
+            frequencyUnit: 'times_per_day',
+            timeOfDay: [],
+            triggers: [],
+            severity: 'low',
+            impact: ''
+          },
+          reminder: {
+            enabled: false,
+            time: '09:00',
+            frequency: 'daily',
+            daysOfWeek: [1, 2, 3, 4, 5],
+            customInterval: 1,
+            customUnit: 'days'
+          }
+        });
+        setShowAddForm(false);
+      } else {
+        alert(response.message || 'Failed to create habit');
       }
-    });
-    setShowAddForm(false);
-  };
+    } catch (error) {
+      console.error('Error creating habit:', error);
+      alert('Failed to create habit. Please try again.');
+    }
+  }, [currentUser?.id, newHabit]);
 
   // Function to add a habit from suggestions
-  const addHabitFromSuggestion = (newHabit: Habit) => {
-    const updatedHabits = [...habits, newHabit];
-    setHabits(updatedHabits);
-  };
-
-  const updateHabit = (updatedHabit: Habit) => {
-    setHabits(habits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
-    setEditingHabit(null);
-  };
-
-  const deleteHabit = (habitId: string) => {
-    const habitToDelete = habits.find(h => h.id === habitId);
-    
-    if (habitToDelete?.habitType === 'bad') {
-      // If deleting a bad habit, also delete its positive alternative
-      const positiveHabitId = habitId + '_positive';
-      setHabits(habits.filter(habit => habit.id !== habitId && habit.id !== positiveHabitId));
-    } else if (habitToDelete?.id.includes('_positive')) {
-      // If deleting a positive habit, also delete its corresponding bad habit
-      const badHabitId = habitId.replace('_positive', '');
-      setHabits(habits.filter(habit => habit.id !== habitId && habit.id !== badHabitId));
-    } else {
-      // Regular habit deletion
-      setHabits(habits.filter(habit => habit.id !== habitId));
+  const addHabitFromSuggestion = useCallback(async (newHabit: FrontendHabit) => {
+    if (!currentUser?.id) {
+      alert('Please log in to add habits');
+      return;
     }
-  };
 
-  const toggleHabit = (habitId: string) => {
-    setHabits(habits.map(habit => 
-      habit.id === habitId 
-        ? { 
-            ...habit, 
-            completedToday: !habit.completedToday, 
-            streak: habit.completedToday ? habit.streak - 1 : habit.streak + 1,
-            currentWeekCompleted: habit.completedToday 
-              ? (habit.currentWeekCompleted || 0) - 1 
-              : (habit.currentWeekCompleted || 0) + 1
-          }
-        : habit
-    ));
-  };
+    try {
+      const habitData = habitService.convertToBackendHabit(newHabit, currentUser.id);
+      const response = await habitService.createHabit(habitData);
+      
+      if (response.success) {
+        const newHabitFrontend = habitService.convertToFrontendHabit(response.habits[0]);
+        setHabits(prevHabits => [...prevHabits, newHabitFrontend]);
+      } else {
+        alert(response.message || 'Failed to create habit');
+      }
+    } catch (error) {
+      console.error('Error creating habit from suggestion:', error);
+      alert('Failed to create habit. Please try again.');
+    }
+  }, [currentUser?.id]);
+
+  const updateHabit = useCallback(async (updatedHabit: FrontendHabit) => {
+    try {
+      const habitData = {
+        id: parseInt(updatedHabit.id),
+        title: updatedHabit.title,
+        description: updatedHabit.description,
+        category: updatedHabit.category,
+        targetTime: updatedHabit.targetTime,
+        weeklyTarget: updatedHabit.weeklyTarget
+      };
+
+      const response = await habitService.updateHabit(habitData);
+      
+      if (response.success) {
+        const updatedHabitFrontend = habitService.convertToFrontendHabit(response.habits[0]);
+        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabitFrontend : habit));
+        setEditingHabit(null);
+      } else {
+        alert(response.message || 'Failed to update habit');
+      }
+    } catch (error) {
+      console.error('Error updating habit:', error);
+      alert('Failed to update habit. Please try again.');
+    }
+  }, []);
+
+  const deleteHabit = useCallback(async (habitId: string) => {
+    try {
+      const response = await habitService.deleteHabit(parseInt(habitId));
+      
+      if (response.success) {
+        setHabits(prevHabits => prevHabits.filter(habit => habit.id !== habitId));
+      } else {
+        alert(response.message || 'Failed to delete habit');
+      }
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+      alert('Failed to delete habit. Please try again.');
+    }
+  }, []);
+
+  const toggleHabit = useCallback(async (habitId: string) => {
+    try {
+      const habit = habits.find(h => h.id === habitId);
+      if (!habit) return;
+
+      const response = await habitService.toggleHabitCompletion(
+        parseInt(habitId), 
+        !habit.completedToday
+      );
+      
+      if (response.success) {
+        const updatedHabit = habitService.convertToFrontendHabit(response.habits[0]);
+        setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
+      } else {
+        alert(response.message || 'Failed to update habit');
+      }
+    } catch (error) {
+      console.error('Error toggling habit:', error);
+      alert('Failed to update habit. Please try again.');
+    }
+  }, [habits]);
 
   // Separate AI-generated and user-created habits
-  const aiGeneratedHabits = habits.filter(h => h.aiGenerated);
-  const userCreatedHabits = habits.filter(h => !h.aiGenerated);
+  const aiGeneratedHabits = useMemo(() => habits.filter(h => h.aiGenerated), [habits]);
+  const userCreatedHabits = useMemo(() => habits.filter(h => !h.aiGenerated), [habits]);
   
   // Separate bad habits
-  const badHabits = habits.filter(h => h.habitType === 'bad');
+  const badHabits = useMemo(() => habits.filter(h => h.habitType === 'bad'), [habits]);
 
   // Function to get positive habit alternatives for bad habits
   const getPositiveHabitAlternatives = (badHabitTitle: string, badHabitCategory: string) => {
@@ -523,7 +383,7 @@ export const HabitDashboard = ({
   const pairedHabits = findPairedHabits();
 
   // Compact Strength Meter Component for inline display
-  const CompactStrengthMeter = ({ habit }: { habit: Habit }) => {
+  const CompactStrengthMeter = ({ habit }: { habit: FrontendHabit }) => {
     const calculateStrengthScore = () => {
       const factors = {
         consistency: habit.completionRate || 0,
@@ -591,7 +451,7 @@ export const HabitDashboard = ({
       return IndividualHabitGoalService.instance;
     }
 
-    generateGoalForHabit(habit: Habit): Goal {
+    generateGoalForHabit(habit: FrontendHabit): Goal {
       const habitTitle = habit.title.toLowerCase();
       const habitCategory = habit.category;
       
@@ -881,7 +741,7 @@ export const HabitDashboard = ({
   }
 
   // Function to generate goal for a specific habit
-  const generateGoalForHabit = (habit: Habit) => {
+  const generateGoalForHabit = (habit: FrontendHabit) => {
     const goalService = IndividualHabitGoalService.getInstance();
     const generatedGoal = goalService.generateGoalForHabit(habit);
     
@@ -896,14 +756,50 @@ export const HabitDashboard = ({
     }, 100);
   };
 
-  const handleScheduleHabit = (habit: Habit) => {
+  const handleScheduleHabit = (habit: FrontendHabit) => {
     setSchedulingHabit(habit);
   };
 
-  const updateHabitSchedule = (updatedHabit: Habit) => {
+  const updateHabitSchedule = (updatedHabit: FrontendHabit) => {
     setHabits(habits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
     setSchedulingHabit(null);
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center py-16">
+          <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <Target className="w-12 h-12 text-gray-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">Loading Habits...</h3>
+          <p className="text-gray-600 text-lg">Fetching your habits from the server</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center py-16">
+          <div className="w-24 h-24 bg-gradient-to-r from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-12 h-12 text-red-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">Error Loading Habits</h3>
+          <p className="text-gray-600 text-lg mb-6">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
