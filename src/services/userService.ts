@@ -102,18 +102,33 @@ export class UserService {
    */
   async loginUser(loginData: UserLoginRequest): Promise<UserLoginResponse> {
     try {
+      console.log('Attempting login with:', { email: loginData.email, password: '***' });
+      console.log('API base URL:', 'http://localhost:8080/api/v1');
+      console.log('Login endpoint:', '/auth/login');
+      
       const response: ApiResponse<any> = await api.post<any>('/auth/login', {
         email: loginData.email,
         password: loginData.password
       });
 
-      if (response.status === 200 && response.data.success) {
+      console.log('Login response:', response);
+
+      if (response.status === 200 && response.data.token) {
+        // Store auth token if provided
+        localStorage.setItem('authToken', response.data.token);
+        
         return {
-          user: response.data.user,
+          user: {
+            id: response.data.userId,
+            email: response.data.email,
+            name: response.data.name
+          },
+          token: response.data.token,
           success: true,
-          message: response.data.message || 'Login successful'
+          message: 'Login successful'
         };
       } else {
+        console.log('Login failed - response status:', response.status, 'data:', response.data);
         return {
           user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
           success: false,
@@ -122,12 +137,26 @@ export class UserService {
       }
     } catch (error: any) {
       console.error('User login error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config
+      });
       
       if (error.response?.status === 401) {
         return {
           user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
           success: false,
           message: 'Invalid email or password'
+        };
+      }
+      
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        return {
+          user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
+          success: false,
+          message: 'Unable to connect to server. Please check if the backend is running.'
         };
       }
       

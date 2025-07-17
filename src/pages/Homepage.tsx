@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HabitDashboard } from '@/components/habits/HabitDashboard';
 import { GoalDashboard } from '@/components/goals/GoalDashboard';
 import { AICoach } from '@/components/ai/AICoach';
-import { LoginForm } from '@/components/auth/LoginForm';
+
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { Header } from '@/components/common/Homepageheader';
 import { ModernDashboard } from '@/components/common/ModernDashboard';
@@ -49,6 +50,7 @@ const moodToNumber = (mood: string | null): number => {
 
 const Index: React.FC<IndexProps> = ({ userMood }) => {
   const { currentUser, setCurrentUser } = useUser();
+  const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [habitsTabValue, setHabitsTabValue] = useState('habits');
   const [reportsTabValue, setReportsTabValue] = useState<'mood' | 'habits' | 'correlation' | 'insights'>('mood');
@@ -62,7 +64,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   const [userGoals, setUserGoals] = useState<any[]>([]);
   const [triggerGoalAddForm, setTriggerGoalAddForm] = useState(false);
   const [triggerGoalEditId, setTriggerGoalEditId] = useState<string | null>(null);
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+
   const [hasLoggedMoodToday, setHasLoggedMoodToday] = useState(moodStorage.hasLoggedMoodToday());
   
   // Mock habit data for gamification (fallback)
@@ -124,33 +126,7 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
     { id: '3', title: 'Meditate 100 Days', target: 100, current: 75 }
   ];
 
-  const handleLogin = (user: User, isSignUp: boolean) => {
-    console.log('Homepage received user data:', user);
-    console.log('Is signup:', isSignUp);
-    
-    if (isSignUp) {
-      // New user - go directly to onboarding (removed Welcome Back screen)
-      setCurrentUser({ 
-        ...user, 
-        streak: 0, 
-        onboardingComplete: false, 
-        isNewUser: true 
-      });
-    } else {
-      // Existing user - go directly to dashboard
-      setCurrentUser({ 
-        ...user, 
-        onboardingComplete: true, 
-        personalityProfile: {
-          personalInfo: { firstName: user.name, generation: 'millennial' },
-          personalitySelection: { selectedPersonality: 'Steve Jobs', selectedHabits: ['Daily meditation', 'Exercise'] }
-        },
-        isNewUser: false 
-      });
-      // Show mood popup for existing users after login
-      setShowMoodPopup(true);
-    }
-  };
+
 
   const handleMoodSelect = (mood: string) => {
     const moodNumber = moodToNumber(mood);
@@ -187,19 +163,18 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   };
 
   const performLogout = () => {
-    setCurrentUser(null);
     setUserHabits([]);
     setUserGoals([]);
     setCurrentMood(2); // Reset to neutral
+    navigate('/logout');
   };
 
   const goToRegistration = () => {
-    // Clear user data and set a flag to show registration form
-    setCurrentUser(null);
+    // Clear user data and redirect to login page
     setUserHabits([]);
     setUserGoals([]);
     setCurrentMood(2); // Reset to neutral
-    setShowRegistrationForm(true);
+    navigate('/logout');
   };
 
   const handleLogout = () => {
@@ -341,7 +316,9 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
   );
 
   if (!currentUser) {
-    return <LoginForm onLogin={handleLogin} showRegistrationByDefault={showRegistrationForm} />;
+    // Redirect to login page instead of showing embedded login form
+    navigate('/login');
+    return null;
   }
 
   if (!currentUser.onboardingComplete) {

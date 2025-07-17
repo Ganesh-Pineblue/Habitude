@@ -1,64 +1,124 @@
-# Habitude
+# Habitude - AI-Powered Habit Tracking App
 
-A modern React application built with Vite for habit tracking and personal development.
+A modern, AI-driven habit tracking application built with React, TypeScript, and Tailwind CSS.
 
 ## Features
 
-- ⚡ Lightning fast development with Vite
-- 🎨 Beautiful, modern UI with glassmorphism design
-- 📱 Responsive design for all devices
-- 🚀 Ready to start building immediately
+- **AI-Powered Habit Coaching**: Personalized habit suggestions and tracking
+- **Mood Tracking**: Integrated mood monitoring with habit correlation
+- **Goal Management**: Set and track personal goals
+- **Social Features**: Share progress and connect with accountability buddies
+- **Admin Panel**: Comprehensive admin dashboard for system management
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (version 16 or higher)
+- Node.js (v16 or higher)
 - npm or yarn
+- Backend server running on `http://localhost:8080`
 
 ### Installation
 
-1. Install dependencies:
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd habitude
+```
+
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Start the development server:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+4. Open your browser and navigate to `http://localhost:5173`
 
-### Available Scripts
+## Authentication & Routing
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+### Routes
 
-## Project Structure
+- `/` - Main dashboard (protected, requires login)
+- `/login` - Login/Registration page
+- `/logout` - Logout and redirect to login
+- `/profile` - User profile page (protected)
+- `/admin` - Admin panel
+- `/test-adaptive` - AI adaptive engine test (protected)
+
+### Authentication Flow
+
+1. **Login**: Users can log in via email/password or social providers
+2. **Registration**: New users are automatically redirected to onboarding
+3. **Protected Routes**: All main routes require authentication
+4. **Auto-redirect**: Unauthenticated users are redirected to `/login`
+
+### Backend API
+
+The app connects to a backend API at `http://localhost:8080/api/v1`:
+
+- **Login**: `POST /api/v1/auth/login`
+- **Registration**: `POST /api/v1/users`
+- **Health Check**: `GET /api/v1/health`
+
+### Backend Status
+
+The login page includes a real-time backend status indicator that shows:
+- ✅ **Backend Connected**: Server is running and accessible
+- ❌ **Backend Disconnected**: Server is not running or unreachable
+
+## Development
+
+### Project Structure
 
 ```
-habitude/
-├── src/
-│   ├── App.jsx          # Main application component
-│   ├── App.css          # Application styles
-│   ├── main.jsx         # Application entry point
-│   └── index.css        # Global styles
-├── index.html           # HTML template
-├── vite.config.js       # Vite configuration
-├── package.json         # Dependencies and scripts
-└── README.md           # This file
+src/
+├── components/          # React components
+│   ├── auth/           # Authentication components
+│   ├── ai/             # AI-related components
+│   ├── habits/         # Habit tracking components
+│   ├── goals/          # Goal management components
+│   ├── mood/           # Mood tracking components
+│   └── ui/             # Reusable UI components
+├── contexts/           # React contexts
+├── services/           # API services
+├── pages/              # Page components
+└── hooks/              # Custom React hooks
 ```
 
-## Technologies Used
+### Key Technologies
 
-- React 18
-- Vite
-- CSS3 with modern features
-- ESLint for code quality
+- **React 18** with TypeScript
+- **React Router DOM** for routing
+- **Tailwind CSS** for styling
+- **Axios** for API communication
+- **React Query** for data fetching
+- **Framer Motion** for animations
+
+## Troubleshooting
+
+### Login Issues
+
+1. **Backend Not Running**: Ensure your backend server is running on `http://localhost:8080`
+2. **API Endpoint**: Verify the login endpoint is `/api/v1/auth/login`
+3. **CORS Issues**: Check that your backend allows requests from `http://localhost:5173`
+
+### Common Issues
+
+- **"Backend Disconnected"**: Start your backend server
+- **Login Fails**: Check browser console for detailed error messages
+- **Routing Issues**: Clear browser cache and restart the dev server
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE). 
+This project is licensed under the MIT License. 

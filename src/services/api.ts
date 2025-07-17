@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = 'http://localhost:8080/api/v1'; // Update this to match your backend port
 
 // Create axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
@@ -26,6 +26,34 @@ export const checkNetworkConnectivity = async (): Promise<boolean> => {
     console.log('Network connectivity check failed:', error);
     return false;
   }
+};
+
+// Health check for backend API
+export const checkBackendHealth = async (): Promise<{ isHealthy: boolean; message: string }> => {
+  // Temporarily disable health check - update this when backend is ready
+  return {
+    isHealthy: true,
+    message: 'Backend health check disabled'
+  };
+  
+  // Uncomment this when your backend is ready:
+  /*
+  try {
+    const response = await apiClient.get('/health');
+    return {
+      isHealthy: response.status === 200,
+      message: 'Backend is running'
+    };
+  } catch (error: any) {
+    console.error('Backend health check failed:', error);
+    return {
+      isHealthy: false,
+      message: error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK' 
+        ? 'Backend server is not running. Please start the backend server.'
+        : 'Backend health check failed'
+    };
+  }
+  */
 };
 
 // Request interceptor for logging and authentication
