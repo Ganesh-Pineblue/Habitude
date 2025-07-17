@@ -22,6 +22,8 @@ interface Habit {
   currentWeekCompleted?: number;
   bestStreak?: number;
   completionRate?: number;
+  targetDuration?: number; // Number of days needed to complete the habit
+  isCompleted?: boolean; // Whether the habit has reached its target duration
   badHabitDetails?: {
     frequency: number;
     frequencyUnit: 'times_per_day' | 'times_per_week';
@@ -248,9 +250,20 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
     
     // Show celebration if habit was just completed (not uncompleted)
     if (!wasCompleted) {
-      setShowCelebration(true);
-      // Auto-hide after 4 seconds
-      setTimeout(() => setShowCelebration(false), 4000);
+      // Check if this completion reached the target duration
+      const newStreak = habit.streak + 1;
+      const reachedTarget = habit.targetDuration && newStreak >= habit.targetDuration;
+      
+      if (reachedTarget) {
+        setShowCelebration(true);
+        // Auto-hide after 6 seconds for completion celebration
+        setTimeout(() => setShowCelebration(false), 6000);
+      } else {
+        // Show brief celebration for daily completion
+        setShowCelebration(true);
+        // Auto-hide after 4 seconds for daily completion
+        setTimeout(() => setShowCelebration(false), 4000);
+      }
     }
   };
 
@@ -472,6 +485,77 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
 
 
 
+            {/* No Target Duration Set */}
+            {!isBadHabit && !habit.targetDuration && (
+              <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                  <span className="text-sm font-semibold text-yellow-800">Target Duration Not Set</span>
+                </div>
+                <p className="text-xs text-yellow-700 mt-2">
+                  Set a target duration to track when this habit will be considered established
+                </p>
+              </div>
+            )}
+
+            {/* Schedule Information */}
+            {(habit.targetTime || (habit.reminder && habit.reminder.enabled)) && (
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-800">Schedule Information</span>
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Target Time */}
+                  {habit.targetTime && (
+                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <Target className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">Target Time:</span>
+                      </div>
+                      <span className="text-sm font-bold text-blue-800">
+                        {habit.targetTime}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Reminder Information */}
+                  {habit.reminder && habit.reminder.enabled && (
+                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <Bell className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">Reminder:</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-bold text-blue-800">
+                          {habit.reminder.time}
+                        </span>
+                        <div className="text-xs text-blue-600">
+                          {(() => {
+                            const frequency = habit.reminder.frequency;
+                            if (frequency === 'daily') {
+                              return 'Daily';
+                            } else if (frequency === 'weekly') {
+                              const days = habit.reminder.daysOfWeek?.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ') || 'Mon, Tue, Wed, Thu, Fri';
+                              return `Weekly on ${days}`;
+                            } else if (frequency === 'custom') {
+                              const interval = habit.reminder.customInterval;
+                              const unit = habit.reminder.customUnit;
+                              return `Every ${interval} ${unit}`;
+                            }
+                            return '';
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+
+
 
           </div>
         </CardContent>
@@ -679,61 +763,105 @@ export const HabitCard = ({ habit, onToggle, onSchedule, onGenerateGoal, onDelet
                 <CheckCircle2 className="w-10 h-10 text-white" />
               </div>
               
-              <h2 className="text-2xl font-bold text-green-800 mb-2">
-                🎉 Habit Completed! 🎉
-              </h2>
-              
-              <p className="text-green-700 mb-4">
-                Great job completing <strong>"{habit.title}"</strong>!
-              </p>
+              {habit.targetDuration && habit.streak >= habit.targetDuration ? (
+                // Habit completed (reached target duration)
+                <>
+                  <h2 className="text-2xl font-bold text-green-800 mb-2">
+                    🎉 Habit Established! 🎉
+                  </h2>
+                  
+                  <p className="text-green-700 mb-4">
+                    Congratulations! You've successfully established <strong>"{habit.title}"</strong>!
+                  </p>
 
-              {/* Streak information */}
-              <div className="bg-white/60 rounded-xl p-4 mb-4">
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <Flame className="w-5 h-5 text-orange-500" />
-                  <span className="text-lg font-bold text-orange-700">
-                    {habit.streak} Day{habit.streak !== 1 ? 's' : ''} Streak!
-                  </span>
-                </div>
-                
-                {habit.streak >= 7 && (
-                  <div className="text-sm text-green-600 font-medium">
-                    🔥 You're on fire! Keep the momentum going!
+                  {/* Completion information */}
+                  <div className="bg-white/60 rounded-xl p-4 mb-4">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <Target className="w-5 h-5 text-green-600" />
+                      <span className="text-lg font-bold text-green-700">
+                        {habit.streak} Days Completed!
+                      </span>
+                    </div>
+                    
+                    <div className="text-sm text-green-600 font-medium">
+                      🏆 You've reached your target of {habit.targetDuration} days!
+                    </div>
+                    
+                    <div className="text-sm text-green-600 mt-2">
+                      This habit is now part of your established routine. Keep it up!
+                    </div>
                   </div>
-                )}
-                
-                {habit.streak >= 30 && (
-                  <div className="text-sm text-purple-600 font-medium">
-                    💎 Diamond level consistency! You're unstoppable!
-                  </div>
-                )}
-                
-                {isStreakRecord && (
-                  <div className="text-sm text-blue-600 font-medium">
-                    🏆 New personal record! Amazing work!
-                  </div>
-                )}
-              </div>
+                </>
+              ) : (
+                // Daily completion
+                <>
+                  <h2 className="text-2xl font-bold text-green-800 mb-2">
+                    🎉 Habit Completed! 🎉
+                  </h2>
+                  
+                  <p className="text-green-700 mb-4">
+                    Great job completing <strong>"{habit.title}"</strong>!
+                  </p>
 
-              {/* Encouraging message based on streak */}
-              <div className="text-sm text-green-600">
-                {habit.streak === 1 && "Every journey begins with a single step. You've taken yours!"}
-                {habit.streak === 2 && "Two days in a row! You're building momentum!"}
-                {habit.streak === 3 && "Three days! They say it takes 3 days to start a habit. You're doing it!"}
-                {habit.streak === 7 && "A full week! You're officially building a habit!"}
-                {habit.streak === 14 && "Two weeks strong! You're becoming consistent!"}
-                {habit.streak === 21 && "Three weeks! You're approaching habit mastery!"}
-                {habit.streak === 30 && "A full month! You're a habit champion!"}
-                {habit.streak > 30 && "Incredible consistency! You're an inspiration!"}
-                {habit.streak > 1 && habit.streak < 7 && "Keep going! Every day counts!"}
-              </div>
+                  {/* Streak information */}
+                  <div className="bg-white/60 rounded-xl p-4 mb-4">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <Flame className="w-5 h-5 text-orange-500" />
+                      <span className="text-lg font-bold text-orange-700">
+                        {habit.streak} Day{habit.streak !== 1 ? 's' : ''} Streak!
+                      </span>
+                    </div>
+                    
+                    {habit.targetDuration ? (
+                      <div className="text-sm text-green-600 font-medium">
+                        {habit.targetDuration - habit.streak} days left to establish this habit
+                      </div>
+                    ) : (
+                      <div className="text-sm text-yellow-600 font-medium">
+                        Set a target duration to track habit establishment
+                      </div>
+                    )}
+                    
+                    {habit.streak >= 7 && (
+                      <div className="text-sm text-green-600 font-medium">
+                        🔥 You're on fire! Keep the momentum going!
+                      </div>
+                    )}
+                    
+                    {habit.streak >= 30 && (
+                      <div className="text-sm text-purple-600 font-medium">
+                        💎 Diamond level consistency! You're unstoppable!
+                      </div>
+                    )}
+                    
+                    {isStreakRecord && (
+                      <div className="text-sm text-blue-600 font-medium">
+                        🏆 New personal record! Amazing work!
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Encouraging message based on streak */}
+                  <div className="text-sm text-green-600">
+                    {habit.streak === 1 && "Every journey begins with a single step. You've taken yours!"}
+                    {habit.streak === 2 && "Two days in a row! You're building momentum!"}
+                    {habit.streak === 3 && "Three days! They say it takes 3 days to start a habit. You're doing it!"}
+                    {habit.streak === 7 && "A full week! You're officially building a habit!"}
+                    {habit.streak === 14 && "Two weeks strong! You're becoming consistent!"}
+                    {habit.streak === 21 && "Three weeks! You're approaching habit mastery!"}
+                    {habit.streak === 30 && "A full month! You're a habit champion!"}
+                    {habit.streak > 30 && "Incredible consistency! You're an inspiration!"}
+                    {habit.streak > 1 && habit.streak < 7 && "Keep going! Every day counts!"}
+                  </div>
+                </>
+              )}
             </div>
 
             <Button 
               onClick={() => setShowCelebration(false)}
               className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg"
             >
-              Keep Going! 💪
+              {habit.targetDuration && habit.streak >= habit.targetDuration ? 'Continue Excellence! 💪' : 'Keep Going! 💪'}
             </Button>
           </div>
         </DialogContent>

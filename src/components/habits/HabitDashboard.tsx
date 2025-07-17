@@ -127,6 +127,7 @@ export const HabitDashboard = ({
     category: 'health' as 'health' | 'productivity' | 'mindfulness' | 'social',
     habitType: 'good' as 'good' | 'bad',
     weeklyTarget: 7,
+    targetDuration: undefined as number | undefined, // User must set their own target duration
     badHabitDetails: {
       frequency: 0,
       frequencyUnit: 'times_per_day' as 'times_per_day' | 'times_per_week',
@@ -151,6 +152,17 @@ export const HabitDashboard = ({
       return;
     }
 
+    // Validate required fields
+    if (!newHabit.title.trim()) {
+      alert('Please enter a habit title');
+      return;
+    }
+
+    if (!newHabit.targetDuration || newHabit.targetDuration < 1) {
+      alert('Please set a target duration (minimum 1 day)');
+      return;
+    }
+
     try {
       const habitData = habitService.convertToBackendHabit(newHabit, currentUser.id);
       const response = await habitService.createHabit(habitData);
@@ -167,6 +179,7 @@ export const HabitDashboard = ({
           category: 'health',
           habitType: 'good',
           weeklyTarget: 7,
+          targetDuration: undefined,
           badHabitDetails: {
             frequency: 0,
             frequencyUnit: 'times_per_day',
@@ -219,23 +232,45 @@ export const HabitDashboard = ({
 
   const updateHabit = useCallback(async (updatedHabit: FrontendHabit) => {
     try {
+      // Validate habit ID
+      const habitId = parseInt(updatedHabit.id);
+      if (isNaN(habitId)) {
+        console.error('Invalid habit ID:', updatedHabit.id);
+        alert('Invalid habit ID. Please try again.');
+        return;
+      }
+
       const habitData = {
-        id: parseInt(updatedHabit.id),
+        id: habitId,
         title: updatedHabit.title,
         description: updatedHabit.description,
         category: updatedHabit.category,
         targetTime: updatedHabit.targetTime,
-        weeklyTarget: updatedHabit.weeklyTarget
+        weeklyTarget: updatedHabit.weeklyTarget,
+        targetDuration: updatedHabit.targetDuration,
+        scheduleType: updatedHabit.reminder?.frequency || 'daily',
+        scheduleDetails: updatedHabit.reminder?.enabled ? JSON.stringify({
+          time: updatedHabit.reminder.time,
+          frequency: updatedHabit.reminder.frequency,
+          days: updatedHabit.reminder.daysOfWeek,
+          interval: updatedHabit.reminder.customInterval,
+          unit: updatedHabit.reminder.customUnit
+        }) : undefined
       };
 
       const response = await habitService.updateHabit(habitData);
       
       if (response.success) {
-        const updatedHabitFrontend = habitService.convertToFrontendHabit(response.habits[0]);
-        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabitFrontend : habit));
+        // Update local state with the updated habit (preserving frontend fields)
+        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
         setEditingHabit(null);
       } else {
-        alert(response.message || 'Failed to update habit');
+        console.error('Backend returned error:', response.message);
+        // Fallback: update local state even if backend fails
+        console.log('Backend update failed, updating local state as fallback');
+        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
+        setEditingHabit(null);
+        alert('Habit updated locally (backend connection issue). Please refresh to sync with server.');
       }
     } catch (error) {
       console.error('Error updating habit:', error);
@@ -263,20 +298,41 @@ export const HabitDashboard = ({
       const habit = habits.find(h => h.id === habitId);
       if (!habit) return;
 
+      console.log('Toggling habit:', habit.title, 'from', habit.completedToday, 'to', !habit.completedToday);
+
       const response = await habitService.toggleHabitCompletion(
         parseInt(habitId), 
         !habit.completedToday
       );
       
+      console.log('Toggle response:', response);
+      
       if (response.success) {
         const updatedHabit = habitService.convertToFrontendHabit(response.habits[0]);
         setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
+        console.log('Habit toggled successfully');
       } else {
-        alert(response.message || 'Failed to update habit');
+        console.error('Backend returned error:', response.message);
+        // Fallback: update local state even if backend fails
+        console.log('Backend toggle failed, updating local state as fallback');
+        const updatedHabit = { ...habit, completedToday: !habit.completedToday };
+        setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
+        alert('Habit updated locally (backend connection issue). Please refresh to sync with server.');
       }
     } catch (error) {
       console.error('Error toggling habit:', error);
-      alert('Failed to update habit. Please try again.');
+      console.error('Error details:', error);
+      
+      // Fallback: update local state even if backend fails
+      const habit = habits.find(h => h.id === habitId);
+      if (habit) {
+        console.log('Updating local state as fallback due to error');
+        const updatedHabit = { ...habit, completedToday: !habit.completedToday };
+        setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
+        alert('Habit updated locally (backend connection issue). Please refresh to sync with server.');
+      } else {
+        alert('Failed to update habit. Please try again.');
+      }
     }
   }, [habits]);
 
@@ -768,9 +824,61 @@ export const HabitDashboard = ({
     setSchedulingHabit(habit);
   };
 
-  const updateHabitSchedule = (updatedHabit: FrontendHabit) => {
-    setHabits(habits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
-    setSchedulingHabit(null);
+  const updateHabitSchedule = async (updatedHabit: FrontendHabit) => {
+    try {
+      console.log('Updating habit schedule for:', updatedHabit.title);
+      console.log('Updated habit data:', updatedHabit);
+      
+      // Validate habit ID
+      const habitId = parseInt(updatedHabit.id);
+      if (isNaN(habitId)) {
+        console.error('Invalid habit ID:', updatedHabit.id);
+        alert('Invalid habit ID. Please try again.');
+        return;
+      }
+
+      // Convert frontend habit to backend format for API call
+      const habitData = {
+        id: habitId,
+        title: updatedHabit.title,
+        description: updatedHabit.description,
+        category: updatedHabit.category,
+        targetTime: updatedHabit.targetTime,
+        weeklyTarget: updatedHabit.weeklyTarget,
+        scheduleType: updatedHabit.reminder?.frequency || 'daily',
+        scheduleDetails: updatedHabit.reminder?.enabled ? JSON.stringify({
+          time: updatedHabit.reminder.time,
+          frequency: updatedHabit.reminder.frequency,
+          days: updatedHabit.reminder.daysOfWeek,
+          interval: updatedHabit.reminder.customInterval,
+          unit: updatedHabit.reminder.customUnit
+        }) : undefined
+      };
+
+      console.log('Sending habit data to backend:', habitData);
+
+      const response = await habitService.updateHabit(habitData);
+      
+      console.log('Backend response:', response);
+      
+      if (response.success) {
+        // Update local state with the updated habit (preserving frontend fields)
+        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
+        setSchedulingHabit(null);
+        console.log('Habit schedule updated successfully');
+      } else {
+        console.error('Backend returned error:', response.message);
+        // Fallback: update local state even if backend fails
+        console.log('Backend update failed, updating local state as fallback');
+        setHabits(prevHabits => prevHabits.map(habit => habit.id === updatedHabit.id ? updatedHabit : habit));
+        setSchedulingHabit(null);
+        alert('Schedule updated locally (backend connection issue). Please refresh to sync with server.');
+      }
+    } catch (error) {
+      console.error('Error updating habit schedule:', error);
+      console.error('Error details:', error);
+      alert('Failed to update habit schedule. Please try again.');
+    }
   };
 
   // Show loading state
@@ -952,7 +1060,7 @@ export const HabitDashboard = ({
                   <Activity className="w-4 h-4" />
                   <span>Ongoing</span>
                   <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-                    {habits.filter(h => h.streak > 0).length}
+                    {habits.filter(h => !h.isCompleted).length}
                   </span>
                 </button>
                 <button
@@ -966,7 +1074,7 @@ export const HabitDashboard = ({
                   <CheckCircle className="w-4 h-4" />
                   <span>Completed</span>
                   <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-                    {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length}
+                    {habits.filter(h => h.isCompleted && h.habitType !== 'bad').length}
                   </span>
                 </button>
               </div>
@@ -1042,6 +1150,44 @@ export const HabitDashboard = ({
                     <option value="good">Healthy Routine</option>
                     <option value="bad">Unhealthy Routine</option>
                   </select>
+                </div>
+                
+                {/* Target Duration Field */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-gray-700">Target Duration (days) *</Label>
+                    <Input
+                      type="number"
+                      placeholder="How many days to establish this habit?"
+                      value={editingHabit ? editingHabit.targetDuration : newHabit.targetDuration}
+                      onChange={(e) => editingHabit 
+                        ? setEditingHabit({...editingHabit, targetDuration: Number(e.target.value)})
+                        : setNewHabit({...newHabit, targetDuration: Number(e.target.value)})
+                      }
+                      className="border-gray-200"
+                      required
+                      min="1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Set how many consecutive days you want to complete this habit to consider it established
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-gray-700">Weekly Target</Label>
+                    <Input
+                      type="number"
+                      placeholder="How many times per week?"
+                      value={editingHabit ? editingHabit.weeklyTarget : newHabit.weeklyTarget}
+                      onChange={(e) => editingHabit 
+                        ? setEditingHabit({...editingHabit, weeklyTarget: Number(e.target.value)})
+                        : setNewHabit({...newHabit, weeklyTarget: Number(e.target.value)})
+                      }
+                      className="border-gray-200"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      How many times you want to do this habit per week
+                    </p>
+                  </div>
                 </div>
                 
                 {/* Bad Habit Specific Fields */}
@@ -1756,6 +1902,93 @@ export const HabitDashboard = ({
                           </div>
                         </div>
                         
+                        {/* Weekly Days Selection */}
+                        {schedulingHabit.reminder?.frequency === 'weekly' && (
+                          <div>
+                            <Label>Days of Week</Label>
+                            <div className="grid grid-cols-7 gap-2 mt-2">
+                              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                                <Button
+                                  key={day}
+                                  type="button"
+                                  variant={schedulingHabit.reminder?.daysOfWeek?.includes(index) ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => {
+                                    const reminder = schedulingHabit.reminder || {
+                                      enabled: true,
+                                      time: '09:00',
+                                      frequency: 'weekly',
+                                      daysOfWeek: [1, 2, 3, 4, 5],
+                                      customInterval: 1,
+                                      customUnit: 'days'
+                                    };
+                                    const currentDays = reminder.daysOfWeek || [1, 2, 3, 4, 5];
+                                    const newDays = currentDays.includes(index) 
+                                      ? currentDays.filter(d => d !== index)
+                                      : [...currentDays, index];
+                                    setSchedulingHabit({...schedulingHabit, reminder: {...reminder, daysOfWeek: newDays}});
+                                  }}
+                                  className="h-8 w-8 p-0 text-xs"
+                                >
+                                  {day}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Custom Interval Selection */}
+                        {schedulingHabit.reminder?.frequency === 'custom' && (
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label>Interval</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={schedulingHabit.reminder?.customInterval || 1}
+                                onChange={(e) => {
+                                  const reminder = schedulingHabit.reminder || {
+                                    enabled: true,
+                                    time: '09:00',
+                                    frequency: 'custom',
+                                    daysOfWeek: [1, 2, 3, 4, 5],
+                                    customInterval: 1,
+                                    customUnit: 'days'
+                                  };
+                                  setSchedulingHabit({...schedulingHabit, reminder: {...reminder, customInterval: Number(e.target.value)}});
+                                }}
+                                className="border-gray-200"
+                              />
+                            </div>
+                            <div>
+                              <Label>Unit</Label>
+                              <Select
+                                value={schedulingHabit.reminder?.customUnit || 'days'}
+                                onValueChange={(value) => {
+                                  const reminder = schedulingHabit.reminder || {
+                                    enabled: true,
+                                    time: '09:00',
+                                    frequency: 'custom',
+                                    daysOfWeek: [1, 2, 3, 4, 5],
+                                    customInterval: 1,
+                                    customUnit: 'days'
+                                  };
+                                  setSchedulingHabit({...schedulingHabit, reminder: {...reminder, customUnit: value as 'days' | 'weeks' | 'months'}});
+                                }}
+                              >
+                                <SelectTrigger className="border-gray-200">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="days">Days</SelectItem>
+                                  <SelectItem value="weeks">Weeks</SelectItem>
+                                  <SelectItem value="months">Months</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
                           <div className="flex items-center space-x-2">
                             <Bell className="w-4 h-4 text-blue-600" />
@@ -1795,7 +2028,7 @@ export const HabitDashboard = ({
                   
                   <div className="flex space-x-2 pt-4">
                     <Button 
-                      onClick={() => updateHabitSchedule(schedulingHabit)}
+                      onClick={() => updateHabitSchedule(schedulingHabit!)}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       Update Schedule
@@ -1818,7 +2051,7 @@ export const HabitDashboard = ({
           {habitsView === 'ongoing' && (
             <div className="space-y-8">
               {/* Ongoing Good Habits */}
-              {habits.filter(h => h.streak > 0 && h.habitType !== 'bad').length > 0 && (
+              {habits.filter(h => !h.isCompleted && h.habitType !== 'bad').length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
@@ -1826,12 +2059,12 @@ export const HabitDashboard = ({
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900">Currently Active</h3>
-                      <p className="text-gray-600">Habits you're actively working on ({habits.filter(h => h.streak > 0 && h.habitType !== 'bad').length})</p>
+                      <p className="text-gray-600">Habits you're actively working on ({habits.filter(h => !h.isCompleted && h.habitType !== 'bad').length})</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    {habits.filter(h => h.streak > 0 && h.habitType !== 'bad').map((habit) => (
+                    {habits.filter(h => !h.isCompleted && h.habitType !== 'bad').map((habit) => (
                       <div key={habit.id} className="relative group">
                         <HabitCard 
                           habit={habit} 
@@ -1849,7 +2082,7 @@ export const HabitDashboard = ({
               )}
 
               {/* Ongoing Bad Habits */}
-              {habits.filter(h => h.streak > 0 && h.habitType === 'bad').length > 0 && (
+              {habits.filter(h => !h.isCompleted && h.habitType === 'bad').length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
@@ -1857,12 +2090,12 @@ export const HabitDashboard = ({
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900">Bad Habits Being Tracked</h3>
-                      <p className="text-gray-600">Habits you're working to reduce or eliminate ({habits.filter(h => h.streak > 0 && h.habitType === 'bad').length})</p>
+                      <p className="text-gray-600">Habits you're working to reduce or eliminate ({habits.filter(h => !h.isCompleted && h.habitType === 'bad').length})</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    {habits.filter(h => h.streak > 0 && h.habitType === 'bad').map((habit) => (
+                    {habits.filter(h => !h.isCompleted && h.habitType === 'bad').map((habit) => (
                       <div key={habit.id} className="relative group">
                         <HabitCard 
                           habit={habit} 
@@ -1880,7 +2113,7 @@ export const HabitDashboard = ({
               )}
 
               {/* No ongoing habits */}
-              {habits.filter(h => h.streak > 0).length === 0 && (
+              {habits.filter(h => !h.isCompleted).length === 0 && (
                 <div className="text-center py-16">
                   <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Activity className="w-12 h-12 text-gray-400" />
@@ -1903,7 +2136,7 @@ export const HabitDashboard = ({
           {habitsView === 'completed' && (
             <div className="space-y-8">
               {/* Completed Good Habits */}
-              {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length > 0 && (
+              {habits.filter(h => h.isCompleted && h.habitType !== 'bad').length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
@@ -1911,12 +2144,12 @@ export const HabitDashboard = ({
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900">Successfully Completed</h3>
-                      <p className="text-gray-600">Habits you've successfully established ({habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length})</p>
+                      <p className="text-gray-600">Habits you've successfully established ({habits.filter(h => h.isCompleted && h.habitType !== 'bad').length})</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').map((habit) => (
+                    {habits.filter(h => h.isCompleted && h.habitType !== 'bad').map((habit) => (
                       <div key={habit.id} className="relative group">
                         <HabitCard 
                           habit={habit} 
@@ -1934,7 +2167,7 @@ export const HabitDashboard = ({
               )}
 
               {/* No completed habits */}
-              {habits.filter(h => h.streak === 0 && h.habitType !== 'bad').length === 0 && (
+              {habits.filter(h => h.isCompleted && h.habitType !== 'bad').length === 0 && (
                 <div className="text-center py-16">
                   <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-12 h-12 text-gray-400" />
@@ -2145,7 +2378,7 @@ export const HabitDashboard = ({
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {habits.filter(h => h.streak > 0).slice(0, 4).map((habit) => (
+                      {habits.filter(h => !h.isCompleted).slice(0, 4).map((habit) => (
                         <div key={habit.id} className="p-4 bg-white rounded-lg border border-purple-200">
                           <div className="flex items-center space-x-2 mb-2">
                             <Target className="w-4 h-4 text-purple-600" />

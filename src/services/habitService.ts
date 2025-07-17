@@ -19,6 +19,7 @@ export interface Habit {
   targetTime?: string;
   weeklyTarget: number;
   currentWeekCompleted: number;
+  targetDuration?: number; // Number of days needed to complete the habit
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +39,8 @@ export interface FrontendHabit {
   currentWeekCompleted?: number;
   bestStreak?: number;
   completionRate?: number;
+  targetDuration?: number; // Number of days needed to complete the habit
+  isCompleted?: boolean; // Whether the habit has reached its target duration
   badHabitDetails?: {
     frequency: number;
     frequencyUnit: 'times_per_day' | 'times_per_week';
@@ -78,6 +81,7 @@ export interface HabitCreateRequest {
   status?: string;
   targetTime?: string;
   weeklyTarget?: number;
+  targetDuration?: number; // Number of days needed to complete the habit
 }
 
 export interface HabitUpdateRequest {
@@ -174,7 +178,12 @@ export class HabitService {
    */
   async updateHabit(habitData: HabitUpdateRequest): Promise<HabitResponse> {
     try {
+      console.log('habitService.updateHabit called with:', habitData);
+      console.log('Making API call to:', `/habits/${habitData.id}`);
+      
       const response: ApiResponse<Habit> = await api.put<Habit>(`/habits/${habitData.id}`, habitData);
+      
+      console.log('Update habit API response:', response);
       
       return {
         habits: [response.data],
@@ -183,11 +192,14 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Update habit error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.message);
       
       return {
         habits: [],
         success: false,
-        message: error.response?.data?.message || 'Failed to update habit'
+        message: error.response?.data?.message || error.message || 'Failed to update habit'
       };
     }
   }
@@ -225,11 +237,36 @@ export class HabitService {
    */
   async toggleHabitCompletion(habitId: number, completedToday: boolean): Promise<HabitResponse> {
     try {
-      const response: ApiResponse<Habit> = await api.put<Habit>(`/habits/${habitId}`, {
-        completedToday,
-        streak: completedToday ? 1 : 0, // This will be calculated on backend
-        currentWeekCompleted: completedToday ? 1 : 0 // This will be calculated on backend
-      });
+      console.log('toggleHabitCompletion called with:', { habitId, completedToday });
+      
+      // Try different approaches to update habit completion
+      let response: ApiResponse<Habit>;
+      
+      try {
+        // First try: Use PATCH request with minimal data
+        response = await api.patch<Habit>(`/habits/${habitId}/toggle`, {
+          completedToday
+        });
+      } catch (patchError) {
+        console.log('PATCH /toggle failed, trying PUT with minimal data');
+        
+        try {
+          // Second try: Use PUT with minimal data
+          response = await api.put<Habit>(`/habits/${habitId}`, {
+            completedToday
+          });
+        } catch (putError) {
+          console.log('PUT with minimal data failed, trying PUT with full habit data');
+          
+          // Third try: Use PUT with full habit data (fallback)
+          response = await api.put<Habit>(`/habits/${habitId}`, {
+            completedToday,
+            status: 'active' // Ensure status is set
+          });
+        }
+      }
+      
+      console.log('Toggle completion response:', response);
       
       return {
         habits: [response.data],
@@ -238,11 +275,13 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Toggle habit completion error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       
       return {
         habits: [],
         success: false,
-        message: error.response?.data?.message || 'Failed to update habit completion'
+        message: error.response?.data?.message || error.message || 'Failed to update habit completion'
       };
     }
   }
@@ -299,6 +338,12 @@ export class HabitService {
       ? Math.round((currentWeekCompleted / weeklyTarget) * 100)
       : 0;
 
+    // Use user-defined target duration or default to 7 days
+    const targetDuration = habit.targetDuration || 7;
+
+    // Calculate if habit is completed based on target duration
+    const isCompleted = habit.streak >= targetDuration;
+
     // Provide all fields with safe defaults
     return {
       id: habit.id.toString(),
@@ -314,6 +359,8 @@ export class HabitService {
       currentWeekCompleted,
       bestStreak: habit.streak ?? 0,
       completionRate,
+      targetDuration,
+      isCompleted,
       aiGenerated: false, // This would need to be determined from backend data
       reminder,
       badHabitDetails: habitType === 'bad' ? {
@@ -359,6 +406,7 @@ export class HabitService {
       status: 'active',
       targetTime: habit.targetTime,
       weeklyTarget: habit.weeklyTarget || 7,
+      targetDuration: habit.targetDuration || 7,
       suggestions
     };
   }

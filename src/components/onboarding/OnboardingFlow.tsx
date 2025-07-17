@@ -1020,6 +1020,7 @@ class HabitConversionService {
         description: '10 minutes of mindfulness to start the day with clarity',
         category: 'mindfulness' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Choose a time when you\'re least likely to be interrupted. Morning or evening works great!',
         reminder: {
@@ -1036,6 +1037,7 @@ class HabitConversionService {
         description: '30 minutes of physical activity for health and energy',
         category: 'health' as const,
         weeklyTarget: 5,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Pick a time that fits your schedule. Consistency matters more than the specific time!',
         reminder: {
@@ -1052,6 +1054,7 @@ class HabitConversionService {
         description: 'Read for 30 minutes to expand knowledge and vocabulary',
         category: 'productivity' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Find a quiet time that works for you. Many people enjoy reading before bed!',
         reminder: {
@@ -1068,6 +1071,7 @@ class HabitConversionService {
         description: 'Make nutritious food choices throughout the day',
         category: 'health' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Focus on making healthy choices throughout the day rather than specific meal times.',
         reminder: {
@@ -1084,6 +1088,7 @@ class HabitConversionService {
         description: 'Start each day with a structured morning routine',
         category: 'productivity' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Choose a time that gives you enough buffer before your day starts.',
         reminder: {
@@ -1100,6 +1105,7 @@ class HabitConversionService {
         description: 'Reflect on the day and plan tomorrow',
         category: 'mindfulness' as const,
         weeklyTarget: 5,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Pick a time when you can reflect without distractions. Evening works well for most people!',
         reminder: {
@@ -1116,6 +1122,7 @@ class HabitConversionService {
         description: 'Walk 10,000 steps for cardiovascular health',
         category: 'health' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Find a time that fits your schedule. You can break it into smaller walks throughout the day!',
         reminder: {
@@ -1132,6 +1139,7 @@ class HabitConversionService {
         description: 'Spend 30 minutes learning something new',
         category: 'productivity' as const,
         weeklyTarget: 5,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Choose a time when you\'re most alert and can focus on learning new things.',
         reminder: {
@@ -1148,6 +1156,7 @@ class HabitConversionService {
         description: 'Write down 3 things you\'re grateful for each day',
         category: 'mindfulness' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Morning or evening works great. Choose a time when you can reflect peacefully.',
         reminder: {
@@ -1164,6 +1173,7 @@ class HabitConversionService {
         description: 'Review and adjust your goals weekly',
         category: 'productivity' as const,
         weeklyTarget: 1,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Pick a time when you can think clearly about your goals and plan ahead.',
         reminder: {
@@ -1180,6 +1190,7 @@ class HabitConversionService {
         description: '8 glasses throughout the day for optimal hydration',
         category: 'health' as const,
         weeklyTarget: 7,
+        targetDuration: undefined, // User will set their own target duration
         targetTime: null, // Let user set their own time
         aiSuggestion: 'Set reminders throughout the day rather than specific times. Stay hydrated!',
         reminder: {
@@ -1224,6 +1235,7 @@ class HabitConversionService {
           description: `Build consistency in ${habit.toLowerCase()}`,
           category: 'productivity' as const,
           weeklyTarget: 5,
+          targetDuration: undefined, // User will set their own target duration
           targetTime: null, // Let user set their own time
           aiSuggestion: `Choose a time that works best for your schedule. Consistency is key for ${habit.toLowerCase()}!`,
           streak: 0,
