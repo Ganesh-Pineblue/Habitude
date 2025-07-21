@@ -5,7 +5,7 @@ export interface OnboardingFlow {
   id?: number;
   userId: number;
   firstName: string;
-  generation: string;
+  ageGroup: string;
   gender: string;
   selectedPersonality: string;
   personalityCategory: string;
@@ -24,7 +24,7 @@ export interface OnboardingFlow {
 export interface OnboardingFlowRequest {
   userId: number;
   firstName: string;
-  generation: string;
+  ageGroup: string;
   gender: string;
   selectedPersonality: string;
   personalityCategory: string;
@@ -70,7 +70,7 @@ export class OnboardingService {
       const backendData: OnboardingFlow = {
         userId: onboardingData.userId,
         firstName: onboardingData.firstName,
-        generation: onboardingData.generation,
+        ageGroup: onboardingData.ageGroup,
         gender: onboardingData.gender,
         selectedPersonality: onboardingData.selectedPersonality,
         personalityCategory: onboardingData.personalityCategory,
@@ -101,29 +101,12 @@ export class OnboardingService {
           message: 'Failed to create onboarding flow'
         };
       }
-    } catch (error: any) {
-      console.error('Onboarding flow creation error:', error);
-      
-      if (error.response?.status === 400) {
-        return {
-          onboardingFlow: onboardingData as any,
-          success: false,
-          message: 'Invalid request data. Please check your input.'
-        };
-      }
-      
-      if (error.response?.status === 404) {
-        return {
-          onboardingFlow: onboardingData as any,
-          success: false,
-          message: 'User not found. Please try logging in again.'
-        };
-      }
-      
+    } catch (error) {
+      console.error('Error creating onboarding flow:', error);
       return {
-        onboardingFlow: onboardingData as any,
+        onboardingFlow: {} as OnboardingFlow,
         success: false,
-        message: error.response?.data?.message || 'Failed to create onboarding flow. Please try again.'
+        message: 'Network error occurred'
       };
     }
   }
@@ -136,9 +119,13 @@ export class OnboardingService {
   async getOnboardingFlowById(id: number): Promise<OnboardingFlow | null> {
     try {
       const response: ApiResponse<OnboardingFlow> = await api.get<OnboardingFlow>(`/onboarding/${id}`);
-      return response.data;
-    } catch (error: any) {
-      console.error('Get onboarding flow error:', error);
+      
+      if (response.status === 200) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching onboarding flow:', error);
       return null;
     }
   }
@@ -151,9 +138,13 @@ export class OnboardingService {
   async getOnboardingFlowByUserId(userId: number): Promise<OnboardingFlow | null> {
     try {
       const response: ApiResponse<OnboardingFlow> = await api.get<OnboardingFlow>(`/onboarding/user/${userId}`);
-      return response.data;
-    } catch (error: any) {
-      console.error('Get onboarding flow by user error:', error);
+      
+      if (response.status === 200) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching user onboarding flow:', error);
       return null;
     }
   }
@@ -161,17 +152,16 @@ export class OnboardingService {
   /**
    * Update onboarding flow
    * @param id - Onboarding flow ID
-   * @param onboardingData - Updated onboarding flow data
+   * @param onboardingData - Updated onboarding data
    * @returns Promise<OnboardingFlow | null>
    */
   async updateOnboardingFlow(id: number, onboardingData: OnboardingFlowRequest): Promise<OnboardingFlow | null> {
     try {
       // Convert arrays to JSON strings for backend
       const backendData: OnboardingFlow = {
-        id,
         userId: onboardingData.userId,
         firstName: onboardingData.firstName,
-        generation: onboardingData.generation,
+        ageGroup: onboardingData.ageGroup,
         gender: onboardingData.gender,
         selectedPersonality: onboardingData.selectedPersonality,
         personalityCategory: onboardingData.personalityCategory,
@@ -188,23 +178,31 @@ export class OnboardingService {
       };
 
       const response: ApiResponse<OnboardingFlow> = await api.put<OnboardingFlow>(`/onboarding/${id}`, backendData);
-      return response.data;
-    } catch (error: any) {
-      console.error('Update onboarding flow error:', error);
+      
+      if (response.status === 200) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error updating onboarding flow:', error);
       return null;
     }
   }
 
   /**
-   * Get all onboarding flows
+   * Get all onboarding flows (admin only)
    * @returns Promise<OnboardingFlow[]>
    */
   async getAllOnboardingFlows(): Promise<OnboardingFlow[]> {
     try {
       const response: ApiResponse<OnboardingFlow[]> = await api.get<OnboardingFlow[]>('/onboarding');
-      return response.data;
-    } catch (error: any) {
-      console.error('Get all onboarding flows error:', error);
+      
+      if (response.status === 200) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching all onboarding flows:', error);
       return [];
     }
   }
@@ -216,64 +214,40 @@ export class OnboardingService {
    */
   async deleteOnboardingFlow(id: number): Promise<boolean> {
     try {
-      await api.delete(`/onboarding/${id}`);
-      return true;
-    } catch (error: any) {
-      console.error('Delete onboarding flow error:', error);
+      const response: ApiResponse<void> = await api.delete<void>(`/onboarding/${id}`);
+      
+      if (response.status === 200) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error deleting onboarding flow:', error);
       return false;
     }
   }
 
   /**
    * Validate onboarding data
-   * @param onboardingData - Onboarding flow data to validate
+   * @param onboardingData - Onboarding data to validate
    * @returns Validation result
    */
   validateOnboardingData(onboardingData: OnboardingFlowRequest): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!onboardingData.userId) {
-      errors.push('User ID is required');
+    if (!onboardingData.userId || onboardingData.userId <= 0) {
+      errors.push('Valid user ID is required');
     }
 
     if (!onboardingData.firstName || onboardingData.firstName.trim().length === 0) {
       errors.push('First name is required');
     }
 
-    if (!onboardingData.generation || onboardingData.generation.trim().length === 0) {
-      errors.push('Generation is required');
+    if (!onboardingData.ageGroup || onboardingData.ageGroup.trim().length === 0) {
+      errors.push('Age group is required');
     }
 
     if (!onboardingData.gender || onboardingData.gender.trim().length === 0) {
       errors.push('Gender is required');
-    }
-
-    if (!onboardingData.selectedPersonality || onboardingData.selectedPersonality.trim().length === 0) {
-      errors.push('Selected personality is required');
-    }
-
-    if (!onboardingData.personalityCategory || onboardingData.personalityCategory.trim().length === 0) {
-      errors.push('Personality category is required');
-    }
-
-    if (!onboardingData.personalityDescription || onboardingData.personalityDescription.trim().length === 0) {
-      errors.push('Personality description is required');
-    }
-
-    if (!onboardingData.personalityImage || onboardingData.personalityImage.trim().length === 0) {
-      errors.push('Personality image is required');
-    }
-
-    if (!onboardingData.selectedHabits || onboardingData.selectedHabits.length === 0) {
-      errors.push('At least one habit must be selected');
-    }
-
-    if (!onboardingData.generatedHabits || onboardingData.generatedHabits.length === 0) {
-      errors.push('Generated habits are required');
-    }
-
-    if (!onboardingData.generatedGoals || onboardingData.generatedGoals.length === 0) {
-      errors.push('Generated goals are required');
     }
 
     return {

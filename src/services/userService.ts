@@ -56,7 +56,7 @@ export class UserService {
    */
   async registerUser(userData: UserRegistrationRequest): Promise<UserRegistrationResponse> {
     try {
-      const response: ApiResponse<User> = await api.post<User>('/users', {
+      const response: ApiResponse<User> = await api.post<User>('/auth/signup', {
         email: userData.email,
         password: userData.password,
         name: userData.name,

@@ -24,6 +24,7 @@ interface User {
   name: string;
   email: string;
   streak?: number;
+  ageGroup?: string;
   personalityProfile?: any;
   onboardingComplete?: boolean;
   isNewUser?: boolean;
@@ -204,9 +205,14 @@ const Index: React.FC<IndexProps> = ({ userMood }) => {
           }
         }
       }
+      
+      // Extract ageGroup from personalityProfile if available
+      const ageGroup = personalityProfile.personalInfo?.ageGroup;
+      
       setCurrentUser({
         ...currentUser,
         personalityProfile,
+        ageGroup, // Save the ageGroup to user context
         onboardingComplete: true
       });
       setCurrentTab('habits'); // Redirect to Habits tab after onboarding

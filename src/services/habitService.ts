@@ -41,6 +41,8 @@ export interface FrontendHabit {
   completionRate?: number;
   targetDuration?: number; // Number of days needed to complete the habit
   isCompleted?: boolean; // Whether the habit has reached its target duration
+  userId?: string; // User ID for sync operations
+  pairedBadHabitId?: string; // For paired habits (good/bad habit pairs)
   badHabitDetails?: {
     frequency: number;
     frequencyUnit: 'times_per_day' | 'times_per_week';
@@ -116,6 +118,53 @@ export class HabitService {
   }
 
   /**
+   * Get all habits (for admin or general use)
+   * @returns Promise<HabitResponse>
+   */
+  async getAllHabits(): Promise<HabitResponse> {
+    try {
+      console.log('Getting all habits');
+      const response: ApiResponse<Habit[]> = await api.get<Habit[]>('/habits');
+      
+      console.log('Get all habits response:', response);
+      
+      // Handle different possible response structures
+      let habitsArray: Habit[] = [];
+      
+      if (Array.isArray(response.data)) {
+        habitsArray = response.data;
+      } else if (response.data && typeof response.data === 'object' && 'habits' in response.data && Array.isArray((response.data as any).habits)) {
+        habitsArray = (response.data as any).habits;
+      } else if (response.data && typeof response.data === 'object' && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        habitsArray = (response.data as any).data;
+      } else {
+        console.warn('Unexpected response structure:', response.data);
+        habitsArray = [];
+      }
+      
+      console.log('Processed habits array:', habitsArray);
+      
+      return {
+        habits: habitsArray,
+        success: true,
+        message: 'All habits retrieved successfully'
+      };
+    } catch (error: any) {
+      console.error('Get all habits error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || 'Failed to retrieve all habits'
+      };
+    }
+  }
+
+  /**
    * Get habits by user ID
    * @param userId - User ID
    * @returns Promise<HabitResponse>
@@ -137,10 +186,10 @@ export class HabitService {
       
       if (Array.isArray(response.data)) {
         habitsArray = response.data;
-      } else if (response.data && Array.isArray(response.data.habits)) {
-        habitsArray = response.data.habits;
-      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        habitsArray = response.data.data;
+      } else if (response.data && typeof response.data === 'object' && 'habits' in response.data && Array.isArray((response.data as any).habits)) {
+        habitsArray = (response.data as any).habits;
+      } else if (response.data && typeof response.data === 'object' && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        habitsArray = (response.data as any).data;
       } else {
         console.warn('Unexpected response structure:', response.data);
         habitsArray = [];
@@ -155,7 +204,8 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Get habits error:', error);
-      console.error('Error details:', error.response?.data);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       
 
       
@@ -174,7 +224,10 @@ export class HabitService {
    */
   async createHabit(habitData: HabitCreateRequest): Promise<HabitResponse> {
     try {
+      console.log('Creating habit with data:', habitData);
       const response: ApiResponse<Habit> = await api.post<Habit>('/habits', habitData);
+      
+      console.log('Create habit response:', response);
       
       return {
         habits: [response.data],
@@ -183,6 +236,8 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Create habit error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       
 
       
@@ -201,8 +256,8 @@ export class HabitService {
    */
   async updateHabit(habitData: HabitUpdateRequest): Promise<HabitResponse> {
     try {
-      console.log('habitService.updateHabit called with:', habitData);
-      console.log('Making API call to:', `/habits/${habitData.id}`);
+
+      console.log('habitService.updateHabit called with:-------------------------------------', habitData);
       
       const response: ApiResponse<Habit> = await api.put<Habit>(`/habits/${habitData.id}`, habitData);
       
@@ -230,13 +285,48 @@ export class HabitService {
   }
 
   /**
+   * Get a single habit by ID
+   * @param habitId - Habit ID
+   * @returns Promise<HabitResponse>
+   */
+  async getHabitById(habitId: number): Promise<HabitResponse> {
+    try {
+      console.log('Getting habit by ID:', habitId);
+      const response: ApiResponse<Habit> = await api.get<Habit>(`/habits/${habitId}`);
+      
+      console.log('Get habit by ID response:', response);
+      
+      return {
+        habits: [response.data],
+        success: true,
+        message: 'Habit retrieved successfully'
+      };
+    } catch (error: any) {
+      console.error('Get habit by ID error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || 'Failed to retrieve habit'
+      };
+    }
+  }
+
+  /**
    * Delete a habit
    * @param habitId - Habit ID
    * @returns Promise<HabitResponse>
    */
   async deleteHabit(habitId: number): Promise<HabitResponse> {
     try {
-      await api.delete(`/habits/${habitId}`);
+      console.log('Deleting habit with ID:', habitId);
+      const response: ApiResponse<void> = await api.delete<void>(`/habits/${habitId}`);
+      
+      console.log('Delete habit response:', response);
       
       return {
         habits: [],
@@ -245,6 +335,8 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Delete habit error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       
 
       
@@ -252,6 +344,112 @@ export class HabitService {
         habits: [],
         success: false,
         message: error.response?.data?.message || 'Failed to delete habit'
+      };
+    }
+  }
+
+  /**
+   * Search habits by title or description
+   * @param searchTerm - Search term
+   * @param userId - Optional user ID to filter by user
+   * @returns Promise<HabitResponse>
+   */
+  async searchHabits(searchTerm: string, userId?: number): Promise<HabitResponse> {
+    try {
+      console.log('Searching habits with term:', searchTerm, 'userId:', userId);
+      
+      let endpoint = `/habits/search?q=${encodeURIComponent(searchTerm)}`;
+      if (userId) {
+        endpoint += `&userId=${userId}`;
+      }
+      
+      const response: ApiResponse<Habit[]> = await api.get<Habit[]>(endpoint);
+      
+      console.log('Search habits response:', response);
+      
+      // Handle different possible response structures
+      let habitsArray: Habit[] = [];
+      
+      if (Array.isArray(response.data)) {
+        habitsArray = response.data;
+      } else if (response.data && typeof response.data === 'object' && 'habits' in response.data && Array.isArray((response.data as any).habits)) {
+        habitsArray = (response.data as any).habits;
+      } else if (response.data && typeof response.data === 'object' && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        habitsArray = (response.data as any).data;
+      } else {
+        console.warn('Unexpected response structure:', response.data);
+        habitsArray = [];
+      }
+      
+      return {
+        habits: habitsArray,
+        success: true,
+        message: `Found ${habitsArray.length} habits matching "${searchTerm}"`
+      };
+    } catch (error: any) {
+      console.error('Search habits error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || 'Failed to search habits'
+      };
+    }
+  }
+
+  /**
+   * Get habits by category
+   * @param category - Habit category
+   * @param userId - Optional user ID to filter by user
+   * @returns Promise<HabitResponse>
+   */
+  async getHabitsByCategory(category: string, userId?: number): Promise<HabitResponse> {
+    try {
+      console.log('Getting habits by category:', category, 'userId:', userId);
+      
+      let endpoint = `/habits/category/${encodeURIComponent(category)}`;
+      if (userId) {
+        endpoint += `?userId=${userId}`;
+      }
+      
+      const response: ApiResponse<Habit[]> = await api.get<Habit[]>(endpoint);
+      
+      console.log('Get habits by category response:', response);
+      
+      // Handle different possible response structures
+      let habitsArray: Habit[] = [];
+      
+      if (Array.isArray(response.data)) {
+        habitsArray = response.data;
+      } else if (response.data && typeof response.data === 'object' && 'habits' in response.data && Array.isArray((response.data as any).habits)) {
+        habitsArray = (response.data as any).habits;
+      } else if (response.data && typeof response.data === 'object' && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        habitsArray = (response.data as any).data;
+      } else {
+        console.warn('Unexpected response structure:', response.data);
+        habitsArray = [];
+      }
+      
+      return {
+        habits: habitsArray,
+        success: true,
+        message: `Found ${habitsArray.length} habits in category "${category}"`
+      };
+    } catch (error: any) {
+      console.error('Get habits by category error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || 'Failed to retrieve habits by category'
       };
     }
   }
@@ -266,32 +464,39 @@ export class HabitService {
     try {
       console.log('toggleHabitCompletion called with:', { habitId, completedToday });
       
-      // Try different approaches to update habit completion
-      let response: ApiResponse<Habit>;
-      
+      // First, try to get the current habit to ensure it exists
+      let currentHabit: Habit | null = null;
       try {
-        // First try: Use PATCH request with minimal data
-        response = await api.patch<Habit>(`/habits/${habitId}/toggle`, {
-          completedToday
-        });
-      } catch (patchError) {
-        console.log('PATCH /toggle failed, trying PUT with minimal data');
-        
-        try {
-          // Second try: Use PUT with minimal data
-          response = await api.put<Habit>(`/habits/${habitId}`, {
-            completedToday
-          });
-        } catch (putError) {
-          console.log('PUT with minimal data failed, trying PUT with full habit data');
-          
-          // Third try: Use PUT with full habit data (fallback)
-          response = await api.put<Habit>(`/habits/${habitId}`, {
-            completedToday,
-            status: 'active' // Ensure status is set
-          });
-        }
+        const getResponse = await api.get<Habit>(`/habits/${habitId}`);
+        currentHabit = getResponse.data;
+        console.log('Current habit data:', currentHabit);
+      } catch (getError) {
+        console.log('Could not fetch current habit, proceeding with update');
       }
+      
+      // Prepare update data - include current habit data if available
+      const updateData: any = {
+        completedToday
+      };
+      
+      // If we have current habit data, include other fields to prevent data loss
+      if (currentHabit) {
+        updateData.id = currentHabit.id;
+        updateData.title = currentHabit.title;
+        updateData.description = currentHabit.description;
+        updateData.category = currentHabit.category;
+        updateData.status = currentHabit.status || 'active';
+        updateData.streak = currentHabit.streak;
+        updateData.weeklyTarget = currentHabit.weeklyTarget;
+        updateData.currentWeekCompleted = currentHabit.currentWeekCompleted;
+        updateData.targetTime = currentHabit.targetTime;
+        updateData.targetDuration = currentHabit.targetDuration;
+      }
+      
+      console.log('Sending update data:------------------------', updateData);
+      
+      // Use standard PUT endpoint to update habit completion
+      const response: ApiResponse<Habit> = await api.put<Habit>(`/habits`, updateData);
       
       console.log('Toggle completion response:', response);
       
@@ -302,6 +507,185 @@ export class HabitService {
       };
     } catch (error: any) {
       console.error('Toggle habit completion error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.message);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to update habit completion'
+      };
+    }
+  }
+
+  /**
+   * Get habit statistics for a user
+   * @param userId - User ID
+   * @returns Promise with habit statistics
+   */
+  async getHabitStatistics(userId: number): Promise<{
+    totalHabits: number;
+    completedToday: number;
+    totalStreak: number;
+    averageCompletionRate: number;
+    success: boolean;
+    message?: string;
+  }> {
+    try {
+      console.log('Getting habit statistics for userId:', userId);
+      const response: ApiResponse<any> = await api.get<any>(`/habits/statistics/${userId}`);
+      
+      console.log('Habit statistics response:', response);
+      
+      return {
+        totalHabits: response.data.totalHabits || 0,
+        completedToday: response.data.completedToday || 0,
+        totalStreak: response.data.totalStreak || 0,
+        averageCompletionRate: response.data.averageCompletionRate || 0,
+        success: true,
+        message: 'Habit statistics retrieved successfully'
+      };
+    } catch (error: any) {
+      console.error('Get habit statistics error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        totalHabits: 0,
+        completedToday: 0,
+        totalStreak: 0,
+        averageCompletionRate: 0,
+        success: false,
+        message: error.response?.data?.message || 'Failed to retrieve habit statistics'
+      };
+    }
+  }
+
+  /**
+   * Bulk update habits (for batch operations)
+   * @param habitUpdates - Array of habit updates
+   * @returns Promise<HabitResponse>
+   */
+  async bulkUpdateHabits(habitUpdates: HabitUpdateRequest[]): Promise<HabitResponse> {
+    try {
+      console.log('Bulk updating habits:', habitUpdates);
+      const response: ApiResponse<Habit[]> = await api.put<Habit[]>('/habits/bulk', habitUpdates);
+      
+      console.log('Bulk update response:', response);
+      
+      return {
+        habits: Array.isArray(response.data) ? response.data : [],
+        success: true,
+        message: 'Habits updated successfully'
+      };
+    } catch (error: any) {
+      console.error('Bulk update habits error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+
+      
+      return {
+        habits: [],
+        success: false,
+        message: error.response?.data?.message || 'Failed to bulk update habits'
+      };
+    }
+  }
+
+  /**
+   * Check if backend is available
+   * @returns Promise<boolean>
+   */
+  async checkBackendAvailability(): Promise<boolean> {
+    try {
+      await api.get('/health');
+      return true;
+    } catch (error) {
+      console.log('Backend health check failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Sync local habit changes with backend
+   * @param localHabits - Array of locally modified habits
+   * @returns Promise<boolean>
+   */
+  async syncLocalChanges(localHabits: FrontendHabit[]): Promise<boolean> {
+    try {
+      console.log('Syncing local changes with backend');
+      
+      // Check if backend is available
+      const isBackendAvailable = await this.checkBackendAvailability();
+      if (!isBackendAvailable) {
+        console.log('Backend not available for sync');
+        return false;
+      }
+      
+      // Sync each habit that has been modified locally
+      for (const habit of localHabits) {
+        try {
+          const backendHabit = this.convertToBackendHabit(habit, parseInt(habit.userId || '0'));
+          await this.updateHabit({
+            id: parseInt(habit.id),
+            ...backendHabit
+          });
+          console.log(`Synced habit: ${habit.title}`);
+        } catch (error) {
+          console.error(`Failed to sync habit ${habit.title}:`, error);
+        }
+      }
+      
+      console.log('Local changes synced successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to sync local changes:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Simple toggle method that only updates completion status
+   * This is a fallback method when the main toggle fails
+   * @param habitId - Habit ID
+   * @param completedToday - Whether habit is completed today
+   * @returns Promise<HabitResponse>
+   */
+  async simpleToggleHabitCompletion(habitId: number, completedToday: boolean): Promise<HabitResponse> {
+    try {
+      console.log('simpleToggleHabitCompletion called with:', { habitId, completedToday });
+      
+      // Use PATCH method if available, otherwise PUT with minimal data
+      let response: ApiResponse<Habit>;
+      
+      try {
+        // Try PATCH first (if backend supports it)
+        response = await api.patch<Habit>(`/habits/${habitId}`, {
+          completedToday
+        });
+      } catch (patchError) {
+        console.log('PATCH failed, trying PUT with minimal data');
+        // Fallback to PUT with minimal data
+        response = await api.put<Habit>(`/habits/${habitId}`, {
+          completedToday
+        });
+      }
+      
+      console.log('Simple toggle response:', response);
+      
+      return {
+        habits: [response.data],
+        success: true,
+        message: 'Habit completion updated successfully'
+      };
+    } catch (error: any) {
+      console.error('Simple toggle habit completion error:', error);
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
       
@@ -390,6 +774,7 @@ export class HabitService {
       completionRate,
       targetDuration,
       isCompleted,
+      userId: habit.userId?.toString(),
       aiGenerated: false, // This would need to be determined from backend data
       reminder,
       badHabitDetails: habitType === 'bad' ? {

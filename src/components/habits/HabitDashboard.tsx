@@ -15,7 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp, CheckCircle } from 'lucide-react';
+import { Target, Plus, CalendarDays, Sparkles, AlertTriangle, Activity, Trophy, Users, Share2, UserPlus, Brain, Facebook, Twitter, Instagram, Linkedin, Heart, CheckCircle2, Flame, Bell, TrendingUp, CheckCircle, Stethoscope, Video } from 'lucide-react';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 
 // Using FrontendHabit from the service instead of local interface
@@ -34,11 +34,21 @@ interface Goal {
   sourceHabit?: string;
 }
 
-
-
-
-
-
+// Utility function to check if user is 45 or older
+const isUser45OrOlder = (ageGroup?: string): boolean => {
+  if (!ageGroup) return false;
+  
+  // Age groups that represent 45 years and above
+  const ageGroups45Plus = [
+    'mid-forties',      // 45-49
+    'early-fifties',    // 50-54
+    'mid-fifties',      // 55-59
+    'sixties',          // 60-69
+    'seventies-plus'    // 70+
+  ];
+  
+  return ageGroups45Plus.includes(ageGroup);
+};
 
 export const HabitDashboard = ({ 
   tabValue = 'habits', 
@@ -182,7 +192,14 @@ export const HabitDashboard = ({
     }
 
     try {
-      const habitData = habitService.convertToBackendHabit(newHabit, currentUser.id);
+      // Create a proper FrontendHabit object with required properties
+      const frontendHabit: FrontendHabit = {
+        ...newHabit,
+        id: 'temp-' + Date.now(), // Temporary ID for conversion
+        streak: 0,
+        completedToday: false
+      };
+      const habitData = habitService.convertToBackendHabit(frontendHabit, currentUser.id);
       const response = await habitService.createHabit(habitData);
       
       if (response.success) {
@@ -233,6 +250,7 @@ export const HabitDashboard = ({
     }
 
     try {
+      // The newHabit parameter is already a FrontendHabit, so we can use it directly
       const habitData = habitService.convertToBackendHabit(newHabit, currentUser.id);
       const response = await habitService.createHabit(habitData);
       
@@ -276,6 +294,8 @@ export const HabitDashboard = ({
         }) : undefined
       };
 
+      console.log('Updating habit with data:-------------------------', habitData);
+
       const response = await habitService.updateHabit(habitData);
       
       if (response.success) {
@@ -318,12 +338,23 @@ export const HabitDashboard = ({
 
       console.log('Toggling habit:', habit.title, 'from', habit.completedToday, 'to', !habit.completedToday);
 
-      const response = await habitService.toggleHabitCompletion(
+      // Try the main toggle method first
+      let response = await habitService.toggleHabitCompletion(
         parseInt(habitId), 
         !habit.completedToday
       );
       
       console.log('Toggle response:', response);
+      
+      // If main method fails, try the simple toggle method
+      if (!response.success) {
+        console.log('Main toggle failed, trying simple toggle method');
+        response = await habitService.simpleToggleHabitCompletion(
+          parseInt(habitId), 
+          !habit.completedToday
+        );
+        console.log('Simple toggle response:', response);
+      }
       
       if (response.success) {
         const updatedHabit = habitService.convertToFrontendHabit(response.habits[0]);
@@ -335,7 +366,9 @@ export const HabitDashboard = ({
         console.log('Backend toggle failed, updating local state as fallback');
         const updatedHabit = { ...habit, completedToday: !habit.completedToday };
         setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
-        alert('Habit updated locally (backend connection issue). Please refresh to sync with server.');
+        
+        // Show a more user-friendly message
+        console.log('Habit updated locally due to backend connection issue');
       }
     } catch (error) {
       console.error('Error toggling habit:', error);
@@ -347,9 +380,9 @@ export const HabitDashboard = ({
         console.log('Updating local state as fallback due to error');
         const updatedHabit = { ...habit, completedToday: !habit.completedToday };
         setHabits(prevHabits => prevHabits.map(h => h.id === habitId ? updatedHabit : h));
-        alert('Habit updated locally (backend connection issue). Please refresh to sync with server.');
+        console.log('Habit updated locally due to error');
       } else {
-        alert('Failed to update habit. Please try again.');
+        console.error('Failed to find habit for local update');
       }
     }
   }, [habits]);
@@ -448,7 +481,7 @@ export const HabitDashboard = ({
 
   // Function to find paired habits (bad habit + positive alternative)
   const findPairedHabits = () => {
-    const pairedHabits: { badHabit: Habit; positiveHabit: Habit }[] = [];
+    const pairedHabits: { badHabit: FrontendHabit; positiveHabit: FrontendHabit }[] = [];
     badHabits.forEach(badHabit => {
       const positiveHabit = habits.find(h =>
         h.habitType === 'good' &&
@@ -1151,8 +1184,8 @@ export const HabitDashboard = ({
                   <select
                     value={editingHabit ? editingHabit.category : newHabit.category}
                     onChange={(e) => editingHabit 
-                      ? setEditingHabit({...editingHabit, category: e.target.value as Habit['category']})
-                      : setNewHabit({...newHabit, category: e.target.value as Habit['category']})
+                      ? setEditingHabit({...editingHabit, category: e.target.value as FrontendHabit['category']})
+                      : setNewHabit({...newHabit, category: e.target.value as FrontendHabit['category']})
                     }
                     className="p-2 border border-gray-200 rounded-md text-gray-600"
                   >
@@ -2225,9 +2258,176 @@ export const HabitDashboard = ({
               </Button>
             </div>
           )}
-        </TabsContent>
-        
 
+          {/* Age-based Medical Reminders and Video Call Reminders - Only in Habits Tab */}
+          {isUser45OrOlder(currentUser?.ageGroup) && (
+            <div className="space-y-6 mt-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                  <Stethoscope className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Health & Wellness Reminders</h3>
+                  <p className="text-gray-600">Important health-related reminders for users 45 and above</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Medical Reminders */}
+                <Card className="bg-gradient-to-r from-red-50 to-red-100 border-red-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-red-800">
+                      <Stethoscope className="w-5 h-5" />
+                      <span>Medical Reminders</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Annual Physical Checkup</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                          Schedule
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Blood Pressure Check</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+                          Remind Me
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Cholesterol Screening</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-600 hover:bg-yellow-50">
+                          Schedule
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Diabetes Screening</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-green-300 text-green-600 hover:bg-green-50">
+                          Schedule
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-sm text-blue-800">
+                        <strong>Tip:</strong> Regular health checkups are crucial for maintaining good health as we age. 
+                        Consider scheduling these appointments well in advance.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Video Call Reminders */}
+                <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-blue-800">
+                      <Video className="w-5 h-5" />
+                      <span>Video Call Reminders</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Family Video Call</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-blue-300 text-blue-600 hover:bg-blue-50">
+                          Schedule
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Doctor Teleconsultation</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-50">
+                          Book Now
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Wellness Group Session</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-indigo-300 text-indigo-600 hover:bg-indigo-50">
+                          Join
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+                          <span className="font-medium text-gray-900">Mental Health Check-in</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-teal-300 text-teal-600 hover:bg-teal-50">
+                          Schedule
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <p className="text-sm text-green-800">
+                        <strong>Tip:</strong> Regular video calls with family and healthcare providers help maintain 
+                        social connections and ensure timely medical care.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Additional Health Tips */}
+              <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-green-800">
+                    <Heart className="w-5 h-5" />
+                    <span>Health & Wellness Tips</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-900">Physical Health</h4>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        <li>• Stay active with 30 minutes of exercise daily</li>
+                        <li>• Maintain a balanced diet with plenty of fruits and vegetables</li>
+                        <li>• Get 7-8 hours of quality sleep each night</li>
+                        <li>• Stay hydrated by drinking 8 glasses of water daily</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-900">Mental Wellness</h4>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        <li>• Practice mindfulness or meditation daily</li>
+                        <li>• Stay connected with family and friends</li>
+                        <li>• Engage in hobbies and activities you enjoy</li>
+                        <li>• Seek professional help if needed</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
         
         <TabsContent value="challenges">
           <Tabs defaultValue="challenges" className="w-full">

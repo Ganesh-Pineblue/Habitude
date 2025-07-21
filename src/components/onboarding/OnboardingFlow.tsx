@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Brain, ArrowRight, ArrowLeft, Sparkles, User, CheckCircle, Search, Loader2, Zap } from 'lucide-react';
+import { Brain, ArrowRight, ArrowLeft, Sparkles, User, CheckCircle, Search, Loader2, Zap, Target, Users, Heart, Star } from 'lucide-react';
 import { FriendlyChatbotLogo } from '../common/FriendlyChatbotLogo';
 import { onboardingService } from '../../services/OnboardingService';
 
@@ -16,7 +16,7 @@ interface OnboardingFlowProps {
 
 interface PersonalInfo {
   firstName: string;
-  generation: string;
+  ageGroup: string;
   gender: string;
   customGender: string;
 }
@@ -33,14 +33,25 @@ interface PersonalityData {
   image: string;
   description?: string;
   achievements?: string[];
+  ageGroups?: string[];
+  genderAppeal?: string[];
+  lifeStage?: string;
+  motivationType?: string;
 }
 
-const generations = [
-  { value: 'gen-alpha', label: 'Gen Alpha (2013–2025)', emoji: '🍼' },
-  { value: 'gen-z', label: 'Gen Z (1997–2012)', emoji: '👶' },
-  { value: 'millennial', label: 'Millennial (1981–1996)', emoji: '🧑‍💻' },
-  { value: 'gen-x', label: 'Gen X (1965–1980)', emoji: '👔' },
-  { value: 'boomer', label: 'Boomer (1946–1964)', emoji: '🕺' }
+// Enhanced age groups with more specific ranges
+const ageGroups = [
+  { value: 'teens', label: 'Teens (13-19)', emoji: '🎓', description: 'Building foundations for future success' },
+  { value: 'early-twenties', label: 'Early 20s (20-24)', emoji: '🎯', description: 'Career exploration and skill development' },
+  { value: 'mid-twenties', label: 'Mid 20s (25-29)', emoji: '🚀', description: 'Establishing career and personal growth' },
+  { value: 'early-thirties', label: 'Early 30s (30-34)', emoji: '💼', description: 'Career advancement and life balance' },
+  { value: 'mid-thirties', label: 'Mid 30s (35-39)', emoji: '🏆', description: 'Leadership and expertise development' },
+  { value: 'early-forties', label: 'Early 40s (40-44)', emoji: '🌟', description: 'Peak performance and mentorship' },
+  { value: 'mid-forties', label: 'Mid 40s (45-49)', emoji: '🎖️', description: 'Experience-based leadership' },
+  { value: 'early-fifties', label: 'Early 50s (50-54)', emoji: '🏅', description: 'Wisdom and strategic thinking' },
+  { value: 'mid-fifties', label: 'Mid 50s (55-59)', emoji: '👑', description: 'Mentorship and legacy building' },
+  { value: 'sixties', label: '60s (60-69)', emoji: '💎', description: 'Active aging and continued growth' },
+  { value: 'seventies-plus', label: '70s+ (70+)', emoji: '🌅', description: 'Wisdom sharing and life fulfillment' }
 ];
 
 const genderOptions = [
@@ -51,60 +62,150 @@ const genderOptions = [
   { value: 'custom', label: 'Custom' }
 ];
 
-const famousPersonalities = [
+// Enhanced personality database with demographic targeting
+const famousPersonalities: PersonalityData[] = [
+  // Teens & Early 20s - Tech & Innovation Focus
   { 
-    name: 'Steve Jobs', 
-    category: 'Tech Visionary',
-    habits: ['Daily meditation', 'Minimalist workspace', 'Walking meetings', 'Focus on one project', 'Early morning routine', 'Reading biographies', 'Perfectionist mindset', 'Healthy eating', 'Regular exercise', 'Deep work sessions'],
-    image: '/images/steve.webp'
+    name: 'Mark Zuckerberg', 
+    category: 'Tech Entrepreneur',
+    habits: ['Coding daily', 'Reading tech books', 'Networking events', 'Product iteration', 'User feedback focus', 'Continuous learning', 'Risk-taking mindset', 'Team collaboration', 'Innovation focus', 'Goal setting'],
+    image: '/images/zukerber.jpg',
+    ageGroups: ['teens', 'early-twenties', 'mid-twenties'],
+    genderAppeal: ['all'],
+    lifeStage: 'early-career',
+    motivationType: 'innovation'
   },
   { 
-    name: 'Oprah Winfrey', 
-    category: 'Media Mogul',
-    habits: ['Daily gratitude practice', 'Morning journaling', 'Regular reading', 'Mindful eating', 'Exercise routine', 'Helping others', 'Positive affirmations', 'Quality sleep', 'Learning new things', 'Building relationships'],
-    image: '/images/oprah.webp'
+    name: 'Emma Watson', 
+    category: 'Actor & Activist',
+    habits: ['Daily reading', 'Environmental advocacy', 'Public speaking practice', 'Language learning', 'Sustainable living', 'Education focus', 'Women empowerment', 'Cultural awareness', 'Personal growth', 'Social impact'],
+    image: '/images/oprah.webp',
+    ageGroups: ['teens', 'early-twenties', 'mid-twenties'],
+    genderAppeal: ['ms', 'mx'],
+    lifeStage: 'early-career',
+    motivationType: 'social-impact'
   },
+  
+  // Mid 20s to Early 30s - Career & Growth Focus
   { 
     name: 'Elon Musk', 
-    category: 'Entrepreneur',
+    category: 'Technology Innovator',
     habits: ['Reading extensively', 'Working long hours', 'Problem-solving focus', 'Taking calculated risks', 'Continuous learning', 'Physical exercise', 'Healthy diet', 'Goal setting', 'Innovation mindset', 'Time blocking'],
-    image: '/images/musk.jpg'
+    image: '/images/musk.jpg',
+    ageGroups: ['mid-twenties', 'early-thirties', 'mid-thirties'],
+    genderAppeal: ['all'],
+    lifeStage: 'career-growth',
+    motivationType: 'innovation'
   },
   { 
     name: 'Michelle Obama', 
     category: 'Leader & Author',
     habits: ['Morning workouts', 'Family time priority', 'Healthy eating', 'Community service', 'Continuous education', 'Public speaking', 'Writing daily', 'Self-care routine', 'Mentoring others', 'Work-life balance'],
-    image: '/images/mother.webp'
+    image: '/images/mother.webp',
+    ageGroups: ['early-thirties', 'mid-thirties', 'early-forties'],
+    genderAppeal: ['ms', 'mx'],
+    lifeStage: 'career-advancement',
+    motivationType: 'leadership'
   },
+  
+  // Mid 30s to Early 40s - Leadership & Balance Focus
+  { 
+    name: 'Steve Jobs', 
+    category: 'Tech Visionary',
+    habits: ['Daily meditation', 'Minimalist workspace', 'Walking meetings', 'Focus on one project', 'Early morning routine', 'Reading biographies', 'Perfectionist mindset', 'Healthy eating', 'Regular exercise', 'Deep work sessions'],
+    image: '/images/steve.webp',
+    ageGroups: ['mid-thirties', 'early-forties', 'mid-forties'],
+    genderAppeal: ['all'],
+    lifeStage: 'leadership',
+    motivationType: 'excellence'
+  },
+  { 
+    name: 'Oprah Winfrey', 
+    category: 'Media Mogul',
+    habits: ['Daily gratitude practice', 'Morning journaling', 'Regular reading', 'Mindful eating', 'Exercise routine', 'Helping others', 'Positive affirmations', 'Quality sleep', 'Learning new things', 'Building relationships'],
+    image: '/images/oprah.webp',
+    ageGroups: ['mid-thirties', 'early-forties', 'mid-forties'],
+    genderAppeal: ['ms', 'mx'],
+    lifeStage: 'leadership',
+    motivationType: 'empowerment'
+  },
+  
+  // Mid 40s to Early 50s - Wisdom & Mentorship Focus
   { 
     name: 'Warren Buffett', 
     category: 'Investor',
     habits: ['Reading 5 hours daily', 'Long-term thinking', 'Simple living', 'Playing bridge', 'Annual letters', 'Value investing', 'Patience practice', 'Learning from mistakes', 'Staying curious', 'Giving back'],
-    image: '/images/gates.webp'
+    image: '/images/gates.webp',
+    ageGroups: ['mid-forties', 'early-fifties', 'mid-fifties'],
+    genderAppeal: ['all'],
+    lifeStage: 'wisdom',
+    motivationType: 'long-term-thinking'
   },
   { 
     name: 'Bill Gates', 
     category: 'Philanthropist',
     habits: ['Reading 50 books/year', 'Think weeks', 'Learning continuously', 'Problem-solving', 'Giving to charity', 'Time management', 'Healthy lifestyle', 'Innovation focus', 'Global awareness', 'Technology adoption'],
-    image: '/images/gates.webp'
+    image: '/images/gates.webp',
+    ageGroups: ['mid-forties', 'early-fifties', 'mid-fifties'],
+    genderAppeal: ['all'],
+    lifeStage: 'wisdom',
+    motivationType: 'philanthropy'
   },
+  
+  // 50s to 60s - Legacy & Impact Focus
+  { 
+    name: 'Nelson Mandela', 
+    category: 'Leader',
+    habits: ['Early morning exercise', 'Reading and education', 'Forgiveness practice', 'Unity building', 'Listening to others', 'Staying positive', 'Leading by example', 'Persistence in goals', 'Respect for all people', 'Hope and optimism'],
+    image: '/images/mandela.webp',
+    ageGroups: ['mid-fifties', 'sixties'],
+    genderAppeal: ['all'],
+    lifeStage: 'legacy',
+    motivationType: 'social-change'
+  },
+  { 
+    name: 'Mahatma Gandhi', 
+    category: 'Leader',
+    habits: ['Daily prayer and meditation', 'Fasting for discipline', 'Non-violent communication', 'Simple living', 'Walking daily', 'Reading religious texts', 'Spinning cotton', 'Truth and honesty', 'Service to others', 'Self-reflection'],
+    image: '/images/Gandhi.webp',
+    ageGroups: ['mid-fifties', 'sixties'],
+    genderAppeal: ['all'],
+    lifeStage: 'legacy',
+    motivationType: 'spiritual-growth'
+  },
+  
+  // 60s+ - Active Aging & Wisdom Focus
   { 
     name: 'Albert Einstein',
     category: 'Scientist',
     habits: ['Deep thinking sessions', 'Questioning assumptions', 'Imagination exercises', 'Mathematical practice', 'Reading philosophy', 'Playing violin', 'Walking for inspiration', 'Simple living', 'Curiosity cultivation', 'Independent thinking'],
-    image: '/images/Einstein.webp'
+    image: '/images/Einstein.webp',
+    ageGroups: ['sixties', 'seventies-plus'],
+    genderAppeal: ['all'],
+    lifeStage: 'wisdom-sharing',
+    motivationType: 'intellectual-curiosity'
+  },
+  
+  // Cross-generational role models
+  { 
+    name: 'Cristiano Ronaldo', 
+    category: 'Sports Champion',
+    habits: ['Intensive training sessions', 'Mental preparation', 'Nutrition planning', 'Recovery protocols', 'Skill development', 'Team collaboration', 'Goal setting', 'Performance analysis', 'Discipline maintenance', 'Competition focus'],
+    image: '/images/ronaldo.jpg',
+    ageGroups: ['teens', 'early-twenties', 'mid-twenties', 'early-thirties'],
+    genderAppeal: ['mr', 'all'],
+    lifeStage: 'peak-performance',
+    motivationType: 'excellence'
   },
   { 
-    name: 'Mahatma Gandhi',
-    category: 'Leader',
-    habits: ['Daily prayer and meditation', 'Fasting for discipline', 'Non-violent communication', 'Simple living', 'Walking daily', 'Reading religious texts', 'Spinning cotton', 'Truth and honesty', 'Service to others', 'Self-reflection'],
-    image: '/images/Gandhi.webp'
-  },
-  { 
-    name: 'Nelson Mandela',
-    category: 'Leader',
-    habits: ['Early morning exercise', 'Reading and education', 'Forgiveness practice', 'Unity building', 'Listening to others', 'Staying positive', 'Leading by example', 'Persistence in goals', 'Respect for all people', 'Hope and optimism'],
-    image: '/images/mandela.webp'
+    name: 'Serena Williams', 
+    category: 'Sports Champion',
+    habits: ['Intensive training sessions', 'Mental preparation', 'Nutrition planning', 'Recovery protocols', 'Skill development', 'Team collaboration', 'Goal setting', 'Performance analysis', 'Discipline maintenance', 'Competition focus'],
+    image: '/images/mother.webp',
+    ageGroups: ['early-twenties', 'mid-twenties', 'early-thirties', 'mid-thirties'],
+    genderAppeal: ['ms', 'mx'],
+    lifeStage: 'peak-performance',
+    motivationType: 'excellence'
   }
 ];
 
@@ -162,7 +263,7 @@ class AIPersonalityService {
           'Discipline maintenance',
           'Competition focus'
         ],
-        image: '/images/musk.jpg', // Using available image
+        image: '/images/ronaldo.jpg', // Using available image
         description: 'Professional footballer known for his exceptional work ethic and dedication to fitness.',
         achievements: ['Multiple championships', 'Record breaking', 'Sports excellence']
       },
@@ -1263,6 +1364,220 @@ class HabitConversionService {
   }
 }
 
+// Demographic-based role model filtering service
+class DemographicRoleModelService {
+  private static instance: DemographicRoleModelService;
+  
+  static getInstance(): DemographicRoleModelService {
+    if (!DemographicRoleModelService.instance) {
+      DemographicRoleModelService.instance = new DemographicRoleModelService();
+    }
+    return DemographicRoleModelService.instance;
+  }
+
+  // Get personalized role models based on age group and gender
+  getPersonalizedRoleModels(ageGroup: string, gender: string): PersonalityData[] {
+    let filteredPersonalities = famousPersonalities.filter(personality => {
+      // Check if personality is suitable for the age group
+      const ageMatch = personality.ageGroups?.includes(ageGroup) || !personality.ageGroups;
+      
+      // Check if personality is suitable for the gender
+      const genderMatch = personality.genderAppeal?.includes(gender) || 
+                         personality.genderAppeal?.includes('all') || 
+                         !personality.genderAppeal;
+      
+      return ageMatch && genderMatch;
+    });
+
+    // Sort by relevance score
+    filteredPersonalities.sort((a, b) => {
+      const scoreA = this.calculateRelevanceScore(a, ageGroup, gender);
+      const scoreB = this.calculateRelevanceScore(b, ageGroup, gender);
+      return scoreB - scoreA;
+    });
+
+    return filteredPersonalities;
+  }
+
+  private calculateRelevanceScore(personality: PersonalityData, ageGroup: string, gender: string): number {
+    let score = 0;
+
+    // Age group relevance
+    if (personality.ageGroups?.includes(ageGroup)) {
+      score += 50;
+    } else if (personality.ageGroups) {
+      score += 20; // Some relevance but not perfect match
+    } else {
+      score += 30; // Universal appeal
+    }
+
+    // Gender relevance
+    if (personality.genderAppeal?.includes(gender)) {
+      score += 30;
+    } else if (personality.genderAppeal?.includes('all')) {
+      score += 25;
+    } else {
+      score += 15; // Some relevance
+    }
+
+    // Life stage relevance
+    const ageGroupToLifeStage: { [key: string]: string } = {
+      'teens': 'early-career',
+      'early-twenties': 'early-career',
+      'mid-twenties': 'career-growth',
+      'early-thirties': 'career-advancement',
+      'mid-thirties': 'leadership',
+      'early-forties': 'leadership',
+      'mid-forties': 'wisdom',
+      'early-fifties': 'wisdom',
+      'mid-fifties': 'legacy',
+      'sixties': 'legacy',
+      'seventies-plus': 'wisdom-sharing'
+    };
+
+    const userLifeStage = ageGroupToLifeStage[ageGroup];
+    if (personality.lifeStage === userLifeStage) {
+      score += 20;
+    }
+
+    return score;
+  }
+
+  // Get motivational insights based on demographics
+  getMotivationalInsights(ageGroup: string, gender: string): {
+    title: string;
+    description: string;
+    icon: string;
+    tips: string[];
+  } {
+    const insights = {
+      'teens': {
+        title: 'Building Your Foundation',
+        description: 'This is the perfect time to develop habits that will serve you throughout your life.',
+        icon: '🎓',
+        tips: [
+          'Focus on learning and skill development',
+          'Build healthy routines early',
+          'Explore different interests and passions',
+          'Develop good study and time management habits'
+        ]
+      },
+      'early-twenties': {
+        title: 'Career Exploration & Growth',
+        description: 'You\'re at the perfect age to experiment and find your path.',
+        icon: '🎯',
+        tips: [
+          'Try different career paths and industries',
+          'Build a strong professional network',
+          'Develop both technical and soft skills',
+          'Start saving and investing early'
+        ]
+      },
+      'mid-twenties': {
+        title: 'Establishing Your Path',
+        description: 'Time to focus and build expertise in your chosen field.',
+        icon: '🚀',
+        tips: [
+          'Specialize in your area of interest',
+          'Build a personal brand',
+          'Take on leadership opportunities',
+          'Invest in continuous learning'
+        ]
+      },
+      'early-thirties': {
+        title: 'Career Advancement & Balance',
+        description: 'Balance professional growth with personal fulfillment.',
+        icon: '💼',
+        tips: [
+          'Seek mentorship and become a mentor',
+          'Focus on work-life balance',
+          'Build long-term relationships',
+          'Develop strategic thinking skills'
+        ]
+      },
+      'mid-thirties': {
+        title: 'Leadership & Expertise',
+        description: 'You have the experience to lead and inspire others.',
+        icon: '🏆',
+        tips: [
+          'Take on leadership roles',
+          'Share your knowledge with others',
+          'Build a strong personal brand',
+          'Focus on strategic decision-making'
+        ]
+      },
+      'early-forties': {
+        title: 'Peak Performance & Mentorship',
+        description: 'Your experience is valuable - share it with the next generation.',
+        icon: '🌟',
+        tips: [
+          'Mentor younger professionals',
+          'Focus on high-impact work',
+          'Build lasting legacies',
+          'Continue learning and adapting'
+        ]
+      },
+      'mid-forties': {
+        title: 'Experience-Based Leadership',
+        description: 'Your wisdom and experience are your greatest assets.',
+        icon: '🎖️',
+        tips: [
+          'Lead with wisdom and experience',
+          'Focus on legacy building',
+          'Mentor and develop others',
+          'Stay current with industry trends'
+        ]
+      },
+      'early-fifties': {
+        title: 'Wisdom & Strategic Thinking',
+        description: 'You have the perspective to make strategic decisions.',
+        icon: '🏅',
+        tips: [
+          'Share your wisdom with others',
+          'Focus on strategic initiatives',
+          'Build sustainable systems',
+          'Prepare for the next phase of life'
+        ]
+      },
+      'mid-fifties': {
+        title: 'Mentorship & Legacy Building',
+        description: 'Time to focus on leaving a lasting impact.',
+        icon: '👑',
+        tips: [
+          'Mentor the next generation',
+          'Build lasting legacies',
+          'Share your knowledge widely',
+          'Focus on meaningful contributions'
+        ]
+      },
+      'sixties': {
+        title: 'Active Aging & Continued Growth',
+        description: 'Age is just a number - continue growing and contributing.',
+        icon: '💎',
+        tips: [
+          'Stay physically and mentally active',
+          'Share your wisdom with others',
+          'Pursue new interests and passions',
+          'Maintain strong social connections'
+        ]
+      },
+      'seventies-plus': {
+        title: 'Wisdom Sharing & Life Fulfillment',
+        description: 'Your life experience is invaluable to others.',
+        icon: '🌅',
+        tips: [
+          'Share your life lessons',
+          'Stay engaged with your community',
+          'Pursue activities that bring joy',
+          'Maintain strong relationships'
+        ]
+      }
+    };
+
+    return insights[ageGroup as keyof typeof insights] || insights['early-thirties'];
+  }
+}
+
 export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
@@ -1270,11 +1585,13 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<PersonalityData[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0); // Track which question is currently shown - 0 for both questions
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [personalizedRoleModels, setPersonalizedRoleModels] = useState<PersonalityData[]>([]);
+  const [motivationalInsights, setMotivationalInsights] = useState<any>(null);
   
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: '',
-    generation: '',
+    ageGroup: '',
     gender: '',
     customGender: ''
   });
@@ -1284,18 +1601,16 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
     selectedHabits: []
   });
 
-
-
   const totalSteps = 2;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   // Questions array for progressive display
   const questions = [
     {
-      id: 'generation',
-      title: 'Pick your generation so I can understand you better!',
-      options: generations,
-      field: 'generation' as keyof PersonalInfo
+      id: 'ageGroup',
+      title: 'Pick your age group so I can understand you better!',
+      options: ageGroups,
+      field: 'ageGroup' as keyof PersonalInfo
     },
     {
       id: 'gender',
@@ -1305,13 +1620,23 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
     }
   ];
 
+  // Update personalized recommendations when demographics change
+  useEffect(() => {
+    if (personalInfo.ageGroup && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim())) {
+      const demographicService = DemographicRoleModelService.getInstance();
+      const personalized = demographicService.getPersonalizedRoleModels(personalInfo.ageGroup, personalInfo.gender);
+      const insights = demographicService.getMotivationalInsights(personalInfo.ageGroup, personalInfo.gender);
+      
+      setPersonalizedRoleModels(personalized);
+      setMotivationalInsights(insights);
+    }
+  }, [personalInfo.ageGroup, personalInfo.gender, personalInfo.customGender]);
+
   const handleQuestionAnswer = (questionId: string, value: string) => {
     setPersonalInfo(prev => ({ ...prev, [questionId]: value }));
     
-    // No need to move to next question since both are on same page
-    // Just update the current question to show both are answered
-    if (personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim())) {
-      setCurrentQuestion(1); // Mark as completed
+    if (personalInfo.ageGroup && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim())) {
+      setCurrentQuestion(1);
     }
   };
 
@@ -1365,7 +1690,7 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
       const onboardingData = {
         userId: user.id || 1, // Use actual user ID from props
         firstName: personalInfo.firstName || user.name.split(' ')[0] || 'User',
-        generation: personalInfo.generation,
+        ageGroup: personalInfo.ageGroup,
         gender: personalInfo.gender,
         selectedPersonality: personalitySelection.selectedPersonality,
         personalityCategory: selectedPersonalityData?.category || 'Unknown',
@@ -1436,7 +1761,7 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
       const onboardingData = {
         userId: user.id || 1,
         firstName: personalInfo.firstName || user.name.split(' ')[0] || 'User',
-        generation: personalInfo.generation,
+        ageGroup: personalInfo.ageGroup,
         gender: personalInfo.gender,
         selectedPersonality: '',
         personalityCategory: 'Skipped',
@@ -1652,7 +1977,7 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
               </div>
 
               {/* Privacy Notice - Show after both questions are answered */}
-              {personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
+              {personalInfo.ageGroup && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
                 <div className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0">
                   <div className="bg-gradient-to-r from-green-100 to-green-50 p-2 rounded-xl border border-green-200">
                     <div className="flex items-center space-x-2">
@@ -1669,7 +1994,7 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
               )}
 
               {/* Continue Button - Show after both questions are answered */}
-              {personalInfo.generation && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
+              {personalInfo.ageGroup && personalInfo.gender && (personalInfo.gender !== 'custom' || personalInfo.customGender.trim()) && (
                 <div className="transition-all duration-500 ease-in-out opacity-100 transform translate-y-0">
                   <div className="flex justify-end pt-1">
                     <Button
@@ -1840,42 +2165,111 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
                   {/* Predefined Personalities */}
                   <div className="mb-3">
                     <h3 className="text-base font-semibold text-green-800 mb-2">⭐ Curated Role Models</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                      {famousPersonalities.map((personality) => (
-                        <div
-                          key={personality.name}
-                          onClick={() => handlePersonalitySelect(personality.name)}
-                          className="p-2 rounded-xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg hover:scale-105 bg-white"
-                        >
-                          <div className="text-center">
-                            {personality.image ? (
-                              <img
-                                src={personality.image}
-                                alt={personality.name}
-                                className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-green-200"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                                <User className="w-8 h-8 text-white" />
-                              </div>
-                            )}
-                            <h3 className="text-base font-bold text-green-800 mb-1">{personality.name}</h3>
-                            <p className="text-green-600 text-xs">{personality.category}</p>
+                    
+                    {/* Personalized Recommendations Section */}
+                    {personalizedRoleModels.length > 0 && motivationalInsights && (
+                      <div className="mb-4 bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-xl border border-blue-200">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="text-2xl">{motivationalInsights.icon}</span>
+                          <div>
+                            <h4 className="text-sm font-semibold text-blue-800">{motivationalInsights.title}</h4>
+                            <p className="text-blue-600 text-xs">{motivationalInsights.description}</p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                        <div className="text-blue-700 text-xs">
+                          <p className="font-medium mb-1">💡 Tips for your age group:</p>
+                          <ul className="space-y-0.5">
+                            {motivationalInsights.tips.slice(0, 2).map((tip: string, index: number) => (
+                              <li key={index} className="flex items-start space-x-1">
+                                <span className="text-blue-500">•</span>
+                                <span>{tip}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Previous button for personality selection */}
-                  <div className="flex justify-between items-center pt-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleGoBack}
-                      className="border-green-500 text-green-600 hover:bg-green-50 h-8 px-4 font-semibold rounded-xl transition-all duration-300 text-sm"
-                    >
-                      <ArrowLeft className="w-4 h-4 mr-1" /> Previous
-                    </Button>
+                    {/* Personalized Role Models */}
+                    {personalizedRoleModels.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center">
+                          <Target className="w-4 h-4 mr-1" />
+                          Personalized for You
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                          {personalizedRoleModels.slice(0, 4).map((personality) => (
+                            <div
+                              key={personality.name}
+                              onClick={() => handlePersonalitySelect(personality.name)}
+                              className="p-2 rounded-xl border-2 border-blue-300 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:scale-105 bg-white relative"
+                            >
+                              <div className="absolute top-1 right-1">
+                                <div className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                  <Star className="w-2 h-2" />
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                {personality.image ? (
+                                  <img
+                                    src={personality.image}
+                                    alt={personality.name}
+                                    className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-blue-200"
+                                  />
+                                ) : (
+                                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <User className="w-8 h-8 text-white" />
+                                  </div>
+                                )}
+                                <h3 className="text-base font-bold text-blue-800 mb-1">{personality.name}</h3>
+                                <p className="text-blue-600 text-xs">{personality.category}</p>
+                                {personality.lifeStage && (
+                                  <p className="text-blue-500 text-xs italic">{personality.lifeStage}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* All Available Role Models */}
+                    <div className="mb-3">
+                      <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center">
+                        <Users className="w-4 h-4 mr-1" />
+                        All Role Models
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {famousPersonalities.map((personality) => (
+                          <div
+                            key={personality.name}
+                            onClick={() => handlePersonalitySelect(personality.name)}
+                            className="p-2 rounded-xl border-2 border-green-200 cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg hover:scale-105 bg-white"
+                          >
+                            <div className="text-center">
+                              {personality.image ? (
+                                <img
+                                  src={personality.image}
+                                  alt={personality.name}
+                                  className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-green-200"
+                                />
+                              ) : (
+                                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                  <User className="w-8 h-8 text-white" />
+                                </div>
+                              )}
+                              <h3 className="text-base font-bold text-green-800 mb-1">{personality.name}</h3>
+                              <p className="text-green-600 text-xs">{personality.category}</p>
+                              {personality.ageGroups && (
+                                <p className="text-green-500 text-xs italic">
+                                  {personality.ageGroups.length > 0 ? personality.ageGroups[0] : ''}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -1964,7 +2358,7 @@ export const OnboardingFlow = ({ onComplete, user }: OnboardingFlowProps) => {
               <div className="bg-green-50 p-4 rounded-xl">
                 <h4 className="font-semibold text-green-800 mb-2">Based on your selections:</h4>
                 <ul className="text-green-700 space-y-1">
-                  <li>• Generation: {generations.find(g => g.value === personalInfo.generation)?.label}</li>
+                  <li>• Age Group: {ageGroups.find(g => g.value === personalInfo.ageGroup)?.label}</li>
                   <li>• Role Model: {personalitySelection.selectedPersonality}</li>
                   <li>• Selected Habits: {personalitySelection.selectedHabits.length}</li>
                 </ul>

@@ -7,6 +7,7 @@ interface User {
   generation?: string;
   gender?: string;
   customGender?: string;
+  ageGroup?: string; // Add age group field
   roleModel?: string;
   roleModelHabits?: string;
   streak?: number;
