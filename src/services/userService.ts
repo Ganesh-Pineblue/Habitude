@@ -267,4 +267,4 @@ export class UserService {
 }
 
 // Export singleton instance
-export const userService = UserService.getInstance(); ,
+export const userService = UserService.getInstance();

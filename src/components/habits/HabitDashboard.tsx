@@ -2166,24 +2166,6 @@ export const HabitDashboard = ({
                   </div>
                 </div>
               )}
-
-              {/* No ongoing habits */}
-              {habits.filter(h => !h.isCompleted).length === 0 && (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Activity className="w-12 h-12 text-gray-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No Ongoing Habits</h3>
-                  <p className="text-gray-600 mb-6 text-lg">Start tracking your habits to see them here</p>
-                  <Button 
-                    onClick={() => setShowAddForm(true)}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add Your First Habit
-                  </Button>
-                </div>
-              )}
             </div>
           )}
 
@@ -2220,25 +2202,7 @@ export const HabitDashboard = ({
                   </div>
                 </div>
               )}
-
-              {/* No completed habits */}
-              {habits.filter(h => h.isCompleted && h.habitType !== 'bad').length === 0 && (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-12 h-12 text-gray-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No Completed Habits Yet</h3>
-                  <p className="text-gray-600 mb-6 text-lg">Keep working on your habits to see them here</p>
-                  <Button 
-                    onClick={() => setShowAddForm(true)}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add New Habit
-                  </Button>
-                </div>
-              )}
-            </div>
+           </div>
           )}
 
           {/* Show message if no habits */}
