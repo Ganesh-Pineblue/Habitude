@@ -428,4 +428,6 @@ export const authApi = {
   }
 };
 
+export { tokenManager };
+
 export default apiClient; 

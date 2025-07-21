@@ -1,4 +1,4 @@
-import { api, ApiResponse, authApi } from './api';
+import { api, ApiResponse, authApi, tokenManager } from './api';
 
 // User types based on the backend Users model
 export interface User {
@@ -64,6 +64,16 @@ export class UserService {
       });
 
       if (response.status === 201) {
+        // Store the token in localStorage if present
+        if ((response.data as any).token) {
+          tokenManager.setToken((response.data as any).token);
+          if ((response.data as any).refreshToken) {
+            tokenManager.setRefreshToken((response.data as any).refreshToken);
+          }
+          if ((response.data as any).expiresIn) {
+            tokenManager.setTokenExpiration((response.data as any).expiresIn);
+          }
+        }
         return {
           user: response.data,
           success: true,
@@ -78,7 +88,7 @@ export class UserService {
       }
     } catch (error: any) {
       console.error('User registration error:', error);
-      
+
       if (error.response?.status === 409) {
         return {
           user: userData as any,
@@ -86,7 +96,7 @@ export class UserService {
           message: 'User with this email already exists'
         };
       }
-      
+
       return {
         user: userData as any,
         success: false,
@@ -105,7 +115,7 @@ export class UserService {
       console.log('Attempting login with:', { email: loginData.email, password: '***' });
       console.log('API base URL:', 'http://localhost:8080/api/v1');
       console.log('Login endpoint:', '/auth/login');
-      
+
       // Use the enhanced authApi for login
       const response = await authApi.login({
         email: loginData.email,
@@ -141,7 +151,7 @@ export class UserService {
         data: error.response?.data,
         config: error.config
       });
-      
+
       if (error.response?.status === 401) {
         return {
           user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
@@ -149,7 +159,7 @@ export class UserService {
           message: 'Invalid email or password'
         };
       }
-      
+
       if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
         return {
           user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
@@ -157,7 +167,7 @@ export class UserService {
           message: 'Unable to connect to server. Please check if the backend is running.'
         };
       }
-      
+
       return {
         user: { email: loginData.email, name: loginData.email.split('@')[0] || 'User' },
         success: false,
@@ -257,4 +267,4 @@ export class UserService {
 }
 
 // Export singleton instance
-export const userService = UserService.getInstance(); 
+export const userService = UserService.getInstance(); ,

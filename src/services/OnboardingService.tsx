@@ -68,10 +68,7 @@ export class OnboardingService {
     try {
       // Convert arrays to JSON strings for backend
       const backendData: OnboardingFlow = {
-        userId: onboardingData.userId,
-        firstName: onboardingData.firstName,
-        ageGroup: onboardingData.ageGroup,
-        gender: onboardingData.gender,
+        ...onboardingData,
         selectedPersonality: onboardingData.selectedPersonality,
         personalityCategory: onboardingData.personalityCategory,
         personalityDescription: onboardingData.personalityDescription,
